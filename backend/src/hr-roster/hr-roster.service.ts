@@ -38,7 +38,7 @@ export class HrRosterService {
       const email = row.email || row.Email || null;
       const photoUrl = row.photoUrl || row.PhotoUrl || null;
 
-      let status = EmploymentStatus.ACTIVE;
+      let status: EmploymentStatus = EmploymentStatus.ACTIVE;
       const rawStatus = (row.employmentStatus || row.Status || '').toUpperCase();
       if (rawStatus === 'INACTIVE') status = EmploymentStatus.INACTIVE;
       if (rawStatus === 'SUSPENDED') status = EmploymentStatus.SUSPENDED;

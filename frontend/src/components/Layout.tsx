@@ -1,28 +1,51 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
+import { Sidebar } from './Sidebar';
 import { MoaHeader } from './MoaHeader';
+import { useAuth } from '../lib/auth-context';
 
 export const Layout: React.FC = () => {
+  const { user } = useAuth();
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   return (
-    <div className="min-h-screen flex flex-col bg-moa-surface text-slate-800">
-      <MoaHeader />
+    <div className="min-h-screen bg-moa-surface text-slate-800 flex flex-col">
+      {/* Side Menu */}
+      {user && (
+        <Sidebar
+          collapsed={collapsed}
+          onToggleCollapse={() => setCollapsed(!collapsed)}
+          mobileOpen={mobileOpen}
+          onCloseMobile={() => setMobileOpen(false)}
+        />
+      )}
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <Outlet />
-      </main>
+      {/* Main Column Wrapper */}
+      <div
+        className={`flex-1 flex flex-col transition-all duration-300 ease-in-out ${
+          user ? (collapsed ? 'lg:pl-20' : 'lg:pl-64') : ''
+        }`}
+      >
+        <MoaHeader onOpenMobileSidebar={() => setMobileOpen(true)} />
 
-      <footer className="bg-white border-t border-slate-200 mt-auto py-4">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
-          <p>© 2026 Federal Democratic Republic of Ethiopia – Ministry of Agriculture. Internal Staff Portal.</p>
-          <div className="flex items-center gap-4 text-[11px]">
-            <span className="text-emerald-700 font-semibold">Strict HR Whitelist</span>
-            <span>·</span>
-            <span className="text-slate-600">No Commercial Access</span>
-            <span>·</span>
-            <span className="text-slate-600">On-Premises Intranet Stack</span>
+        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <Outlet />
+        </main>
+
+        <footer className="bg-white border-t border-slate-200 mt-auto py-3">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-500 gap-2">
+            <p>© 2026 Federal Democratic Republic of Ethiopia – Ministry of Agriculture. Internal Staff Portal.</p>
+            <div className="flex items-center gap-3">
+              <span className="text-emerald-700 font-semibold">Strict HR Whitelist</span>
+              <span>·</span>
+              <span className="text-slate-600">No Commercial Access</span>
+              <span>·</span>
+              <span className="text-slate-600">On-Premises Intranet Stack</span>
+            </div>
           </div>
-        </div>
-      </footer>
+        </footer>
+      </div>
     </div>
   );
 };

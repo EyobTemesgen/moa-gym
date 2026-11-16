@@ -1,0 +1,50 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: moa-gym-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: moa_gym_user
+      POSTGRES_PASSWORD: moa_gym_password
+      POSTGRES_DB: moa_gym_db
+    ports:
+      - "5436:5432"
+    volumes:
+      - moa_gym_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U moa_gym_user -d moa_gym_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: moa-gym-backend
+    restart: unless-stopped
+    environment:
+      PORT: 5005
+      DATABASE_URL: postgresql://moa_gym_user:moa_gym_password@db:5432/moa_gym_db?schema=public
+      JWT_SECRET: moa-gym-super-secret-jwt-key-2026-wellness
+      JWT_EXPIRATION: 8h
+      FRONTEND_URL: http://localhost:3005
+    ports:
+      - "5005:5005"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: moa-gym-frontend
+    restart: unless-stopped
+    ports:
+      - "3005:80"
+    depends_on:
+      - backend
+
+volumes:
+  moa_gym_pgdata:

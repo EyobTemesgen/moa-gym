@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  HR_ADMIN
+  GYM_ATTENDANT
+  STAFF_MEMBER
+}
+
+enum EmploymentStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum LockerStatus {
+  AVAILABLE
+  OCCUPIED
+  MAINTENANCE
+}
+
+enum IssueStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+}
+
+model HrEmployeeRoster {
+  employeeId       String           @id
+  fullName         String
+  department       String
+  phone            String
+  email            String?
+  photoUrl         String?
+  employmentStatus EmploymentStatus @default(ACTIVE)
+  syncedAt         DateTime         @updatedAt
+  userAccount      User?
+}
+
+model User {
+  id                    String           @id @default(uuid())
+  employeeId            String           @unique
+  hrRecord              HrEmployeeRoster @relation(fields: [employeeId], references: [employeeId])
+  passwordHash          String
+  role                  Role             @default(STAFF_MEMBER)
+  waiverSigned          Boolean          @default(false)
+  waiverSignedAt        DateTime?
+  parqResponses         Json?
+  emergencyContactName  String?
+  emergencyContactPhone String?
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+  attendanceLogs        Attendance[]
+  classBookings         ClassBooking[]
+}
+
+model Attendance {
+  id            String    @id @default(uuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  checkInTime   DateTime  @default(now())
+  checkOutTime  DateTime?
+  lockerNumber  String?
+  checkedInById String?
+  autoClosed    Boolean   @default(false)
+
+  @@index([checkOutTime])
+  @@index([userId])
+}
+
+model Locker {
+  id             String       @id @default(uuid())
+  lockerNumber   String       @unique
+  status         LockerStatus @default(AVAILABLE)
+  assignedUserId String?
+}
+
+model WellnessClass {
+  id             String         @id @default(uuid())
+  title          String
+  instructorName String
+  scheduledDate  DateTime
+  startTime      String
+  endTime        String
+  capacity       Int
+  bookings       ClassBooking[]
+}
+
+model ClassBooking {
+  id        String        @id @default(uuid())
+  classId   String
+  class     WellnessClass @relation(fields: [classId], references: [id])
+  userId    String
+  user      User          @relation(fields: [userId], references: [id])
+  attended  Boolean       @default(false)
+  createdAt DateTime      @default(now())
+
+  @@unique([classId, userId])
+}
+
+model EquipmentIssue {
+  id            String      @id @default(uuid())
+  equipmentName String
+  description   String
+  status        IssueStatus @default(OPEN)
+  reportedAt    DateTime    @default(now())
+  resolvedAt    DateTime?
+}
+
+model SystemConfig {
+  id          Int    @id @default(1)
+  maxCapacity Int    @default(40)
+  waiverText  String
+}

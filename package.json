@@ -1,0 +1,19 @@
+{
+  "name": "moa-gym",
+  "version": "1.0.0",
+  "description": "MoA Staff Gym & Wellness Management System (Ministry of Agriculture, Ethiopia)",
+  "private": true,
+  "scripts": {
+    "build": "npm run build:backend && npm run build:frontend",
+    "build:backend": "npm --prefix backend run build",
+    "build:frontend": "npm --prefix frontend run build"
+  },
+  "keywords": [
+    "ethiopia",
+    "moa",
+    "gym-management",
+    "internal-wellness"
+  ],
+  "author": "Ministry of Agriculture - ICT Directorate",
+  "license": "UNLICENSED"
+}

@@ -268,11 +268,11 @@ export const RegistrationsPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsBatchModalOpen(true)}
-            title="Batch enter paper registration forms"
+            title="Import staff registrations from Excel (.xlsx) or CSV, or batch enter forms"
             className={btn.secondary}
           >
             <FileSpreadsheet className="h-4 w-4 text-emerald-700" />
-            <span>Batch Intake</span>
+            <span>Import CSV / Excel</span>
           </button>
 
           <button

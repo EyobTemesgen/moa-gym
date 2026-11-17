@@ -43,14 +43,13 @@ export interface Registrant {
   };
 }
 
-type TabFilter = 'ALL' | 'ACTIVE' | 'MORNING' | 'LUNCH' | 'EVENING' | 'SUSPENDED';
+type TabFilter = 'ALL' | 'ACTIVE' | 'MORNING' | 'EVENING' | 'SUSPENDED';
 
 const TABS: { key: TabFilter; label: string }[] = [
   { key: 'ALL', label: 'All Members' },
   { key: 'ACTIVE', label: 'Active' },
-  { key: 'MORNING', label: 'Morning Shift' },
-  { key: 'LUNCH', label: 'Lunch Shift' },
-  { key: 'EVENING', label: 'Evening Shift' },
+  { key: 'MORNING', label: 'Morning (ጠዋት 11:00 - 1:30)' },
+  { key: 'EVENING', label: 'Evening (ማታ 11:30 - 3:00)' },
   { key: 'SUSPENDED', label: 'Suspended' },
 ];
 
@@ -106,8 +105,6 @@ export const RegistrationsPage: React.FC = () => {
       items = items.filter((item) => item.status === 'SUSPENDED');
     } else if (activeTab === 'MORNING') {
       items = items.filter((item) => item.shiftPreference === 'MORNING');
-    } else if (activeTab === 'LUNCH') {
-      items = items.filter((item) => item.shiftPreference === 'LUNCH');
     } else if (activeTab === 'EVENING') {
       items = items.filter((item) => item.shiftPreference === 'EVENING');
     }

@@ -132,9 +132,8 @@ function matchColumn(header: string): string | null {
 function normalizeShift(raw?: string): 'MORNING' | 'LUNCH' | 'EVENING' | 'ANY' {
   if (!raw) return 'ANY';
   const s = raw.toLowerCase().trim();
-  if (s.includes('morn') || s.includes('ጠዋት') || s.includes('06') || s.includes('8:30')) return 'MORNING';
-  if (s.includes('lunch') || s.includes('ምሳ') || s.includes('12') || s.includes('14')) return 'LUNCH';
-  if (s.includes('even') || s.includes('ማታ') || s.includes('17') || s.includes('20')) return 'EVENING';
+  if (s.includes('morn') || s.includes('ጠዋት') || s.includes('ማለዳ') || s.includes('11') || s.includes('05') || s.includes('06')) return 'MORNING';
+  if (s.includes('even') || s.includes('ማታ') || s.includes('ምሽት') || s.includes('03') || s.includes('17') || s.includes('21')) return 'EVENING';
   return 'ANY';
 }
 

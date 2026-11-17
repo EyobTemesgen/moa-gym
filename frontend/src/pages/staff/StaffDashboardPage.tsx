@@ -87,27 +87,20 @@ export const StaffDashboardPage: React.FC = () => {
         return (
           <span className={`${pill} ${statusTone.morning}`}>
             <Clock className="w-3 h-3 text-amber-700" />
-            <span>Morning (06:00 - 08:30)</span>
-          </span>
-        );
-      case 'LUNCH':
-        return (
-          <span className={`${pill} ${statusTone.lunch}`}>
-            <Clock className="w-3 h-3 text-sky-700" />
-            <span>Lunch (12:00 - 14:00)</span>
+            <span>ጠዋት / Morning (11:00 – 1:30)</span>
           </span>
         );
       case 'EVENING':
         return (
           <span className={`${pill} ${statusTone.evening}`}>
             <Clock className="w-3 h-3 text-indigo-700" />
-            <span>Evening (17:00 - 20:00)</span>
+            <span>ማታ / Evening (11:30 – 3:00)</span>
           </span>
         );
       default:
         return (
           <span className={`${pill} ${statusTone.neutral}`}>
-            <span>Flexible / Any Shift</span>
+            <span>Flexible / ማንኛውም ሰዓት</span>
           </span>
         );
     }
@@ -319,65 +312,63 @@ export const StaffDashboardPage: React.FC = () => {
               To balance equipment availability and ensure a comfortable environment, sessions are organized by shifts:
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Morning Shift */}
               <div
-                className={`p-3 rounded-lg border text-left ${
+                className={`p-4 rounded-xl border text-left transition ${
                   profile?.shiftPreference === 'MORNING'
-                    ? 'border-amber-300 bg-amber-50/70 shadow-2xs'
-                    : 'border-slate-200 bg-slate-50/50'
+                    ? 'border-emerald-300 bg-emerald-50/70 shadow-xs'
+                    : 'border-slate-200 bg-slate-50/60'
                 }`}
               >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-bold text-amber-900">Morning Shift</span>
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-emerald-950">ጠዋት / Morning Shift</span>
+                  </div>
                   {profile?.shiftPreference === 'MORNING' && (
-                    <span className="text-[10px] font-bold text-amber-800 bg-amber-200/80 px-1.5 py-0.5 rounded">
+                    <span className="text-[10px] font-bold text-emerald-800 bg-emerald-200/80 px-2 py-0.5 rounded-full">
                       Your Shift
                     </span>
                   )}
                 </div>
-                <div className="text-sm font-mono font-bold text-slate-900">06:00 – 08:30</div>
-                <p className="text-[11px] text-slate-500 mt-1">Pre-work training session</p>
-              </div>
-
-              {/* Lunch Shift */}
-              <div
-                className={`p-3 rounded-lg border text-left ${
-                  profile?.shiftPreference === 'LUNCH'
-                    ? 'border-sky-300 bg-sky-50/70 shadow-2xs'
-                    : 'border-slate-200 bg-slate-50/50'
-                }`}
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-bold text-sky-900">Lunch Shift</span>
-                  {profile?.shiftPreference === 'LUNCH' && (
-                    <span className="text-[10px] font-bold text-sky-800 bg-sky-200/80 px-1.5 py-0.5 rounded">
-                      Your Shift
-                    </span>
-                  )}
+                <div className="text-base font-mono font-extrabold text-slate-900">
+                  ከማለዳው 11:00 – 1:30
                 </div>
-                <div className="text-sm font-mono font-bold text-slate-900">12:00 – 14:00</div>
-                <p className="text-[11px] text-slate-500 mt-1">Mid-day fitness break</p>
+                <div className="text-xs font-mono text-emerald-700 font-semibold mt-0.5">
+                  5:00 AM – 7:30 AM (Standard Time)
+                </div>
+                <p className="text-[11px] text-slate-500 mt-1.5">
+                  ቅድመ-ስራ ስፖርታዊ እንቅስቃሴ (Pre-work training session)
+                </p>
               </div>
 
               {/* Evening Shift */}
               <div
-                className={`p-3 rounded-lg border text-left ${
+                className={`p-4 rounded-xl border text-left transition ${
                   profile?.shiftPreference === 'EVENING'
-                    ? 'border-indigo-300 bg-indigo-50/70 shadow-2xs'
-                    : 'border-slate-200 bg-slate-50/50'
+                    ? 'border-indigo-300 bg-indigo-50/70 shadow-xs'
+                    : 'border-slate-200 bg-slate-50/60'
                 }`}
               >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-bold text-indigo-900">Evening Shift</span>
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-indigo-950">ማታ / Evening Shift</span>
+                  </div>
                   {profile?.shiftPreference === 'EVENING' && (
-                    <span className="text-[10px] font-bold text-indigo-800 bg-indigo-200/80 px-1.5 py-0.5 rounded">
+                    <span className="text-[10px] font-bold text-indigo-800 bg-indigo-200/80 px-2 py-0.5 rounded-full">
                       Your Shift
                     </span>
                   )}
                 </div>
-                <div className="text-sm font-mono font-bold text-slate-900">17:00 – 20:00</div>
-                <p className="text-[11px] text-slate-500 mt-1">Post-office evening workout</p>
+                <div className="text-base font-mono font-extrabold text-slate-900">
+                  ከ11:30 – ምሽት 3:00
+                </div>
+                <div className="text-xs font-mono text-indigo-700 font-semibold mt-0.5">
+                  5:30 PM – 9:00 PM (Standard Time)
+                </div>
+                <p className="text-[11px] text-slate-500 mt-1.5">
+                  ከስራ ሰዓት በኋላ (Post-office evening workout session)
+                </p>
               </div>
             </div>
           </div>

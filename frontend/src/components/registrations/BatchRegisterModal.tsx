@@ -493,10 +493,9 @@ export const BatchRegisterModal: React.FC<BatchRegisterModalProps> = ({
                             onChange={(e) => updateManualRow(index, 'shiftPreference', e.target.value as any)}
                             className="w-full px-2 py-1.5 border border-slate-200 rounded-md focus:outline-none focus:border-emerald-600 bg-white"
                           >
-                            <option value="ANY">Flexible</option>
-                            <option value="MORNING">Morning (06:00 - 08:30)</option>
-                            <option value="LUNCH">Lunch (12:00 - 14:00)</option>
-                            <option value="EVENING">Evening (17:00 - 20:00)</option>
+                            <option value="MORNING">Morning (11:00 – 1:30)</option>
+                            <option value="EVENING">Evening (11:30 – 3:00)</option>
+                            <option value="ANY">Flexible / Any</option>
                           </select>
                         </td>
                         <td className="py-2 px-3 text-center">

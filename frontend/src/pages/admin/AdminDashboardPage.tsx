@@ -222,6 +222,56 @@ export const AdminDashboardPage: React.FC = () => {
 
         {/* Right Column: Shift Preferences & Facility Health */}
         <div className="space-y-6">
+          {/* Official Ministry Operating Schedule Notice Card */}
+          <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+            <div className="bg-[#07572A] p-4 text-white">
+              <div className="flex items-center gap-2 text-[10px] font-bold text-moa-gold uppercase tracking-wider">
+                <Clock className="h-3.5 w-3.5" />
+                <span>ጂምናዚየሙ አገልግሎት የሚሰጥበት ሰዓት</span>
+              </div>
+              <h3 className="text-xs font-bold text-white mt-1 leading-snug">
+                የሚኒስቴር መ/ቤታችን ጂምናዚየም አገልግሎት መስጠት መጀመሩን በደስታ እንገልጻለን!
+              </h3>
+            </div>
+
+            <div className="p-4 space-y-3 bg-white">
+              <p className="text-[11px] text-slate-600 leading-relaxed">
+                በጂምናዚየሙ አባል በመሆን ስፖርታዊ እንቅስቃሴ ለመስራት ፍላጎት ያላችሁ ሰራተኞች በ<strong className="text-slate-800">መሰረታዊ አገልግሎት ስራ አስፈፃሚ ክፍል</strong> በመገኘት መመዝገብ ይችላሉ።
+              </p>
+
+              <div className="space-y-2 pt-1 border-t border-slate-100">
+                <div className="p-2.5 rounded-lg bg-emerald-50/70 border border-emerald-100 flex items-center justify-between">
+                  <div>
+                    <div className="text-xs font-bold text-emerald-950 flex items-center gap-1.5">
+                      <span>🌅 ጠዋት</span>
+                      <span className="text-[10px] text-emerald-700 font-semibold">(Morning)</span>
+                    </div>
+                    <div className="text-[11px] text-slate-500 font-mono">5:00 AM – 7:30 AM</div>
+                  </div>
+                  <div className="text-xs font-mono font-extrabold text-emerald-900 bg-emerald-100/80 px-2 py-1 rounded">
+                    ከማለዳው 11:00 – 1:30
+                  </div>
+                </div>
+
+                <div className="p-2.5 rounded-lg bg-indigo-50/70 border border-indigo-100 flex items-center justify-between">
+                  <div>
+                    <div className="text-xs font-bold text-indigo-950 flex items-center gap-1.5">
+                      <span>🌙 ማታ</span>
+                      <span className="text-[10px] text-indigo-700 font-semibold">(Evening)</span>
+                    </div>
+                    <div className="text-[11px] text-slate-500 font-mono">5:30 PM – 9:00 PM</div>
+                  </div>
+                  <div className="text-xs font-mono font-extrabold text-indigo-900 bg-indigo-100/80 px-2 py-1 rounded">
+                    ከ11:30 – ምሽት 3:00
+                  </div>
+                </div>
+              </div>
+
+              {/* Tri-color Accent Bar */}
+              <div className="h-1 w-full bg-gradient-to-r from-moa-gold via-moa-green to-moa-blue rounded-full mt-2"></div>
+            </div>
+          </div>
+
           {/* Shift Preferences Card */}
           <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-5">
             <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2 pb-3 border-b border-slate-100">
@@ -229,39 +279,31 @@ export const AdminDashboardPage: React.FC = () => {
               Workout Shift Distribution
             </h2>
             <p className="text-xs text-slate-500 mt-1 mb-4">
-              Registered workout time preferences
+              Registered staff workout time preferences
             </p>
 
-            <div className="grid grid-cols-2 gap-2.5">
-              <div className="p-3 rounded-lg bg-emerald-50/60 border border-emerald-100">
-                <span className="text-[11px] font-semibold text-emerald-800 block">Morning</span>
-                <span className="text-[10px] text-emerald-600 block">6:00 - 8:30 AM</span>
-                <div className="text-xl font-bold text-emerald-950 mt-1 tabular-nums">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              <div className="p-3 rounded-lg bg-emerald-50/70 border border-emerald-100">
+                <span className="text-[11px] font-semibold text-emerald-800 block">ጠዋት (Morning)</span>
+                <span className="text-[10px] text-emerald-600 block">11:00 – 1:30 (5:00–7:30 AM)</span>
+                <div className="text-xl font-bold text-emerald-950 mt-1.5 tabular-nums">
                   {stats?.shiftBreakdown?.MORNING ?? 0}
                 </div>
               </div>
 
-              <div className="p-3 rounded-lg bg-amber-50/60 border border-amber-100">
-                <span className="text-[11px] font-semibold text-amber-800 block">Lunch</span>
-                <span className="text-[10px] text-amber-600 block">12:00 - 1:30 PM</span>
-                <div className="text-xl font-bold text-amber-950 mt-1 tabular-nums">
-                  {stats?.shiftBreakdown?.LUNCH ?? 0}
-                </div>
-              </div>
-
-              <div className="p-3 rounded-lg bg-sky-50/60 border border-sky-100">
-                <span className="text-[11px] font-semibold text-sky-800 block">Evening</span>
-                <span className="text-[10px] text-sky-600 block">5:00 - 8:30 PM</span>
-                <div className="text-xl font-bold text-sky-950 mt-1 tabular-nums">
+              <div className="p-3 rounded-lg bg-indigo-50/70 border border-indigo-100">
+                <span className="text-[11px] font-semibold text-indigo-800 block">ማታ (Evening)</span>
+                <span className="text-[10px] text-indigo-600 block">11:30 – 3:00 (5:30–9:00 PM)</span>
+                <div className="text-xl font-bold text-indigo-950 mt-1.5 tabular-nums">
                   {stats?.shiftBreakdown?.EVENING ?? 0}
                 </div>
               </div>
 
               <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
                 <span className="text-[11px] font-semibold text-slate-700 block">Flexible</span>
-                <span className="text-[10px] text-slate-500 block">Any Workout Time</span>
-                <div className="text-xl font-bold text-slate-900 mt-1 tabular-nums">
-                  {stats?.shiftBreakdown?.FLEXIBLE ?? 0}
+                <span className="text-[10px] text-slate-500 block">ማንኛውም ሰዓት</span>
+                <div className="text-xl font-bold text-slate-900 mt-1.5 tabular-nums">
+                  {(stats?.shiftBreakdown?.FLEXIBLE ?? 0) + (stats?.shiftBreakdown?.LUNCH ?? 0)}
                 </div>
               </div>
             </div>

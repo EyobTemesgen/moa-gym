@@ -522,10 +522,9 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
                 onChange={(e) => setShiftPreference(e.target.value)}
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-moa-green/30"
               >
-                <option value="ANY">Flexible / Any Time</option>
-                <option value="MORNING">Morning (06:00 - 08:30)</option>
-                <option value="LUNCH">Lunch Hours (12:00 - 14:00)</option>
-                <option value="EVENING">Evening (17:00 - 20:00)</option>
+                <option value="MORNING">Morning / ጠዋት (ከማለዳው 11:00 – 1:30 / 5:00 – 7:30 AM)</option>
+                <option value="EVENING">Evening / ማታ (ከ11:30 – ምሽት 3:00 / 5:30 – 9:00 PM)</option>
+                <option value="ANY">Flexible / ማንኛውም ሰዓት</option>
               </select>
             </div>
 

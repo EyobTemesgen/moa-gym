@@ -101,7 +101,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <div>
               {!collapsed && (
                 <div className="px-3 text-[10px] font-bold text-emerald-200/70 uppercase tracking-wider mb-2">
-                  Staff Member Portal
+                  Staff Portal
                 </div>
               )}
               <div className="space-y-1.5">
@@ -112,11 +112,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       ? 'bg-white/20 text-white shadow-xs'
                       : 'text-white/80 hover:text-white hover:bg-white/10'
                     }`}
-                  title={collapsed ? 'My Digital QR Pass' : undefined}
+                  title={collapsed ? 'My Entry Pass' : undefined}
                 >
                   {isActive('/dashboard') && <ActiveBar />}
                   <QrCode className="h-5 w-5 text-moa-gold shrink-0" />
-                  {!collapsed && <span>My QR Entry Pass</span>}
+                  {!collapsed && <span className="font-semibold text-xs">My Entry Pass</span>}
                 </NavLink>
               </div>
             </div>
@@ -139,16 +139,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       ? 'bg-white/20 text-white shadow-xs'
                       : 'text-white/80 hover:text-white hover:bg-white/10'
                     }`}
-                  title={collapsed ? 'Executive Dashboard' : undefined}
+                  title={collapsed ? 'Dashboard' : undefined}
                 >
                   {isActive('/admin/dashboard') && <ActiveBar />}
                   <LayoutDashboard className="h-5 w-5 text-moa-gold shrink-0" />
-                  {!collapsed && (
-                    <div className="flex flex-col">
-                      <span className="font-bold">Dashboard</span>
-                      <span className="text-[10px] text-emerald-200/80 font-normal">Executive Overview & Stats</span>
-                    </div>
-                  )}
+                  {!collapsed && <span className="font-semibold text-xs">Dashboard</span>}
                 </NavLink>
 
                 {/* 2. Staff Registration */}
@@ -163,12 +158,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 >
                   {isActive('/registrations') && <ActiveBar />}
                   <Users className="h-5 w-5 text-emerald-200 shrink-0" />
-                  {!collapsed && (
-                    <div className="flex flex-col">
-                      <span className="font-bold">Staff Registrations</span>
-                      <span className="text-[10px] text-emerald-200/80 font-normal">Directory & Member Intake</span>
-                    </div>
-                  )}
+                  {!collapsed && <span className="font-semibold text-xs">Staff Registrations</span>}
                 </NavLink>
 
                 {/* 3. Reports */}
@@ -183,12 +173,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 >
                   {(isActive('/reports') || isActive('/admin/analytics')) && <ActiveBar />}
                   <BarChart3 className="h-5 w-5 text-sky-300 shrink-0" />
-                  {!collapsed && (
-                    <div className="flex flex-col">
-                      <span className="font-bold">Reports</span>
-                      <span className="text-[10px] text-emerald-200/80 font-normal">Attendance & Export</span>
-                    </div>
-                  )}
+                  {!collapsed && <span className="font-semibold text-xs">Reports</span>}
                 </NavLink>
               </div>
             </div>
@@ -211,16 +196,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       ? 'bg-white/20 text-white shadow-xs'
                       : 'text-white/80 hover:text-white hover:bg-white/10'
                     }`}
-                  title={collapsed ? 'Gate Checking Terminal' : undefined}
+                  title={collapsed ? 'Gate Terminal' : undefined}
                 >
                   {isActive('/terminal') && <ActiveBar />}
                   <ShieldCheck className="h-5 w-5 text-moa-gold shrink-0" />
-                  {!collapsed && (
-                    <div className="flex flex-col">
-                      <span className="font-bold">Gate Checking</span>
-                      <span className="text-[10px] text-emerald-200/80 font-normal">Access Control & Verify</span>
-                    </div>
-                  )}
+                  {!collapsed && <span className="font-semibold text-xs">Gate Terminal</span>}
                 </NavLink>
               </div>
             </div>

@@ -17,6 +17,21 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
+  @Get('departments')
+  @ApiOperation({ summary: 'List all distinct MoA directorates from staff roster' })
+  async getDepartments() {
+    return this.authService.getDepartments();
+  }
+
+  @Get('lookup-by-name')
+  @ApiOperation({ summary: 'Search active MoA staff by Full Name and optional Directorate' })
+  async lookupByName(
+    @Query('name') name: string,
+    @Query('department') department?: string,
+  ) {
+    return this.authService.lookupByName(name, department);
+  }
+
   @Get('lookup')
   @ApiOperation({ summary: 'Check Employee ID and Name eligibility against MoA HR roster' })
   async lookup(

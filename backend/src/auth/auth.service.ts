@@ -156,6 +156,59 @@ export class AuthService {
     };
   }
 
+  async getDepartments(): Promise<string[]> {
+    const records = await this.prisma.hrEmployeeRoster.findMany({
+      select: { department: true },
+      distinct: ['department'],
+      orderBy: { department: 'asc' },
+    });
+    return records.map((r) => r.department).filter(Boolean);
+  }
+
+  async lookupByName(name: string, department?: string) {
+    if (!name || !name.trim()) {
+      throw new BadRequestException('Please enter your name to search.');
+    }
+
+    const trimmedName = name.trim();
+    const whereClause: any = {
+      employmentStatus: EmploymentStatus.ACTIVE,
+    };
+
+    if (department && department !== 'ALL' && department.trim()) {
+      whereClause.department = department.trim();
+    }
+
+    const rosterList = await this.prisma.hrEmployeeRoster.findMany({
+      where: whereClause,
+      include: {
+        userAccount: {
+          select: { id: true, role: true, waiverSigned: true },
+        },
+      },
+    });
+
+    const matches = rosterList.filter((staff) =>
+      isNameMatching(staff.fullName, trimmedName),
+    );
+
+    if (matches.length === 0) {
+      const deptMsg = department && department !== 'ALL' ? ` in "${department}"` : '';
+      throw new NotFoundException(
+        `No active employee matching "${trimmedName}" was found${deptMsg}. Please verify spelling or select "All Directorates".`,
+      );
+    }
+
+    return matches.map((roster) => ({
+      employeeId: roster.employeeId,
+      fullName: roster.fullName,
+      department: roster.department,
+      employmentStatus: roster.employmentStatus,
+      isClaimed: !!roster.userAccount,
+      waiverSigned: roster.userAccount?.waiverSigned ?? false,
+    }));
+  }
+
   async lookupRoster(employeeId: string, fullName?: string) {
     const trimmed = employeeId.trim();
     const roster = await this.prisma.hrEmployeeRoster.findUnique({

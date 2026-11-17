@@ -367,6 +367,190 @@ async function main() {
   }
   console.log('✓ Sample equipment issue logged');
 
+  // 7. Initial Gym Registrants (Digitized from the official MoA paper registration form)
+  const paperRegistrants = [
+    {
+      regNumber: 1,
+      employeeId: 'EMP-MOA-003',
+      fullName: 'ሙሉጌታ አለሙ (Mulugeta Alemu)',
+      department: 'ምግብ ዋስትና (Food Security Directorate)',
+      phone: '+251 91 234 0001',
+      shiftPreference: 'MORNING',
+      registeredBy: 'Tigist Alemayehu (Front Desk)',
+      registrationSource: 'PAPER_FORM',
+      signatureConfirmed: true,
+      status: 'ACTIVE',
+    },
+    {
+      regNumber: 2,
+      employeeId: 'EMP-MOA-102',
+      fullName: 'መሰረት መብራቴ (Meseret Mebrate)',
+      department: 'ምግብ ዋስትና (Food Security Directorate)',
+      phone: '+251 91 234 0002',
+      shiftPreference: 'EVENING',
+      registeredBy: 'Tigist Alemayehu (Front Desk)',
+      registrationSource: 'PAPER_FORM',
+      signatureConfirmed: true,
+      status: 'ACTIVE',
+    },
+    {
+      regNumber: 3,
+      employeeId: 'EMP-MOA-103',
+      fullName: 'ብዙአየሁ አባባው (Bizuayehu Ababawe)',
+      department: 'ምግብ ዋስትና (Food Security Directorate)',
+      phone: '+251 91 234 0003',
+      shiftPreference: 'EVENING',
+      registeredBy: 'Tigist Alemayehu (Front Desk)',
+      registrationSource: 'PAPER_FORM',
+      signatureConfirmed: true,
+      status: 'ACTIVE',
+    },
+    {
+      regNumber: 4,
+      employeeId: 'EMP-MOA-104',
+      fullName: 'ኤርሚያስ ተሾመ (Ermias Teshome)',
+      department: 'ጥራት ግብዓት (Quality & Input Directorate)',
+      phone: '+251 91 234 0004',
+      shiftPreference: 'LUNCH',
+      registeredBy: 'Tigist Alemayehu (Front Desk)',
+      registrationSource: 'PAPER_FORM',
+      signatureConfirmed: true,
+      status: 'ACTIVE',
+    },
+    {
+      regNumber: 5,
+      employeeId: 'EMP-MOA-105',
+      fullName: 'ሰለሞን አለሙ ተወንደኝ (Solomon Alemu)',
+      department: 'መሰረታዊ አገልግሎት (Basic Services Directorate)',
+      phone: '+251 91 234 0005',
+      shiftPreference: 'MORNING',
+      registeredBy: 'Tigist Alemayehu (Front Desk)',
+      registrationSource: 'PAPER_FORM',
+      signatureConfirmed: true,
+      status: 'ACTIVE',
+    },
+    {
+      regNumber: 6,
+      employeeId: 'EMP-MOA-106',
+      fullName: 'ተስፋዬ ታደሰ ገ/ማሪያም (Tesfaye Tadesse)',
+      department: 'መሰረታዊ አገልግሎት (Basic Services Directorate)',
+      phone: '+251 91 234 0006',
+      shiftPreference: 'EVENING',
+      registeredBy: 'Tigist Alemayehu (Front Desk)',
+      registrationSource: 'PAPER_FORM',
+      signatureConfirmed: true,
+      status: 'ACTIVE',
+    },
+    {
+      regNumber: 7,
+      employeeId: 'EMP-MOA-107',
+      fullName: 'ሞላ ተስፋዬ ሊበን (Molla Tesfaye)',
+      department: 'መሰረታዊ አገልግሎት (Basic Services Directorate)',
+      phone: '+251 91 234 0007',
+      shiftPreference: 'EVENING',
+      registeredBy: 'Tigist Alemayehu (Front Desk)',
+      registrationSource: 'PAPER_FORM',
+      signatureConfirmed: true,
+      status: 'ACTIVE',
+    },
+    {
+      regNumber: 8,
+      employeeId: 'EMP-MOA-108',
+      fullName: 'እንዳለካቸው ዛጔ (Endalekachew Zague)',
+      department: 'መሰረታዊ አገልግሎት (Basic Services Directorate)',
+      phone: '+251 91 234 0008',
+      shiftPreference: 'MORNING',
+      registeredBy: 'Tigist Alemayehu (Front Desk)',
+      registrationSource: 'PAPER_FORM',
+      signatureConfirmed: true,
+      status: 'ACTIVE',
+    },
+    {
+      regNumber: 9,
+      employeeId: 'EMP-MOA-109',
+      fullName: 'ዛሬሁን ድንቁ (Zarehun Denku)',
+      department: 'መሰረታዊ አገልግሎት (Basic Services Directorate)',
+      phone: '+251 91 234 0009',
+      shiftPreference: 'EVENING',
+      registeredBy: 'Tigist Alemayehu (Front Desk)',
+      registrationSource: 'PAPER_FORM',
+      signatureConfirmed: true,
+      status: 'ACTIVE',
+    },
+    {
+      regNumber: 10,
+      employeeId: 'EMP-MOA-001',
+      fullName: 'ዳዊት ዮሐንስ (Dawit Yohannes)',
+      department: 'መሰረታዊ አገልግሎት (Basic Services Directorate)',
+      phone: '+251 91 345 6789',
+      shiftPreference: 'MORNING',
+      registeredBy: 'Tigist Alemayehu (Front Desk)',
+      registrationSource: 'PAPER_FORM',
+      signatureConfirmed: true,
+      status: 'ACTIVE',
+    },
+    {
+      regNumber: 11,
+      employeeId: 'EMP-MOA-111',
+      fullName: 'ፍቃዱ ማለደ (Fikadu Malede)',
+      department: 'ኢ/ኮ/ቴ/ሥ/አ (ICT & Digital Agriculture)',
+      phone: '+251 91 234 0011',
+      shiftPreference: 'EVENING',
+      registeredBy: 'Tigist Alemayehu (Front Desk)',
+      registrationSource: 'PAPER_FORM',
+      signatureConfirmed: true,
+      status: 'ACTIVE',
+    },
+    {
+      regNumber: 12,
+      employeeId: 'EMP-MOA-112',
+      fullName: 'ሮማን ተፈራ (Roman Tefera)',
+      department: 'የግብርና ግብዓት (Agricultural Input Directorate)',
+      phone: '+251 91 234 0012',
+      shiftPreference: 'LUNCH',
+      registeredBy: 'Tigist Alemayehu (Front Desk)',
+      registrationSource: 'PAPER_FORM',
+      signatureConfirmed: true,
+      status: 'ACTIVE',
+    },
+  ];
+
+  for (const reg of paperRegistrants) {
+    // Ensure HR Roster record exists so employee is fully whitelisted
+    await prisma.hrEmployeeRoster.upsert({
+      where: { employeeId: reg.employeeId },
+      update: {
+        fullName: reg.fullName,
+        department: reg.department,
+        phone: reg.phone,
+      },
+      create: {
+        employeeId: reg.employeeId,
+        fullName: reg.fullName,
+        department: reg.department,
+        phone: reg.phone,
+        employmentStatus: EmploymentStatus.ACTIVE,
+      },
+    });
+
+    // Seed Gym Registration record
+    await prisma.gymRegistration.upsert({
+      where: { regNumber: reg.regNumber },
+      update: reg,
+      create: reg,
+    });
+  }
+  console.log(`✓ ${paperRegistrants.length} Official Paper Registrants digitized into Gym Registry`);
+
+  // Ensure PostgreSQL sequence for GymRegistration.regNumber is aligned with highest regNumber
+  try {
+    await prisma.$executeRawUnsafe(
+      `SELECT setval(pg_get_serial_sequence('"GymRegistration"', 'regNumber'), COALESCE(MAX("regNumber"), 1)) FROM "GymRegistration";`
+    );
+  } catch (seqErr) {
+    console.warn('Note: Sequence setval skipped or not needed:', seqErr);
+  }
+
   console.log('\n🎉 MoA Gym database seed completed successfully!');
   console.log('Credentials Summary:');
   console.log('  HR Admin:      admin@moa.gov.et / Password123! (ID: EMP-ADM-01)');

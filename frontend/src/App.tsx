@@ -13,6 +13,7 @@ import { StaffDashboardPage } from './pages/staff/StaffDashboardPage';
 import { CheckInTerminalPage } from './pages/desk/CheckInTerminalPage';
 import { ActiveFloorPage } from './pages/desk/ActiveFloorPage';
 import { ClassesPage } from './pages/desk/ClassesPage';
+import { RegistrationsPage } from './pages/desk/RegistrationsPage';
 import { HrRosterPage } from './pages/admin/HrRosterPage';
 import { AnalyticsPage } from './pages/admin/AnalyticsPage';
 import { SettingsPage } from './pages/admin/SettingsPage';
@@ -86,6 +87,15 @@ export const App: React.FC = () => {
               />
 
               {/* Front Desk & Gate Terminal */}
+              <Route
+                path="/registrations"
+                element={
+                  <RoleGuard allowedRoles={['GYM_ATTENDANT', 'HR_ADMIN', 'STAFF_MEMBER']}>
+                    <RegistrationsPage />
+                  </RoleGuard>
+                }
+              />
+
               <Route
                 path="/terminal"
                 element={

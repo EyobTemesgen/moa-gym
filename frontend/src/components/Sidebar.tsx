@@ -169,6 +169,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <Calendar className="h-5 w-5 text-sky-300 shrink-0" />
                   {!collapsed && <span>Fitness Classes</span>}
                 </NavLink>
+
+                <NavLink
+                  to="/registrations"
+                  onClick={onCloseMobile}
+                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${
+                    isActive('/registrations')
+                      ? 'bg-white/20 text-white shadow-xs'
+                      : 'text-white/80 hover:text-white hover:bg-white/10'
+                  }`}
+                  title={collapsed ? 'የተመዝጋቢዎች ዝርዝር (Gym Registrants)' : undefined}
+                >
+                  {isActive('/registrations') && <ActiveBar />}
+                  <Users className="h-5 w-5 text-amber-300 shrink-0" />
+                  {!collapsed && <span>ተመዝጋቢዎች (Registrants)</span>}
+                </NavLink>
               </div>
             </div>
           )}
@@ -182,6 +197,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </div>
               )}
               <div className="space-y-1">
+                <NavLink
+                  to="/registrations"
+                  onClick={onCloseMobile}
+                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${
+                    isActive('/registrations')
+                      ? 'bg-white/20 text-white shadow-xs'
+                      : 'text-white/80 hover:text-white hover:bg-white/10'
+                  }`}
+                  title={collapsed ? 'የተመዝጋቢዎች ዝርዝር (Gym Registrants Roster)' : undefined}
+                >
+                  {isActive('/registrations') && <ActiveBar />}
+                  <Users className="h-5 w-5 text-moa-gold shrink-0" />
+                  {!collapsed && (
+                    <div className="flex flex-col">
+                      <span>ተመዝጋቢዎች (Registrants)</span>
+                      <span className="text-[10px] text-emerald-200/80 font-normal">የስም ዝርዝር ማህደር</span>
+                    </div>
+                  )}
+                </NavLink>
+
                 <NavLink
                   to="/terminal"
                   onClick={onCloseMobile}

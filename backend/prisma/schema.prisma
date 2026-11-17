@@ -41,6 +41,7 @@ model HrEmployeeRoster {
   employmentStatus EmploymentStatus @default(ACTIVE)
   syncedAt         DateTime         @updatedAt
   userAccount      User?
+  gymRegistrations GymRegistration[]
 }
 
 model User {
@@ -117,4 +118,30 @@ model SystemConfig {
   id          Int    @id @default(1)
   maxCapacity Int    @default(40)
   waiverText  String
+}
+
+model GymRegistration {
+  id                 String            @id @default(uuid())
+  regNumber          Int               @unique @default(autoincrement()) // ተ.ቁ (1, 2, 3...)
+  employeeId         String
+  fullName           String            // ስም ዝርዝር (Full Name)
+  department         String            // የስራ ክፍል (Directorate / Work Unit)
+  phone              String?           // ስልክ ቁጥር
+  email              String?
+  gender             String?           // MALE / FEMALE
+  shiftPreference    String?           // MORNING / LUNCH / EVENING / ANY
+  registeredAt       DateTime          @default(now())
+  registeredBy       String?           // Attendant or Admin name/ID
+  registrationSource String            @default("FRONT_DESK") // FRONT_DESK, SELF_SERVICE, PAPER_BATCH
+  signatureConfirmed Boolean           @default(true) // ፊርማ ማረጋገጫ
+  signatureData      String?           // Drawn signature data URL or note
+  status             String            @default("ACTIVE") // ACTIVE, SUSPENDED, CANCELLED
+  remarks            String?           // Any specific remark or medical note
+
+  hrRecord           HrEmployeeRoster? @relation(fields: [employeeId], references: [employeeId], onDelete: SetNull)
+
+  @@index([employeeId])
+  @@index([department])
+  @@index([status])
+  @@index([regNumber])
 }

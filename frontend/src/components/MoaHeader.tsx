@@ -16,6 +16,8 @@ export const MoaHeader: React.FC<MoaHeaderProps> = ({ onOpenMobileSidebar }) => 
   // Page title mapping
   const getPageTitle = () => {
     switch (location.pathname) {
+      case '/registrations':
+        return 'ግብርና ሚ/ር ሰራተኞች የጂምናዚየም ተመዝጋቢዎች ስም ዝርዝር (Staff Gym Registrants Roster)';
       case '/dashboard':
         return 'Staff Dashboard & QR Entry Pass';
       case '/waiver':

@@ -21,11 +21,7 @@ export const LoginPage: React.FC = () => {
     try {
       const user = await login(identifier.trim(), password);
       if (user.role === 'STAFF_MEMBER') {
-        if (!user.waiverSigned) {
-          navigate('/waiver');
-        } else {
-          navigate('/dashboard');
-        }
+        navigate('/dashboard');
       } else if (user.role === 'GYM_ATTENDANT') {
         navigate('/terminal');
       } else {

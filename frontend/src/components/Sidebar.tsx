@@ -7,7 +7,6 @@ import {
   ShieldCheck,
   Users,
   BarChart3,
-  ClipboardList,
   LogOut,
   ChevronLeft,
   ChevronRight,
@@ -131,33 +130,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {isActive('/registrations') && <ActiveBar />}
                   <Users className="h-5 w-5 text-emerald-300 shrink-0" />
                   {!collapsed && <span>Staff Registrations</span>}
-                </NavLink>
-
-                <NavLink
-                  to="/waiver"
-                  onClick={onCloseMobile}
-                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${isActive('/waiver')
-                      ? 'bg-white/20 text-white shadow-xs'
-                      : 'text-white/80 hover:text-white hover:bg-white/10'
-                    }`}
-                  title={collapsed ? 'PAR-Q & Liability Waiver' : undefined}
-                >
-                  {isActive('/waiver') && <ActiveBar />}
-                  <ClipboardList className="h-5 w-5 text-sky-300 shrink-0" />
-                  {!collapsed && (
-                    <div className="flex items-center justify-between flex-1">
-                      <span>PAR-Q & Waiver</span>
-                      {user.waiverSigned ? (
-                        <span className="text-[10px] font-bold text-emerald-300 bg-emerald-900/60 px-1.5 py-0.5 rounded">
-                          Signed
-                        </span>
-                      ) : (
-                        <span className="text-[10px] font-bold text-moa-gold bg-amber-900/60 px-1.5 py-0.5 rounded animate-pulse">
-                          Pending
-                        </span>
-                      )}
-                    </div>
-                  )}
                 </NavLink>
               </div>
             </div>

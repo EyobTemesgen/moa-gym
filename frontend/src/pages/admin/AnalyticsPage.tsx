@@ -114,9 +114,9 @@ export const AnalyticsPage: React.FC = () => {
           icon={<Users className="h-5 w-5" />}
         />
         <StatCard
-          label="Waivers Completed"
+          label="Enrolled Members"
           value={isLoading ? '--' : analytics?.summary.waiversCompleted ?? 0}
-          subtitle="Compliant for entrance"
+          subtitle="Registered gym members"
           valueColor="text-slate-900"
           icon={<ShieldCheck className="h-5 w-5" />}
         />

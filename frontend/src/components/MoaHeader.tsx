@@ -39,11 +39,6 @@ export const MoaHeader: React.FC<MoaHeaderProps> = ({ onOpenMobileSidebar }) => 
           title: 'Staff Member Digital QR Pass',
           subtitle: 'Personal gym access QR code and membership verification status',
         };
-      case '/waiver':
-        return {
-          title: 'Physical Activity Readiness (PAR-Q) & Liability Waiver',
-          subtitle: 'Annual institutional health screening compliance questionnaire',
-        };
       default:
         return {
           title: 'MoA Staff Gym & Wellness Portal',

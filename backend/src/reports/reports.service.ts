@@ -10,7 +10,7 @@ export class ReportsService {
     startDate.setDate(startDate.getDate() - days);
     startDate.setHours(0, 0, 0, 0);
 
-    const [logs, totalRosterCount, registeredUserCount, waiverSignedCount, config] =
+    const [logs, totalRosterCount, registeredUserCount, totalEnrolledCount, config] =
       await Promise.all([
         this.prisma.attendance.findMany({
           where: { checkInTime: { gte: startDate } },
@@ -21,7 +21,7 @@ export class ReportsService {
         }),
         this.prisma.hrEmployeeRoster.count({ where: { employmentStatus: 'ACTIVE' } }),
         this.prisma.user.count(),
-        this.prisma.user.count({ where: { waiverSigned: true } }),
+        this.prisma.gymRegistration.count(),
         this.prisma.systemConfig.findFirst({ where: { id: 1 } }),
       ]);
 
@@ -65,7 +65,7 @@ export class ReportsService {
         uniqueStaffAttendees: uniqueUserSet.size,
         activeRosterEligible: totalRosterCount,
         accountsClaimed: registeredUserCount,
-        waiversCompleted: waiverSignedCount,
+        waiversCompleted: totalEnrolledCount,
         autoClosedSessions: autoClosedCount,
         facilityMaxCapacity: config?.maxCapacity ?? 40,
       },

@@ -33,11 +33,7 @@ const RoleRootRedirect: React.FC = () => {
   if (!user) return <Navigate to="/login" replace />;
 
   if (user.role === 'STAFF_MEMBER') {
-    return user.waiverSigned ? (
-      <Navigate to="/dashboard" replace />
-    ) : (
-      <Navigate to="/waiver" replace />
-    );
+    return <Navigate to="/dashboard" replace />;
   }
 
   if (user.role === 'GYM_ATTENDANT') {
@@ -65,20 +61,13 @@ export const App: React.FC = () => {
               <Route
                 path="/dashboard"
                 element={
-                  <RoleGuard allowedRoles={['STAFF_MEMBER']} requireWaiver={true}>
+                  <RoleGuard allowedRoles={['STAFF_MEMBER']}>
                     <StaffDashboardPage />
                   </RoleGuard>
                 }
               />
 
-              <Route
-                path="/waiver"
-                element={
-                  <RoleGuard>
-                    <OnboardingWaiverPage />
-                  </RoleGuard>
-                }
-              />
+              <Route path="/waiver" element={<Navigate to="/dashboard" replace />} />
 
               {/* Shared Fitness Classes */}
               <Route

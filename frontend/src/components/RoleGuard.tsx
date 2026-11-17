@@ -39,9 +39,5 @@ export const RoleGuard: React.FC<RoleGuardProps> = ({
     return <Navigate to="/terminal" replace />;
   }
 
-  if (requireWaiver && !user.waiverSigned && user.role === 'STAFF_MEMBER') {
-    return <Navigate to="/waiver" replace />;
-  }
-
   return <>{children}</>;
 };

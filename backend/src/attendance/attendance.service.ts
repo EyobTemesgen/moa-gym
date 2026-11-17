@@ -210,22 +210,7 @@ export class AttendanceService {
 
     const user = hrRecord.userAccount;
 
-    // Step 4: Waiver / Registration Signature Compliance Check
-    if (!user.waiverSigned && (!gymReg || !gymReg.signatureConfirmed)) {
-      return {
-        status: 'DENIED' as GateVerificationStatus,
-        reason: 'WAIVER_NOT_SIGNED',
-        employee: {
-          employeeId: hrRecord.employeeId,
-          fullName: hrRecord.fullName,
-          department: hrRecord.department,
-          photoUrl: hrRecord.photoUrl,
-        },
-        message: 'Mandatory gym registration / waiver has not been confirmed.',
-      };
-    }
-
-    // Step 5: Duplicate Check & Capacity Check
+    // Step 4: Duplicate Check & Capacity Check
     const activeSession = user.attendanceLogs[0];
     if (activeSession) {
       return {

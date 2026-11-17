@@ -244,7 +244,7 @@ export const RegistrationsPage: React.FC = () => {
         </div>
 
         {/* Action Buttons Toolbar - Guaranteed Single Row on Desktop/Tablet */}
-        <div className="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap justify-start xl:justify-end">
+        <div className="flex items-center gap-2 shrink-0 flex-nowrap overflow-x-auto justify-start xl:justify-end">
           <button
             type="button"
             onClick={handleExportCsv}

@@ -12,7 +12,6 @@ import { OnboardingWaiverPage } from './pages/staff/OnboardingWaiverPage';
 import { StaffDashboardPage } from './pages/staff/StaffDashboardPage';
 import { CheckInTerminalPage } from './pages/desk/CheckInTerminalPage';
 import { ActiveFloorPage } from './pages/desk/ActiveFloorPage';
-import { ClassesPage } from './pages/desk/ClassesPage';
 import { RegistrationsPage } from './pages/desk/RegistrationsPage';
 import { HrRosterPage } from './pages/admin/HrRosterPage';
 import { AnalyticsPage } from './pages/admin/AnalyticsPage';
@@ -68,16 +67,7 @@ export const App: React.FC = () => {
               />
 
               <Route path="/waiver" element={<Navigate to="/dashboard" replace />} />
-
-              {/* Shared Fitness Classes */}
-              <Route
-                path="/classes"
-                element={
-                  <RoleGuard>
-                    <ClassesPage />
-                  </RoleGuard>
-                }
-              />
+              <Route path="/classes" element={<Navigate to="/" replace />} />
 
               {/* Front Desk & Gate Terminal */}
               <Route

@@ -30,10 +30,10 @@ export const GymRegistrantsPrintModal: React.FC<GymRegistrantsPrintModalProps> =
   });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto print:p-0 print:bg-white print:static">
-      <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-8 print:border-none print:shadow-none print:my-0 print:max-w-none print:w-full">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs print:p-0 print:bg-white print:static">
+      <div className="relative w-full max-w-4xl max-h-[92vh] flex flex-col bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden print:border-none print:shadow-none print:my-0 print:max-w-none print:w-full print:max-h-none">
         {/* Screen Action Bar (hidden on print) */}
-        <div className="px-6 py-3 bg-slate-800 text-white flex items-center justify-between print:hidden">
+        <div className="px-6 py-3 bg-slate-800 text-white flex items-center justify-between shrink-0 print:hidden">
           <div className="flex items-center gap-2 text-xs font-semibold">
             <Printer className="h-4 w-4 text-moa-gold" />
             <span>Official Registrants Roster Document (Print Preview)</span>
@@ -58,7 +58,7 @@ export const GymRegistrantsPrintModal: React.FC<GymRegistrantsPrintModalProps> =
         </div>
 
         {/* Official Printable Document Container */}
-        <div className="p-8 sm:p-12 print:p-6 bg-white space-y-6 text-slate-900 font-sans">
+        <div className="flex-1 overflow-y-auto p-8 sm:p-12 print:p-6 print:overflow-visible bg-white space-y-6 text-slate-900 font-sans min-h-0">
           {/* Institutional Top Tri-color Bar */}
           <div className="h-1.5 w-full bg-gradient-to-r from-moa-gold via-moa-green to-moa-blue"></div>
 

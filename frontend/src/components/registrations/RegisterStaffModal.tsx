@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { apiRequest } from '../../lib/api';
 import { X, Search, Check, AlertCircle, PenTool, RotateCcw, UserPlus } from 'lucide-react';
+import { btn } from '../ui/theme';
 
 interface RegisterStaffModalProps {
   isOpen: boolean;
@@ -176,13 +177,13 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
-      <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs">
+      <div className="relative w-full max-w-2xl max-h-[90vh] flex flex-col bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
         {/* Institutional Color Bar */}
-        <div className="h-1.5 w-full bg-gradient-to-r from-moa-gold via-moa-green to-moa-blue"></div>
+        <div className="h-1.5 w-full bg-gradient-to-r from-moa-gold via-moa-green to-moa-blue shrink-0"></div>
 
         {/* Modal Header */}
-        <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+        <div className="px-6 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between shrink-0">
           <div>
             <h2 className="text-base font-bold text-slate-900">
               Register Staff Member for Gym Service
@@ -201,13 +202,14 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
         </div>
 
         {/* Modal Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-5 text-xs">
-          {errorMsg && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-800 flex items-center gap-2">
-              <AlertCircle className="h-4 w-4 shrink-0 text-red-600" />
-              <span>{errorMsg}</span>
-            </div>
-          )}
+        <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0 overflow-hidden">
+          <div className="flex-1 overflow-y-auto p-6 space-y-4 text-xs">
+            {errorMsg && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-800 flex items-center gap-2">
+                <AlertCircle className="h-4 w-4 shrink-0 text-red-600" />
+                <span>{errorMsg}</span>
+              </div>
+            )}
 
           {/* Employee Auto-Complete / Lookup Section */}
           <div className="bg-emerald-50/60 border border-emerald-200/80 rounded-xl p-3.5 space-y-3">
@@ -455,14 +457,15 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
               className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-moa-green/30"
             />
           </div>
+          </div>
 
-          {/* Footer Actions */}
-          <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-3">
+          {/* Footer Actions (Pinned at bottom) */}
+          <div className="shrink-0 px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
               disabled={submitting}
-              className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-xl font-semibold transition cursor-pointer"
+              className={btn.secondary}
             >
               Cancel
             </button>
@@ -470,7 +473,7 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
             <button
               type="submit"
               disabled={submitting}
-              className="inline-flex items-center gap-1.5 px-5 py-2 bg-moa-green hover:bg-moa-green-dark text-white rounded-xl font-bold shadow-xs transition cursor-pointer disabled:opacity-50"
+              className={btn.primary}
             >
               <Check className="h-4 w-4" />
               <span>{submitting ? 'Registering...' : 'Complete Registration'}</span>

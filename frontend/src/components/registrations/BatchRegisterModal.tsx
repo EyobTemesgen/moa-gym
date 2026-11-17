@@ -208,13 +208,13 @@ export const BatchRegisterModal: React.FC<BatchRegisterModalProps> = ({
   const invalidParsedCount = parsedRows.filter((r) => !r.isValid).length;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
-      <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs">
+      <div className="relative w-full max-w-4xl max-h-[90vh] flex flex-col bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
         {/* Accent Top Bar */}
-        <div className="h-1.5 w-full bg-gradient-to-r from-emerald-600 via-[#00843D] to-moa-gold"></div>
+        <div className="h-1.5 w-full bg-gradient-to-r from-emerald-600 via-[#00843D] to-moa-gold shrink-0"></div>
 
         {/* Modal Header */}
-        <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+        <div className="px-6 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-emerald-50 text-[#00843D] rounded-xl border border-emerald-200">
               <FileSpreadsheet className="h-5 w-5" />
@@ -238,7 +238,7 @@ export const BatchRegisterModal: React.FC<BatchRegisterModalProps> = ({
         </div>
 
         {/* Tab Switcher: Import File vs Manual Paper Entry */}
-        <div className="border-b border-slate-200 bg-white px-6 pt-3 flex items-center justify-between">
+        <div className="border-b border-slate-200 bg-white px-6 pt-3 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -280,7 +280,7 @@ export const BatchRegisterModal: React.FC<BatchRegisterModalProps> = ({
         </div>
 
         {/* Modal Body */}
-        <div className="p-6 space-y-4 text-xs">
+        <div className="flex-1 overflow-y-auto p-6 space-y-4 text-xs min-h-0">
           {errorMsg && (
             <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-800 flex items-center gap-2">
               <AlertCircle className="h-4 w-4 shrink-0 text-red-600" />
@@ -528,7 +528,7 @@ export const BatchRegisterModal: React.FC<BatchRegisterModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+        <div className="shrink-0 px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
           <button
             type="button"
             onClick={onClose}

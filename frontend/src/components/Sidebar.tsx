@@ -67,17 +67,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <MoaLogo className="h-10 w-10 shrink-0" size={40} />
             {!collapsed && (
               <div className="overflow-hidden whitespace-nowrap">
-                <div className="text-[11px] font-bold text-moa-gold tracking-tight font-sans uppercase">
-                  FDRE MoA
+                <div className="text-sm font-bold text-white tracking-tight">
+                  MoA Gym
                 </div>
-                <div className="text-[10px] font-semibold text-white/80 tracking-wider">
-                  MINISTRY OF AGRICULTURE
-                </div>
-                <div className="text-xs font-bold text-white tracking-tight flex items-center gap-1.5 mt-0.5">
-                  <span>MoA Gym</span>
-                  <span className="text-[9px] font-mono text-emerald-200 bg-white/15 px-1.5 py-0.2 rounded">
-                    Staff Wellness
-                  </span>
+                <div className="text-[10px] text-emerald-200/80 font-medium tracking-wide">
+                  Ministry of Agriculture
                 </div>
               </div>
             )}

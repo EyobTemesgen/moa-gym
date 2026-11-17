@@ -96,7 +96,7 @@ export const AdminDashboardPage: React.FC = () => {
 
           <Link to="/reports" className={btn.secondary}>
             <BarChart3 className="h-4 w-4 text-slate-500" />
-            <span>Reports & Analytics</span>
+            <span>Reports</span>
           </Link>
 
           <Link to="/registrations" className={btn.primary}>
@@ -357,8 +357,8 @@ export const AdminDashboardPage: React.FC = () => {
                     <BarChart3 className="h-4 w-4" />
                   </div>
                   <div>
-                    <div className="font-bold text-slate-900">Attendance Analytics</div>
-                    <div className="text-[11px] text-slate-500 font-normal">Utilization charts & CSV exports</div>
+                    <div className="font-bold text-slate-900">Reports</div>
+                    <div className="text-[11px] text-slate-500 font-normal">Attendance summaries & CSV export</div>
                   </div>
                 </div>
                 <ChevronRightIcon className="h-4 w-4 text-slate-400" />

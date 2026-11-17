@@ -63,14 +63,14 @@ export const AnalyticsPage: React.FC = () => {
         <div className="min-w-0">
           <div className="flex items-center gap-2.5 flex-wrap">
             <h1 className="text-xl font-bold text-slate-900 tracking-tight whitespace-nowrap">
-              Facility Utilization & Attendance Analytics
+              Reports
             </h1>
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-[#00843D] border border-emerald-200 shadow-2xs">
-              Institutional Reports
+              Attendance & Utilization
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1 truncate">
-            Aggregated attendance patterns, peak workout hours, and directorate wellness engagement.
+            Ministry of Agriculture · Gymnasium attendance summaries and exportable records
           </p>
         </div>
 
@@ -82,7 +82,7 @@ export const AnalyticsPage: React.FC = () => {
           >
             <option value={7}>Last 7 Days</option>
             <option value={30}>Last 30 Days</option>
-            <option value={90}>Last Quarter (90 Days)</option>
+            <option value={90}>Last 90 Days</option>
           </select>
 
           <button
@@ -92,7 +92,7 @@ export const AnalyticsPage: React.FC = () => {
             title="Download CSV attendance report"
           >
             <Download className="h-4 w-4" />
-            <span>Export CSV Report</span>
+            <span>Export CSV</span>
           </button>
         </div>
       </div>
@@ -100,14 +100,14 @@ export const AnalyticsPage: React.FC = () => {
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard
-          label="Total Gym Visits"
+          label="Total Visits"
           value={isLoading ? '--' : analytics?.summary.totalVisits ?? 0}
-          subtitle="Logged check-ins in period"
+          subtitle="Check-ins in selected period"
           valueColor="text-slate-900"
           icon={<TrendingUp className="h-5 w-5" />}
         />
         <StatCard
-          label="Unique Staff Active"
+          label="Active Staff"
           value={isLoading ? '--' : analytics?.summary.uniqueStaffAttendees ?? 0}
           subtitle={`Out of ${analytics?.summary.activeRosterEligible ?? 0} eligible`}
           valueColor="text-emerald-700"
@@ -116,14 +116,14 @@ export const AnalyticsPage: React.FC = () => {
         <StatCard
           label="Enrolled Members"
           value={isLoading ? '--' : analytics?.summary.waiversCompleted ?? 0}
-          subtitle="Registered gym members"
+          subtitle="Registered staff members"
           valueColor="text-slate-900"
           icon={<ShieldCheck className="h-5 w-5" />}
         />
         <StatCard
-          label="Auto-Closed (23:59)"
+          label="Auto-Closed"
           value={isLoading ? '--' : analytics?.summary.autoClosedSessions ?? 0}
-          subtitle="Closed by nightly safety cron"
+          subtitle="Nightly 23:59 safety checkouts"
           valueColor="text-amber-800"
           icon={<Clock className="h-5 w-5" />}
         />
@@ -138,7 +138,7 @@ export const AnalyticsPage: React.FC = () => {
             </div>
             <div>
               <h3 className="text-sm font-bold text-slate-900">
-                Participation by Directorate
+                Visits by Directorate
               </h3>
               <p className="text-xs text-slate-500">Distribution of gym sessions across MoA work units</p>
             </div>
@@ -174,8 +174,8 @@ export const AnalyticsPage: React.FC = () => {
               <Clock className="h-4 w-4" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-slate-900">Peak Workout Hours</h3>
-              <p className="text-xs text-slate-500">Daily check-in distribution (06:00 to 21:00)</p>
+              <h3 className="text-sm font-bold text-slate-900">Hourly Attendance</h3>
+              <p className="text-xs text-slate-500">Check-in distribution across workout hours</p>
             </div>
           </div>
 

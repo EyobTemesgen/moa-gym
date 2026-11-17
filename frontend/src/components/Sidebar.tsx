@@ -179,14 +179,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       ? 'bg-white/20 text-white shadow-xs'
                       : 'text-white/80 hover:text-white hover:bg-white/10'
                     }`}
-                  title={collapsed ? 'Reports & Analytics' : undefined}
+                  title={collapsed ? 'Reports' : undefined}
                 >
                   {(isActive('/reports') || isActive('/admin/analytics')) && <ActiveBar />}
                   <BarChart3 className="h-5 w-5 text-sky-300 shrink-0" />
                   {!collapsed && (
                     <div className="flex flex-col">
-                      <span className="font-bold">Reports & Analytics</span>
-                      <span className="text-[10px] text-emerald-200/80 font-normal">Utilization & CSV Export</span>
+                      <span className="font-bold">Reports</span>
+                      <span className="text-[10px] text-emerald-200/80 font-normal">Attendance & Export</span>
                     </div>
                   )}
                 </NavLink>

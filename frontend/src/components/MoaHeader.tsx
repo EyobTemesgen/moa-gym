@@ -18,26 +18,31 @@ export const MoaHeader: React.FC<MoaHeaderProps> = ({ onOpenMobileSidebar }) => 
   // Page title mapping - 100% English
   const getPageTitle = () => {
     switch (location.pathname) {
+      case '/admin/dashboard':
+        return {
+          title: 'Dashboard',
+          subtitle: 'Ministry of Agriculture · Staff gym executive summary and metrics',
+        };
       case '/registrations':
         return {
-          title: 'Staff Gym Registration Directory & Intake',
-          subtitle: 'Institutional employee wellness membership roster and physical intake log',
+          title: 'Staff Registrations',
+          subtitle: 'Ministry of Agriculture · Staff gym membership records and directory',
         };
       case '/terminal':
         return {
-          title: 'Gate Access Control & Check-In Terminal',
-          subtitle: 'Real-time QR barcode verification, employee lookup, and capacity monitoring',
+          title: 'Gate Terminal',
+          subtitle: 'Front desk access verification and check-in terminal',
         };
       case '/reports':
       case '/admin/analytics':
         return {
-          title: 'Facility Utilization & Attendance Reports',
-          subtitle: 'Departmental analytics, shift distribution, and audit log exports',
+          title: 'Reports',
+          subtitle: 'Ministry of Agriculture · Attendance summaries and exportable records',
         };
       case '/dashboard':
         return {
-          title: 'Staff Member Digital QR Pass',
-          subtitle: 'Personal gym access QR code and membership verification status',
+          title: 'My Entry Pass',
+          subtitle: 'Personal gym access pass and membership status',
         };
       default:
         return {

@@ -487,15 +487,6 @@ export const RegistrationsPage: React.FC = () => {
             <thead className={table.headRow}>
               <tr>
                 <SortableHeader
-                  label="No."
-                  columnKey="regNumber"
-                  currentSortColumn={sortColumn}
-                  currentSortDirection={sortDirection}
-                  onSort={handleSort}
-                  align="center"
-                  thClassName="py-2.5 px-3 w-16 text-center"
-                />
-                <SortableHeader
                   label="Full Name"
                   columnKey="fullName"
                   currentSortColumn={sortColumn}
@@ -552,14 +543,14 @@ export const RegistrationsPage: React.FC = () => {
             <tbody className="divide-y divide-slate-100 bg-white">
               {isLoading ? (
                 <tr>
-                  <td colSpan={10} className="py-16 text-center text-slate-400">
+                  <td colSpan={9} className="py-16 text-center text-slate-400">
                     <div className="inline-block animate-spin rounded-full h-6 w-6 border-2 border-emerald-600 border-t-transparent mb-2"></div>
                     <p className="text-xs">Loading registrants roster...</p>
                   </td>
                 </tr>
               ) : pager.pageItems.length === 0 ? (
                 <tr>
-                  <td colSpan={10} className="py-16 text-center">
+                  <td colSpan={9} className="py-16 text-center">
                     <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-2 text-slate-400">
                       <Users className="w-6 h-6 text-slate-400" />
                     </div>
@@ -585,13 +576,6 @@ export const RegistrationsPage: React.FC = () => {
 
                   return (
                     <tr key={row.id} className={table.row}>
-                      {/* No. (Monospace Badge) */}
-                      <td className="py-2.5 px-3 text-center">
-                        <span className="inline-flex items-center justify-center px-2 py-0.5 rounded-[4px] bg-slate-100 font-mono font-bold text-xs text-slate-700">
-                          {row.regNumber}
-                        </span>
-                      </td>
-
                       {/* Full Name & Avatar */}
                       <td className="py-2.5 px-4">
                         <div className="flex items-center gap-2.5">

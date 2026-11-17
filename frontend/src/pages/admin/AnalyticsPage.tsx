@@ -59,26 +59,26 @@ export const AnalyticsPage: React.FC = () => {
   return (
     <div className="space-y-5">
       {/* Page Header (Asset Tracking Style) */}
-      <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2.5">
-            <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+      <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <h1 className="text-xl font-bold text-slate-900 tracking-tight whitespace-nowrap">
               Facility Utilization & Attendance Analytics
             </h1>
-            <span className="text-[11px] font-bold text-[#00843D] bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-[#00843D] border border-emerald-200 shadow-2xs">
               Institutional Reports
             </span>
           </div>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-slate-500 mt-1 truncate">
             Aggregated attendance patterns, peak workout hours, and directorate wellness engagement.
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5 shrink-0 flex-wrap sm:flex-nowrap justify-start sm:justify-end">
           <select
             value={days}
             onChange={(e) => setDays(Number(e.target.value))}
-            className="px-3 py-2 text-xs border border-slate-300 rounded-[4px] focus:outline-none focus:border-emerald-700 bg-white font-medium text-slate-700"
+            className="px-3 h-9 text-xs border border-slate-300 rounded-[6px] focus:outline-none focus:border-emerald-700 bg-white font-medium text-slate-700 shadow-2xs"
           >
             <option value={7}>Last 7 Days</option>
             <option value={30}>Last 30 Days</option>

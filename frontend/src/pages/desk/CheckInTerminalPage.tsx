@@ -167,16 +167,16 @@ export const CheckInTerminalPage: React.FC = () => {
     <div className="space-y-5">
       {/* Header Banner (Asset Tracking Style) */}
       <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2.5">
-            <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <h1 className="text-xl font-bold text-slate-900 tracking-tight whitespace-nowrap">
               Front Desk Gate Verification Terminal
             </h1>
-            <span className="text-[11px] font-bold text-[#00843D] bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-[#00843D] border border-emerald-200 shadow-2xs">
               Access Control
             </span>
           </div>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-slate-500 mt-1 truncate">
             Camera QR scan verification paired with instant MoA staff roster & whitelist lookup.
           </p>
         </div>
@@ -184,7 +184,7 @@ export const CheckInTerminalPage: React.FC = () => {
         <button
           type="button"
           onClick={() => setCameraActive(!cameraActive)}
-          className={cameraActive ? btn.secondary : btn.primary}
+          className={`${cameraActive ? btn.secondary : btn.primary} shrink-0`}
         >
           <Camera className="h-4 w-4" />
           <span>{cameraActive ? 'Close Camera Scanner' : 'Activate Camera Scanner'}</span>

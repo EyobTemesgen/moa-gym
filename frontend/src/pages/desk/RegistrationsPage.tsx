@@ -4,6 +4,7 @@ import { apiRequest } from '../../lib/api';
 import {
   Users,
   UserPlus,
+  Plus,
   Printer,
   Search,
   CheckCircle2,
@@ -227,30 +228,30 @@ export const RegistrationsPage: React.FC = () => {
   return (
     <div className="space-y-5">
       {/* Page Title & Main Action Buttons (Asset Tracking style) */}
-      <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2.5">
-            <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+      <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <h1 className="text-xl font-bold text-slate-900 tracking-tight whitespace-nowrap">
               Staff Gym Registrants Roster
             </h1>
-            <span className="text-[11px] font-bold text-[#00843D] bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-[#00843D] border border-emerald-200 shadow-2xs">
               {stats?.totalRegistered ?? data?.total ?? 0} Enrolled
             </span>
           </div>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-slate-500 mt-1 truncate">
             Ministry of Agriculture · Staff Wellness & Fitness Gymnasium Membership Directory
           </p>
         </div>
 
-        {/* Action Buttons Toolbar */}
-        <div className="flex flex-wrap items-center gap-2">
+        {/* Action Buttons Toolbar - Guaranteed Single Row on Desktop/Tablet */}
+        <div className="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap justify-start xl:justify-end">
           <button
             type="button"
             onClick={handleExportCsv}
             title="Export filtered records to CSV"
             className={btn.secondary}
           >
-            <Download className="h-4 w-4 text-slate-600" />
+            <Download className="h-4 w-4 text-slate-500" />
             <span>Export CSV</span>
           </button>
 
@@ -260,7 +261,7 @@ export const RegistrationsPage: React.FC = () => {
             title="Print official A4 roster report"
             className={btn.secondary}
           >
-            <Printer className="h-4 w-4 text-slate-600" />
+            <Printer className="h-4 w-4 text-slate-500" />
             <span>Print Roster</span>
           </button>
 
@@ -280,8 +281,8 @@ export const RegistrationsPage: React.FC = () => {
             title="Register a new staff member"
             className={btn.primary}
           >
-            <UserPlus className="h-4 w-4" />
-            <span>+ Register Staff</span>
+            <Plus className="h-4 w-4" />
+            <span>Register Staff</span>
           </button>
         </div>
       </div>

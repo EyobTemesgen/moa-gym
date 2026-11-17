@@ -7,17 +7,17 @@
 export const btn = {
   /** Main action of a page, e.g. "Register Staff", "Save" */
   primary:
-    'inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#00843D] hover:bg-[#0B6B3A] disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold text-[13px] rounded-[4px] shadow-[0_1px_2px_rgba(16,24,40,0.12)] transition-colors cursor-pointer shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1',
+    'inline-flex items-center justify-center gap-2 px-4 h-9 bg-[#00843D] hover:bg-[#0B6B3A] disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold text-[13px] rounded-[6px] shadow-xs transition-colors cursor-pointer shrink-0 whitespace-nowrap select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1',
   /** Second action next to the main one, e.g. "Print Roster", "Export CSV" */
   secondary:
-    'inline-flex items-center justify-center gap-2 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 hover:border-slate-400 font-semibold text-[13px] rounded-[4px] transition-colors cursor-pointer shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1',
+    'inline-flex items-center justify-center gap-2 px-3.5 h-9 bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-300 hover:border-slate-400 font-semibold text-[13px] rounded-[6px] shadow-2xs transition-colors cursor-pointer shrink-0 whitespace-nowrap select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1',
   /** Small action inside a table row: Edit, Status, Print */
-  row: 'inline-flex items-center justify-center gap-1.5 px-2.5 py-1 bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-300 hover:border-slate-400 rounded-[4px] text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap shadow-2xs',
+  row: 'inline-flex items-center justify-center gap-1.5 px-2.5 h-7 bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-300 hover:border-slate-400 rounded-[4px] text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap select-none shadow-2xs',
   /** Icon inside a row action */
   rowIcon: 'w-3.5 h-3.5 text-emerald-700',
   /** Row action that isn't available */
   rowLocked:
-    'inline-flex items-center justify-center gap-1.5 px-2.5 py-1 bg-slate-50 text-slate-400 border border-slate-200 rounded-[4px] text-xs font-semibold cursor-not-allowed whitespace-nowrap',
+    'inline-flex items-center justify-center gap-1.5 px-2.5 h-7 bg-slate-50 text-slate-400 border border-slate-200 rounded-[4px] text-xs font-semibold cursor-not-allowed whitespace-nowrap select-none',
   /** Active tab in a page's tab switcher */
   tabActive: 'bg-[#00843D] text-white shadow-xs font-semibold',
   tabInactive: 'bg-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100 font-medium',

@@ -1,7 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { apiRequest } from '../../lib/api';
-import { X, Search, Check, AlertCircle, PenTool, RotateCcw, UserPlus } from 'lucide-react';
+import {
+  X,
+  Search,
+  Check,
+  AlertCircle,
+  PenTool,
+  RotateCcw,
+  UserPlus,
+  Upload,
+  Camera,
+  User,
+} from 'lucide-react';
 import { btn } from '../ui/theme';
 
 interface RegisterStaffModalProps {
@@ -20,6 +31,7 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
   const [department, setDepartment] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
+  const [photoUrl, setPhotoUrl] = useState('');
   const [gender, setGender] = useState('MALE');
   const [shiftPreference, setShiftPreference] = useState('ANY');
   const [remarks, setRemarks] = useState('');
@@ -32,6 +44,11 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
   const [manualMode, setManualMode] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // Photo Upload & Webcam
+  const [webcamActive, setWebcamActive] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Digital canvas
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -95,12 +112,80 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
     setIsDrawing(false);
   };
 
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const minDim = Math.min(img.width, img.height);
+        const startX = (img.width - minDim) / 2;
+        const startY = (img.height - minDim) / 2;
+
+        canvas.width = 250;
+        canvas.height = 250;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, startX, startY, minDim, minDim, 0, 0, 250, 250);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+          setPhotoUrl(dataUrl);
+        }
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const startWebcam = async () => {
+    setWebcamActive(true);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: 300, height: 300, facingMode: 'user' },
+      });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+      }
+    } catch (err) {
+      console.warn('Webcam failed to start:', err);
+      setWebcamActive(false);
+      alert('Unable to access webcam. Please check permissions or upload an image file.');
+    }
+  };
+
+  const stopWebcam = () => {
+    if (videoRef.current?.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      stream.getTracks().forEach((track) => track.stop());
+      videoRef.current.srcObject = null;
+    }
+    setWebcamActive(false);
+  };
+
+  const captureWebcamPhoto = () => {
+    if (!videoRef.current) return;
+    const canvas = document.createElement('canvas');
+    canvas.width = 250;
+    canvas.height = 250;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.drawImage(videoRef.current, 0, 0, 250, 250);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      setPhotoUrl(dataUrl);
+    }
+    stopWebcam();
+  };
+
   const handleSelectEmployee = (emp: any) => {
     setEmployeeId(emp.employeeId);
     setFullName(emp.fullName);
     setDepartment(emp.department);
     if (emp.phone) setPhone(emp.phone);
     if (emp.email) setEmail(emp.email);
+    if (emp.photoUrl) setPhotoUrl(emp.photoUrl);
     setShowRosterSuggestions(false);
   };
 
@@ -110,12 +195,14 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
     setDepartment('');
     setPhone('');
     setEmail('');
+    setPhotoUrl('');
     setRemarks('');
     setShiftPreference('ANY');
     setRosterSearch('');
     setManualMode(false);
     setErrorMsg(null);
     clearCanvas();
+    stopWebcam();
   };
 
   useEffect(() => {
@@ -152,6 +239,7 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
         department: department.trim(),
         phone: phone.trim() || undefined,
         email: email.trim() || undefined,
+        photoUrl: photoUrl.trim() || undefined,
         gender,
         shiftPreference,
         registrationSource: manualMode ? 'MANUAL_ENTRY' : 'HR_AUTOFILL',
@@ -272,6 +360,100 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
               <p className="text-[11px] text-slate-500">
                 If the staff member is not found in the HR database, you can type their information directly below.
               </p>
+            )}
+          </div>
+
+          {/* Staff Profile Photo Section */}
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-3">
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                {photoUrl ? (
+                  <img
+                    src={photoUrl}
+                    alt="Staff Preview"
+                    className="w-16 h-16 rounded-xl object-cover ring-2 ring-emerald-600/30 shadow-xs"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-xl bg-emerald-100 text-[#00843D] flex items-center justify-center font-bold text-xl border border-emerald-200">
+                    <User className="w-8 h-8 text-[#00843D]" />
+                  </div>
+                )}
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <div className="font-bold text-slate-800 text-xs">Staff Profile Photo (Optional)</div>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  Appears on the gate terminal for visual verification.
+                </p>
+
+                <div className="flex items-center gap-2 mt-2 flex-wrap">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="px-2.5 py-1 text-[11px] font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 rounded-md transition cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Upload className="w-3 h-3 text-slate-500" />
+                    <span>Upload Photo</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={webcamActive ? stopWebcam : startWebcam}
+                    className="px-2.5 py-1 text-[11px] font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-md transition cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Camera className="w-3 h-3 text-emerald-700" />
+                    <span>{webcamActive ? 'Close Camera' : 'Take with Webcam'}</span>
+                  </button>
+
+                  {photoUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setPhotoUrl('')}
+                      className="text-[11px] text-rose-600 hover:underline cursor-pointer"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Webcam Live Capture Viewport */}
+            {webcamActive && (
+              <div className="p-3 bg-slate-900 rounded-xl flex flex-col items-center gap-2 text-white">
+                <div className="text-xs font-semibold">Webcam Live Viewfinder</div>
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className="w-48 h-48 rounded-lg object-cover border-2 border-white/20 bg-black"
+                />
+                <div className="flex items-center gap-2 mt-1">
+                  <button
+                    type="button"
+                    onClick={captureWebcamPhoto}
+                    className="px-4 py-1.5 bg-[#00843D] hover:bg-[#0B6B3A] text-white text-xs font-bold rounded-md cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Camera className="w-3.5 h-3.5" />
+                    <span>Capture Photo</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={stopWebcam}
+                    className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold rounded-md cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
             )}
           </div>
 

@@ -41,6 +41,7 @@ export class RegistrationsService {
         department,
         phone: dto.phone || undefined,
         email: dto.email || undefined,
+        photoUrl: dto.photoUrl || undefined,
       },
       create: {
         employeeId,
@@ -48,6 +49,7 @@ export class RegistrationsService {
         department,
         phone: dto.phone || '+251 91 000 0000',
         email: dto.email || undefined,
+        photoUrl: dto.photoUrl || undefined,
         employmentStatus: EmploymentStatus.ACTIVE,
       },
     });

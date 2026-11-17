@@ -27,6 +27,11 @@ export class CreateRegistrationDto {
   @IsString()
   email?: string;
 
+  @ApiProperty({ example: 'data:image/jpeg;base64,...', required: false })
+  @IsOptional()
+  @IsString()
+  photoUrl?: string;
+
   @ApiProperty({ example: 'FEMALE', required: false })
   @IsOptional()
   @IsString()

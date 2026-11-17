@@ -25,7 +25,7 @@ export const MoaHeader: React.FC<MoaHeaderProps> = ({ onOpenMobileSidebar }) => 
         };
       case '/registrations':
         return {
-          title: 'Staff Registrations',
+          title: 'Staff Registrations for gym service',
           subtitle: 'Ministry of Agriculture · Staff gym membership records and directory',
         };
       case '/terminal':

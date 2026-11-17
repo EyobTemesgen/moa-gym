@@ -36,7 +36,10 @@ export const RoleGuard: React.FC<RoleGuardProps> = ({
     if (user.role === 'STAFF_MEMBER') {
       return <Navigate to="/dashboard" replace />;
     }
-    return <Navigate to="/terminal" replace />;
+    if (user.role === 'GYM_ATTENDANT') {
+      return <Navigate to="/terminal" replace />;
+    }
+    return <Navigate to="/registrations" replace />;
   }
 
   return <>{children}</>;

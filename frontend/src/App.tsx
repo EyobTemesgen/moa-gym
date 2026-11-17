@@ -69,11 +69,11 @@ export const App: React.FC = () => {
               <Route path="/waiver" element={<Navigate to="/dashboard" replace />} />
               <Route path="/classes" element={<Navigate to="/" replace />} />
 
-              {/* Front Desk & Gate Terminal */}
+              {/* HR Admin: Staff Registration Directory & Intake */}
               <Route
                 path="/registrations"
                 element={
-                  <RoleGuard allowedRoles={['GYM_ATTENDANT', 'HR_ADMIN']}>
+                  <RoleGuard allowedRoles={['HR_ADMIN']}>
                     <RegistrationsPage />
                   </RoleGuard>
                 }

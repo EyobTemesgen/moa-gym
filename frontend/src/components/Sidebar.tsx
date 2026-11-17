@@ -173,7 +173,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           )}
 
-          {/* Front Desk Attendant Navigation: Gate Checking & Registration Intake */}
+          {/* Front Desk Attendant Navigation: Gate Checking Terminal only */}
           {user.role === 'GYM_ATTENDANT' && (
             <div>
               {!collapsed && (
@@ -198,26 +198,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <div className="flex flex-col">
                       <span className="font-bold">Gate Checking</span>
                       <span className="text-[10px] text-emerald-200/80 font-normal">Access Control & Verify</span>
-                    </div>
-                  )}
-                </NavLink>
-
-                {/* 2. Staff Registration Intake */}
-                <NavLink
-                  to="/registrations"
-                  onClick={onCloseMobile}
-                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${isActive('/registrations')
-                      ? 'bg-white/20 text-white shadow-xs'
-                      : 'text-white/80 hover:text-white hover:bg-white/10'
-                    }`}
-                  title={collapsed ? 'Staff Registration' : undefined}
-                >
-                  {isActive('/registrations') && <ActiveBar />}
-                  <Users className="h-5 w-5 text-emerald-300 shrink-0" />
-                  {!collapsed && (
-                    <div className="flex flex-col">
-                      <span className="font-bold">Staff Registration</span>
-                      <span className="text-[10px] text-emerald-200/80 font-normal">Front Desk Intake</span>
                     </div>
                   )}
                 </NavLink>

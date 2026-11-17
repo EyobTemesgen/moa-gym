@@ -2,7 +2,6 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../lib/auth-context';
 import { MoaLogo } from './MoaLogo';
-import { OccupancyBanner } from './OccupancyBanner';
 import { Menu, Calendar } from 'lucide-react';
 import { getTodayGcAndEc } from '../utils/eth-date';
 
@@ -93,18 +92,15 @@ export const MoaHeader: React.FC<MoaHeaderProps> = ({ onOpenMobileSidebar }) => 
             )}
           </div>
 
-          {/* Right: Date Widget & Live Occupancy Counter */}
+          {/* Right: Date Widget */}
           <div className="flex items-center gap-3 shrink-0">
             {/* Ethiopian + Gregorian Date Pill */}
-            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200 rounded-[4px] text-xs text-slate-600">
+            <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200 rounded-[4px] text-xs text-slate-600">
               <Calendar className="h-3.5 w-3.5 text-emerald-700" />
               <span className="font-medium text-slate-800">{today.gc}</span>
               <span className="text-slate-300">|</span>
               <span className="text-slate-500 font-mono text-[11px]">{today.ecFormattedEn}</span>
             </div>
-
-            {/* Live Occupancy Counter */}
-            <OccupancyBanner compact />
           </div>
         </div>
       </div>

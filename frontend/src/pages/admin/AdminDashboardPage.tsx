@@ -7,7 +7,6 @@ import {
   CheckCircle2,
   Building2,
   Calendar,
-  Activity,
   ArrowRight,
   ShieldCheck,
   BarChart3,
@@ -15,7 +14,6 @@ import {
   Clock,
   TrendingUp,
   AlertCircle,
-  FileSpreadsheet,
 } from 'lucide-react';
 import { StatCard } from '../../components/ui/StatCard';
 import { btn, pill, statusTone } from '../../components/ui/theme';
@@ -52,16 +50,6 @@ export const AdminDashboardPage: React.FC = () => {
     queryKey: ['dashboardStats'],
     queryFn: () => apiRequest('/registrations/stats'),
     refetchInterval: 15000,
-  });
-
-  const { data: occupancy } = useQuery<{
-    current: number;
-    maxCapacity: number;
-    percentage: number;
-  }>({
-    queryKey: ['liveOccupancy'],
-    queryFn: () => apiRequest('/attendance/occupancy'),
-    refetchInterval: 10000,
   });
 
   const totalRegistered = stats?.totalRegistered ?? 0;
@@ -107,7 +95,7 @@ export const AdminDashboardPage: React.FC = () => {
       </div>
 
       {/* Top Metric KPI Cards Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
         <StatCard
           label="Total Registrants"
           value={totalRegistered}
@@ -135,14 +123,6 @@ export const AdminDashboardPage: React.FC = () => {
           value={stats?.registeredToday ?? 0}
           subtitle="New intakes today"
           icon={<Calendar className="h-5 w-5" />}
-        />
-
-        <StatCard
-          label="Live On Floor"
-          value={occupancy?.current ?? stats?.activeFloorCount ?? 0}
-          subtitle={`Capacity: ${occupancy?.maxCapacity ?? 40}`}
-          valueColor="text-[#0B7A3B]"
-          icon={<Activity className="h-5 w-5" />}
         />
 
         <StatCard

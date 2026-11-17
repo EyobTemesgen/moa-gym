@@ -16,7 +16,6 @@ import {
   Calendar,
 } from 'lucide-react';
 import { MoaLogo } from '../../components/MoaLogo';
-import { OccupancyBanner } from '../../components/OccupancyBanner';
 import { btn, pill, statusTone } from '../../components/ui/theme';
 
 interface ProfileData {
@@ -295,11 +294,8 @@ export const StaffDashboardPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Right Column: Live Occupancy & Gym Guidelines */}
+        {/* Right Column: Operating Hours & Gym Guidelines */}
         <div className="lg:col-span-7 space-y-5 no-print">
-          {/* Live Facility Occupancy */}
-          <OccupancyBanner />
-
           {/* Operating Hours & Shifts Schedule */}
           <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs">
             <div className="flex items-center gap-2 mb-3">

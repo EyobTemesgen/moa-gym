@@ -13,25 +13,26 @@ export const MoaHeader: React.FC<MoaHeaderProps> = ({ onOpenMobileSidebar }) => 
   const { user, logout } = useAuth();
   const location = useLocation();
 
-  // Page title mapping
+  // Page title mapping - 100% English
   const getPageTitle = () => {
     switch (location.pathname) {
       case '/registrations':
-        return 'ግብርና ሚ/ር ሰራተኞች የጂምናዚየም ተመዝጋቢዎች ስም ዝርዝር (Staff Gym Registrants Roster)';
+        return 'Staff Gym Registration Directory & Intake';
+      case '/terminal':
+        return 'Gate Access Control & Check-In Terminal';
+      case '/reports':
+      case '/admin/analytics':
+        return 'Facility Utilization & Attendance Reports';
       case '/dashboard':
         return 'Staff Dashboard & QR Entry Pass';
       case '/waiver':
         return 'Health Screening & Liability Waiver (PAR-Q)';
-      case '/terminal':
-        return 'Gate Verification Terminal (Camera QR)';
       case '/active-floor':
         return 'Live Floor Occupancy & Lockers';
       case '/classes':
         return 'Group Fitness Classes & Equipment Log';
       case '/admin/roster':
         return 'MoA Staff Whitelist Roster';
-      case '/admin/analytics':
-        return 'Facility Analytics & Utilization Reports';
       case '/admin/settings':
         return 'Institutional Facility Settings';
       default:
@@ -101,22 +102,23 @@ export const MoaHeader: React.FC<MoaHeaderProps> = ({ onOpenMobileSidebar }) => 
                     <User className="h-4 w-4" />
                   </div>
                 )}
+
+                <button
+                  type="button"
+                  onClick={logout}
+                  title="Sign out"
+                  className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition ml-1"
+                >
+                  <LogOut className="h-4 w-4" />
+                </button>
               </div>
             ) : (
-              <div className="flex items-center gap-2">
-                <Link
-                  to="/claim"
-                  className="text-xs font-semibold text-moa-green hover:text-moa-green-dark px-3 py-1.5 rounded-lg hover:bg-emerald-50 transition"
-                >
-                  Claim Account
-                </Link>
-                <Link
-                  to="/login"
-                  className="text-xs font-semibold text-white bg-moa-green hover:bg-moa-green-dark px-3.5 py-1.5 rounded-lg shadow-xs transition"
-                >
-                  Log In
-                </Link>
-              </div>
+              <Link
+                to="/login"
+                className="px-3 py-1.5 bg-moa-green hover:bg-moa-green-dark text-white rounded-lg text-xs font-semibold shadow-xs transition"
+              >
+                Sign In
+              </Link>
             )}
           </div>
         </div>

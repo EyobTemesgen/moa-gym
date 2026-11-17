@@ -82,7 +82,7 @@ export const BatchRegisterModal: React.FC<BatchRegisterModalProps> = ({
     const validRows = rows.filter((r) => r.fullName.trim() && r.department.trim());
 
     if (validRows.length === 0) {
-      setErrorMsg('እባክዎ ቢያንስ የአንድ ሰራተኛ ስም እና የስራ ክፍል ይሙሉ (Fill at least 1 valid row)');
+      setErrorMsg('Please enter at least one valid staff member with Name and Department.');
       return;
     }
 
@@ -125,14 +125,11 @@ export const BatchRegisterModal: React.FC<BatchRegisterModalProps> = ({
         {/* Header */}
         <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
           <div>
-            <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-              <span>ፈጣን የቡድን ምዝገባ</span>
-              <span className="text-xs font-normal text-slate-500 font-sans">
-                / Quick Batch Registration from Paper Forms
-              </span>
+            <h2 className="text-base font-bold text-slate-900">
+              Batch Paper Form Registration Entry
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
-              ከወረቀት ቅጽ ላይ የተመዘገቡትን ሰራተኞች በቀጥታ ረድፍ በረድፍ ወደ ስርዓቱ ያስገቡ።
+              Transcribe physical paper roster sheets line-by-line directly into the MoA database.
             </p>
           </div>
           <button
@@ -157,12 +154,12 @@ export const BatchRegisterModal: React.FC<BatchRegisterModalProps> = ({
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-bold text-[11px]">
-                  <th className="py-2.5 px-3 w-12 text-center">ተ.ቁ</th>
-                  <th className="py-2.5 px-3">የሰራተኛው ሙሉ ስም (Full Name) *</th>
-                  <th className="py-2.5 px-3">የስራ ክፍል / ዳይሬክቶሬት (Department) *</th>
-                  <th className="py-2.5 px-3 w-32">መለያ ቁ. (ID)</th>
-                  <th className="py-2.5 px-3 w-32">ስልክ (Phone)</th>
-                  <th className="py-2.5 px-3 w-32">ሰዓት (Shift)</th>
+                  <th className="py-2.5 px-3 w-12 text-center">No.</th>
+                  <th className="py-2.5 px-3">Full Name *</th>
+                  <th className="py-2.5 px-3">Directorate / Department *</th>
+                  <th className="py-2.5 px-3 w-32">Employee ID</th>
+                  <th className="py-2.5 px-3 w-32">Phone</th>
+                  <th className="py-2.5 px-3 w-32">Shift Preference</th>
                   <th className="py-2.5 px-2 w-10 text-center"></th>
                 </tr>
               </thead>
@@ -175,7 +172,7 @@ export const BatchRegisterModal: React.FC<BatchRegisterModalProps> = ({
                     <td className="py-1.5 px-2">
                       <input
                         type="text"
-                        placeholder="ምሳሌ፡ ኤርሚያስ ተሾመ"
+                        placeholder="e.g. Ermias Teshome"
                         value={row.fullName}
                         onChange={(e) => updateRow(idx, 'fullName', e.target.value)}
                         className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-moa-green"
@@ -184,7 +181,7 @@ export const BatchRegisterModal: React.FC<BatchRegisterModalProps> = ({
                     <td className="py-1.5 px-2">
                       <input
                         type="text"
-                        placeholder="ምሳሌ፡ ጥራት ግብዓት"
+                        placeholder="e.g. Quality & Input"
                         value={row.department}
                         onChange={(e) => updateRow(idx, 'department', e.target.value)}
                         className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-moa-green"
@@ -202,7 +199,7 @@ export const BatchRegisterModal: React.FC<BatchRegisterModalProps> = ({
                     <td className="py-1.5 px-2">
                       <input
                         type="text"
-                        placeholder="09..."
+                        placeholder="+251 91..."
                         value={row.phone}
                         onChange={(e) => updateRow(idx, 'phone', e.target.value)}
                         className="w-full px-2 py-1.5 border border-slate-300 rounded text-[11px] focus:outline-none focus:ring-1 focus:ring-moa-green"
@@ -214,10 +211,10 @@ export const BatchRegisterModal: React.FC<BatchRegisterModalProps> = ({
                         onChange={(e) => updateRow(idx, 'shiftPreference', e.target.value)}
                         className="w-full px-2 py-1.5 border border-slate-300 rounded text-[11px] bg-white focus:outline-none focus:ring-1 focus:ring-moa-green"
                       >
-                        <option value="ANY">ማንኛውም</option>
-                        <option value="MORNING">ጠዋት</option>
-                        <option value="LUNCH">ምሳ</option>
-                        <option value="EVENING">ማታ</option>
+                        <option value="ANY">Flexible / Any</option>
+                        <option value="MORNING">Morning</option>
+                        <option value="LUNCH">Lunch</option>
+                        <option value="EVENING">Evening</option>
                       </select>
                     </td>
                     <td className="py-1.5 px-2 text-center">
@@ -226,7 +223,7 @@ export const BatchRegisterModal: React.FC<BatchRegisterModalProps> = ({
                         onClick={() => removeRow(idx)}
                         disabled={rows.length <= 1}
                         className="p-1 text-slate-400 hover:text-red-600 disabled:opacity-30 cursor-pointer"
-                        title="ረድፍ ሰርዝ"
+                        title="Delete row"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -244,11 +241,11 @@ export const BatchRegisterModal: React.FC<BatchRegisterModalProps> = ({
               className="inline-flex items-center gap-1 px-3 py-1.5 border border-slate-300 rounded-lg text-slate-700 bg-white hover:bg-slate-50 font-semibold cursor-pointer"
             >
               <Plus className="h-4 w-4 text-moa-green" />
-              <span>ተጨማሪ ረድፍ ጨምር (Add Row)</span>
+              <span>Add Another Row</span>
             </button>
 
             <span className="text-slate-500 font-medium">
-              ድምር ረድፎች፡ {rows.length} ({rows.filter((r) => r.fullName.trim() && r.department.trim()).length} ዝግጁ)
+              Total rows: {rows.length} ({rows.filter((r) => r.fullName.trim() && r.department.trim()).length} ready)
             </span>
           </div>
 
@@ -260,7 +257,7 @@ export const BatchRegisterModal: React.FC<BatchRegisterModalProps> = ({
               disabled={submitting}
               className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-xl font-semibold transition cursor-pointer"
             >
-              ሰርዝ (Cancel)
+              Cancel
             </button>
 
             <button
@@ -270,7 +267,7 @@ export const BatchRegisterModal: React.FC<BatchRegisterModalProps> = ({
               className="inline-flex items-center gap-1.5 px-5 py-2 bg-moa-green hover:bg-moa-green-dark text-white rounded-xl font-bold shadow-xs transition cursor-pointer disabled:opacity-50"
             >
               <Save className="h-4 w-4" />
-              <span>{submitting ? 'በማስቀመጥ ላይ...' : 'ሁሉንም መዝግብ (Save All)'}</span>
+              <span>{submitting ? 'Saving batch...' : 'Save All Registrants'}</span>
             </button>
           </div>
         </div>

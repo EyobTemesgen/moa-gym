@@ -36,7 +36,7 @@ export const GymRegistrantsPrintModal: React.FC<GymRegistrantsPrintModalProps> =
         <div className="px-6 py-3 bg-slate-800 text-white flex items-center justify-between print:hidden">
           <div className="flex items-center gap-2 text-xs font-semibold">
             <Printer className="h-4 w-4 text-moa-gold" />
-            <span>ኦፊሴላዊ የተመዝጋቢዎች ስም ዝርዝር ሰነድ (Print Preview)</span>
+            <span>Official Registrants Roster Document (Print Preview)</span>
           </div>
           <div className="flex items-center gap-3">
             <button
@@ -45,7 +45,7 @@ export const GymRegistrantsPrintModal: React.FC<GymRegistrantsPrintModalProps> =
               className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-moa-green hover:bg-moa-green-dark text-white rounded-lg text-xs font-bold shadow transition cursor-pointer"
             >
               <Printer className="h-4 w-4" />
-              <span>አትም (Print / Save PDF)</span>
+              <span>Print / Save as PDF</span>
             </button>
             <button
               type="button"
@@ -67,49 +67,49 @@ export const GymRegistrantsPrintModal: React.FC<GymRegistrantsPrintModalProps> =
             <div className="flex items-center gap-4">
               <MoaLogo className="h-16 w-16" size={64} />
               <div>
-                <h1 className="text-base font-extrabold text-slate-900 tracking-tight leading-tight">
-                  የኢትዮጵያ ፌዴራላዊ ዲሞክራሲያዊ ሪፐብሊክ ግብርና ሚኒስቴር
+                <h1 className="text-base font-extrabold text-slate-900 tracking-tight leading-tight uppercase">
+                  Federal Democratic Republic of Ethiopia
                 </h1>
-                <h2 className="text-xs font-semibold text-slate-700 tracking-normal font-sans">
-                  Federal Democratic Republic of Ethiopia — Ministry of Agriculture
+                <h2 className="text-sm font-bold text-moa-green tracking-normal font-sans">
+                  Ministry of Agriculture
                 </h2>
-                <div className="text-[11px] font-bold text-moa-green uppercase tracking-wider mt-0.5">
-                  የሰራተኞች ደህንነትና የአካል ብቃት ማዕከል · Staff Wellness & Fitness Center
+                <div className="text-[11px] font-semibold text-slate-600 uppercase tracking-wider mt-0.5">
+                  Staff Wellness & Gymnasium Management Center
                 </div>
               </div>
             </div>
 
             <div className="text-right text-[11px] text-slate-600 font-mono">
-              <div>ቀን (Date): <strong>{todayGregorian}</strong></div>
-              <div>ድምር ተመዝጋቢዎች፡ <strong>{totalCount}</strong></div>
+              <div>Date: <strong>{todayGregorian}</strong></div>
+              <div>Total Enrolled: <strong>{totalCount}</strong></div>
               {selectedDepartment !== 'ALL' && (
-                <div className="text-moa-green font-bold">ክፍል፡ {selectedDepartment}</div>
+                <div className="text-moa-green font-bold">Department: {selectedDepartment}</div>
               )}
             </div>
           </div>
 
-          {/* Official Document Title matching user's paper form */}
-          <div className="text-center py-2 bg-slate-50 border border-slate-200 rounded-lg">
-            <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-wide font-sans">
-              ግብርና ሚ/ር ሰራተኞች የጂምናዚየም ተመዝጋቢዎች ስም ዝርዝር
+          {/* Official Document Title */}
+          <div className="text-center py-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+            <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-wide uppercase">
+              Staff Gymnasium Registrants Master Roster
             </h2>
             <p className="text-[11px] text-slate-600 font-medium">
-              Ministry of Agriculture Staff Gym Registered Members Roster
+              Official Institutional Register of Ministry of Agriculture Enrolled Personnel
             </p>
           </div>
 
-          {/* Table matching the paper columns */}
+          {/* Table matching the paper columns in English */}
           <div className="border border-slate-300 rounded-lg overflow-hidden">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-slate-100 border-b border-slate-300 text-slate-800 font-bold text-[11px]">
-                  <th className="py-2.5 px-3 border-r border-slate-300 w-12 text-center">ተ.ቁ</th>
-                  <th className="py-2.5 px-4 border-r border-slate-300">ስም ዝርዝር (Full Name)</th>
-                  <th className="py-2.5 px-4 border-r border-slate-300">የስራ ክፍል (Directorate)</th>
-                  <th className="py-2.5 px-3 border-r border-slate-300 w-28">መለያ ቁ. (ID)</th>
-                  <th className="py-2.5 px-3 border-r border-slate-300 w-28">ስልክ (Phone)</th>
-                  <th className="py-2.5 px-3 border-r border-slate-300 w-24">ቀን (Date)</th>
-                  <th className="py-2.5 px-4 w-28 text-center">ፊርማ (Signature)</th>
+                  <th className="py-2.5 px-3 border-r border-slate-300 w-12 text-center">No.</th>
+                  <th className="py-2.5 px-4 border-r border-slate-300">Full Name</th>
+                  <th className="py-2.5 px-4 border-r border-slate-300">Directorate / Department</th>
+                  <th className="py-2.5 px-3 border-r border-slate-300 w-28">Employee ID</th>
+                  <th className="py-2.5 px-3 border-r border-slate-300 w-28">Phone</th>
+                  <th className="py-2.5 px-3 border-r border-slate-300 w-24">Date</th>
+                  <th className="py-2.5 px-4 w-28 text-center">Signature</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
@@ -159,39 +159,39 @@ export const GymRegistrantsPrintModal: React.FC<GymRegistrantsPrintModalProps> =
           {/* Official Signatory Blocks */}
           <div className="pt-6 border-t-2 border-slate-300 grid grid-cols-3 gap-6 text-[11px] text-slate-700">
             <div className="space-y-4">
-              <div className="font-bold text-slate-900">ያዘጋጀው (Prepared by):</div>
+              <div className="font-bold text-slate-900">Prepared by:</div>
               <div className="space-y-1.5 pt-2">
-                <div>ስም፡ ________________________</div>
-                <div>የስራ መደብ፡ <strong>የጂም አስተባባሪ / Desk</strong></div>
-                <div>ፊርማ፡ ________________________</div>
-                <div>ቀን፡ ________________________</div>
+                <div>Name: ________________________</div>
+                <div>Position: <strong>Gym Attendant / Desk Officer</strong></div>
+                <div>Signature: ________________________</div>
+                <div>Date: ________________________</div>
               </div>
             </div>
 
             <div className="space-y-4">
-              <div className="font-bold text-slate-900">ያረጋገጠው (Verified by):</div>
+              <div className="font-bold text-slate-900">Verified by:</div>
               <div className="space-y-1.5 pt-2">
-                <div>ስም፡ ________________________</div>
-                <div>የስራ መደብ፡ <strong>የደህንነት አገልግሎት ኃላፊ</strong></div>
-                <div>ፊርማ፡ ________________________</div>
-                <div>ቀን፡ ________________________</div>
+                <div>Name: ________________________</div>
+                <div>Position: <strong>Security & Access Control Lead</strong></div>
+                <div>Signature: ________________________</div>
+                <div>Date: ________________________</div>
               </div>
             </div>
 
             <div className="space-y-4">
-              <div className="font-bold text-slate-900">ያፀደቀው (Approved by):</div>
+              <div className="font-bold text-slate-900">Approved by:</div>
               <div className="space-y-1.5 pt-2">
-                <div>ስም፡ ________________________</div>
-                <div>የስራ መደብ፡ <strong>የሰው ሃብት ዳይሬክቶሬት</strong></div>
-                <div>ፊርማ፡ ________________________</div>
-                <div>ቀን፡ ________________________</div>
+                <div>Name: ________________________</div>
+                <div>Position: <strong>Human Resource Directorate</strong></div>
+                <div>Signature: ________________________</div>
+                <div>Date: ________________________</div>
               </div>
             </div>
           </div>
 
           {/* Document Footer Notice */}
           <div className="text-center pt-4 border-t border-slate-200 text-[10px] text-slate-400">
-            © 2026 የኢትዮጵያ ፌዴራላዊ ዲሞክራሲያዊ ሪፐብሊክ ግብርና ሚኒስቴር · የውስጥ ሰራተኞች ደህንነት ማዕከል አገልግሎት
+            © 2026 Federal Democratic Republic of Ethiopia Ministry of Agriculture · Internal Civil Service Wellness Center
           </div>
         </div>
       </div>

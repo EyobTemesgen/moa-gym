@@ -27,7 +27,7 @@ export const LoginPage: React.FC = () => {
           navigate('/dashboard');
         }
       } else {
-        navigate('/terminal');
+        navigate('/registrations');
       }
     } catch (err: any) {
       setError(err.message || 'Login failed. Please verify credentials.');

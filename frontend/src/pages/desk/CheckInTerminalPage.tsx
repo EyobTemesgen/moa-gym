@@ -231,9 +231,9 @@ export const CheckInTerminalPage: React.FC = () => {
                 <input
                   type="text"
                   value={manualId}
-                  onChange={(e) => setManualId(e.target.value.toUpperCase())}
-                  placeholder="e.g. EMP-MOA-001"
-                  className="w-full px-3 py-2.5 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-moa-green/30 focus:border-moa-green font-mono uppercase"
+                  onChange={(e) => setManualId(e.target.value)}
+                  placeholder="e.g. EMP-MOA-001, Mulugeta, or Reg #1"
+                  className="w-full px-3 py-2.5 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-moa-green/30 focus:border-moa-green font-mono"
                 />
               </div>
 

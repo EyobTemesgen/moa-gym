@@ -1,22 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../lib/auth-context';
 import { MoaLogo } from './MoaLogo';
-import { OccupancyBanner } from './OccupancyBanner';
 import {
   QrCode,
   ShieldCheck,
   Users,
-  Calendar,
   BarChart3,
-  Settings,
   ClipboardList,
   LogOut,
   ChevronLeft,
   ChevronRight,
   User,
-  Activity,
-  HeartPulse,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -59,11 +54,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex flex-col bg-[#07572A] text-white shadow-xl transition-all duration-300 ease-in-out ${
-          collapsed ? 'w-20' : 'w-64'
-        } ${
-          mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        }`}
+        className={`fixed inset-y-0 left-0 z-50 flex flex-col bg-[#07572A] text-white shadow-xl transition-all duration-300 ease-in-out ${collapsed ? 'w-20' : 'w-64'
+          } ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+          }`}
       >
         {/* Top 4px MoA Tri-Color Accent Bar */}
         <div className="h-1 w-full bg-gradient-to-r from-moa-gold via-moa-green to-moa-blue shrink-0"></div>
@@ -74,14 +67,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <MoaLogo className="h-10 w-10 shrink-0" size={40} />
             {!collapsed && (
               <div className="overflow-hidden whitespace-nowrap">
-                <div className="text-[11px] font-bold text-moa-gold tracking-tight font-sans">
-                  የግብርና ሚኒስቴር
+                <div className="text-[11px] font-bold text-moa-gold tracking-tight font-sans uppercase">
+                  FDRE MoA
                 </div>
                 <div className="text-[10px] font-semibold text-white/80 tracking-wider">
                   MINISTRY OF AGRICULTURE
                 </div>
                 <div className="text-xs font-bold text-white tracking-tight flex items-center gap-1.5 mt-0.5">
-                  <span>MoA-Gym</span>
+                  <span>MoA Gym</span>
                   <span className="text-[9px] font-mono text-emerald-200 bg-white/15 px-1.5 py-0.2 rounded">
                     Staff Wellness
                   </span>
@@ -95,7 +88,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             type="button"
             onClick={onToggleCollapse}
             title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            className="hidden lg:flex p-1.5 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition"
+            className="hidden lg:flex p-1.5 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition cursor-pointer"
           >
             {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           </button>
@@ -111,15 +104,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   Staff Member Portal
                 </div>
               )}
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <NavLink
                   to="/dashboard"
                   onClick={onCloseMobile}
-                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${
-                    isActive('/dashboard')
+                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${isActive('/dashboard')
                       ? 'bg-white/20 text-white shadow-xs'
                       : 'text-white/80 hover:text-white hover:bg-white/10'
-                  }`}
+                    }`}
                   title={collapsed ? 'My Digital QR Pass' : undefined}
                 >
                   {isActive('/dashboard') && <ActiveBar />}
@@ -128,17 +120,30 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </NavLink>
 
                 <NavLink
-                  to="/waiver"
+                  to="/registrations"
                   onClick={onCloseMobile}
-                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${
-                    isActive('/waiver')
+                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${isActive('/registrations')
                       ? 'bg-white/20 text-white shadow-xs'
                       : 'text-white/80 hover:text-white hover:bg-white/10'
-                  }`}
+                    }`}
+                  title={collapsed ? 'Staff Gym Registration Roster' : undefined}
+                >
+                  {isActive('/registrations') && <ActiveBar />}
+                  <Users className="h-5 w-5 text-emerald-300 shrink-0" />
+                  {!collapsed && <span>Staff Registrations</span>}
+                </NavLink>
+
+                <NavLink
+                  to="/waiver"
+                  onClick={onCloseMobile}
+                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${isActive('/waiver')
+                      ? 'bg-white/20 text-white shadow-xs'
+                      : 'text-white/80 hover:text-white hover:bg-white/10'
+                    }`}
                   title={collapsed ? 'PAR-Q & Liability Waiver' : undefined}
                 >
                   {isActive('/waiver') && <ActiveBar />}
-                  <ClipboardList className="h-5 w-5 text-emerald-300 shrink-0" />
+                  <ClipboardList className="h-5 w-5 text-sky-300 shrink-0" />
                   {!collapsed && (
                     <div className="flex items-center justify-between flex-1">
                       <span>PAR-Q & Waiver</span>
@@ -154,169 +159,77 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     </div>
                   )}
                 </NavLink>
-
-                <NavLink
-                  to="/classes"
-                  onClick={onCloseMobile}
-                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${
-                    isActive('/classes')
-                      ? 'bg-white/20 text-white shadow-xs'
-                      : 'text-white/80 hover:text-white hover:bg-white/10'
-                  }`}
-                  title={collapsed ? 'Wellness & Fitness Classes' : undefined}
-                >
-                  {isActive('/classes') && <ActiveBar />}
-                  <Calendar className="h-5 w-5 text-sky-300 shrink-0" />
-                  {!collapsed && <span>Fitness Classes</span>}
-                </NavLink>
-
-                <NavLink
-                  to="/registrations"
-                  onClick={onCloseMobile}
-                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${
-                    isActive('/registrations')
-                      ? 'bg-white/20 text-white shadow-xs'
-                      : 'text-white/80 hover:text-white hover:bg-white/10'
-                  }`}
-                  title={collapsed ? 'የተመዝጋቢዎች ዝርዝር (Gym Registrants)' : undefined}
-                >
-                  {isActive('/registrations') && <ActiveBar />}
-                  <Users className="h-5 w-5 text-amber-300 shrink-0" />
-                  {!collapsed && <span>ተመዝጋቢዎች (Registrants)</span>}
-                </NavLink>
               </div>
             </div>
           )}
 
-          {/* Front Desk / Gym Attendant Navigation */}
+          {/* Core Operations: 1. Registration, 2. Gate Checking, 3. Reports */}
           {(user.role === 'GYM_ATTENDANT' || user.role === 'HR_ADMIN') && (
             <div>
               {!collapsed && (
                 <div className="px-3 text-[10px] font-bold text-emerald-200/70 uppercase tracking-wider mb-2">
-                  Front Desk Operations
+                  Gym Operations
                 </div>
               )}
-              <div className="space-y-1">
+              <div className="space-y-1.5">
+                {/* 1. Registration */}
                 <NavLink
                   to="/registrations"
                   onClick={onCloseMobile}
-                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${
-                    isActive('/registrations')
+                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${isActive('/registrations')
                       ? 'bg-white/20 text-white shadow-xs'
                       : 'text-white/80 hover:text-white hover:bg-white/10'
-                  }`}
-                  title={collapsed ? 'የተመዝጋቢዎች ዝርዝር (Gym Registrants Roster)' : undefined}
+                    }`}
+                  title={collapsed ? 'Staff Registration' : undefined}
                 >
                   {isActive('/registrations') && <ActiveBar />}
                   <Users className="h-5 w-5 text-moa-gold shrink-0" />
                   {!collapsed && (
                     <div className="flex flex-col">
-                      <span>ተመዝጋቢዎች (Registrants)</span>
-                      <span className="text-[10px] text-emerald-200/80 font-normal">የስም ዝርዝር ማህደር</span>
+                      <span className="font-bold">Staff Registration</span>
+                      <span className="text-[10px] text-emerald-200/80 font-normal">Registrants Roster & Intake</span>
                     </div>
                   )}
                 </NavLink>
 
+                {/* 2. Gate Checking */}
                 <NavLink
                   to="/terminal"
                   onClick={onCloseMobile}
-                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${
-                    isActive('/terminal')
+                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${isActive('/terminal')
                       ? 'bg-white/20 text-white shadow-xs'
                       : 'text-white/80 hover:text-white hover:bg-white/10'
-                  }`}
-                  title={collapsed ? 'Gate Verification Terminal' : undefined}
+                    }`}
+                  title={collapsed ? 'Gate Checking Terminal' : undefined}
                 >
                   {isActive('/terminal') && <ActiveBar />}
-                  <ShieldCheck className="h-5 w-5 text-moa-gold shrink-0" />
-                  {!collapsed && <span>Gate Terminal (QR)</span>}
+                  <ShieldCheck className="h-5 w-5 text-emerald-300 shrink-0" />
+                  {!collapsed && (
+                    <div className="flex flex-col">
+                      <span className="font-bold">Gate Checking</span>
+                      <span className="text-[10px] text-emerald-200/80 font-normal">Access Control & Verify</span>
+                    </div>
+                  )}
                 </NavLink>
 
+                {/* 3. Reports */}
                 <NavLink
-                  to="/active-floor"
+                  to="/reports"
                   onClick={onCloseMobile}
-                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${
-                    isActive('/active-floor')
+                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${isActive('/reports') || isActive('/admin/analytics')
                       ? 'bg-white/20 text-white shadow-xs'
                       : 'text-white/80 hover:text-white hover:bg-white/10'
-                  }`}
-                  title={collapsed ? 'Live Floor & Lockers' : undefined}
+                    }`}
+                  title={collapsed ? 'Reports & Analytics' : undefined}
                 >
-                  {isActive('/active-floor') && <ActiveBar />}
-                  <Activity className="h-5 w-5 text-emerald-300 shrink-0" />
-                  {!collapsed && <span>Active Floor & Lockers</span>}
-                </NavLink>
-
-                <NavLink
-                  to="/classes"
-                  onClick={onCloseMobile}
-                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${
-                    isActive('/classes')
-                      ? 'bg-white/20 text-white shadow-xs'
-                      : 'text-white/80 hover:text-white hover:bg-white/10'
-                  }`}
-                  title={collapsed ? 'Classes & Equipment Log' : undefined}
-                >
-                  {isActive('/classes') && <ActiveBar />}
-                  <Calendar className="h-5 w-5 text-sky-300 shrink-0" />
-                  {!collapsed && <span>Classes & Equipment</span>}
-                </NavLink>
-              </div>
-            </div>
-          )}
-
-          {/* HR Admin Exclusive Navigation */}
-          {user.role === 'HR_ADMIN' && (
-            <div>
-              {!collapsed && (
-                <div className="px-3 text-[10px] font-bold text-emerald-200/70 uppercase tracking-wider mb-2">
-                  HR Administration
-                </div>
-              )}
-              <div className="space-y-1">
-                <NavLink
-                  to="/admin/roster"
-                  onClick={onCloseMobile}
-                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${
-                    isActive('/admin/roster')
-                      ? 'bg-white/20 text-white shadow-xs'
-                      : 'text-white/80 hover:text-white hover:bg-white/10'
-                  }`}
-                  title={collapsed ? 'Staff Eligibility Whitelist' : undefined}
-                >
-                  {isActive('/admin/roster') && <ActiveBar />}
-                  <Users className="h-5 w-5 text-amber-300 shrink-0" />
-                  {!collapsed && <span>Staff Whitelist Roster</span>}
-                </NavLink>
-
-                <NavLink
-                  to="/admin/analytics"
-                  onClick={onCloseMobile}
-                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${
-                    isActive('/admin/analytics')
-                      ? 'bg-white/20 text-white shadow-xs'
-                      : 'text-white/80 hover:text-white hover:bg-white/10'
-                  }`}
-                  title={collapsed ? 'Utilization Analytics & CSV' : undefined}
-                >
-                  {isActive('/admin/analytics') && <ActiveBar />}
+                  {(isActive('/reports') || isActive('/admin/analytics')) && <ActiveBar />}
                   <BarChart3 className="h-5 w-5 text-sky-300 shrink-0" />
-                  {!collapsed && <span>Analytics & CSV Report</span>}
-                </NavLink>
-
-                <NavLink
-                  to="/admin/settings"
-                  onClick={onCloseMobile}
-                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${
-                    isActive('/admin/settings')
-                      ? 'bg-white/20 text-white shadow-xs'
-                      : 'text-white/80 hover:text-white hover:bg-white/10'
-                  }`}
-                  title={collapsed ? 'Facility & Waiver Settings' : undefined}
-                >
-                  {isActive('/admin/settings') && <ActiveBar />}
-                  <Settings className="h-5 w-5 text-slate-300 shrink-0" />
-                  {!collapsed && <span>Facility Settings</span>}
+                  {!collapsed && (
+                    <div className="flex flex-col">
+                      <span className="font-bold">Reports</span>
+                      <span className="text-[10px] text-emerald-200/80 font-normal">Analytics & CSV Export</span>
+                    </div>
+                  )}
                 </NavLink>
               </div>
             </div>
@@ -352,7 +265,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               type="button"
               onClick={logout}
               title="Sign out"
-              className="p-1.5 text-white/70 hover:text-red-300 hover:bg-white/10 rounded-lg transition shrink-0 ml-auto"
+              className="p-1.5 text-white/70 hover:text-red-300 hover:bg-white/10 rounded-lg transition shrink-0 ml-auto cursor-pointer"
             >
               <LogOut className="h-4 w-4" />
             </button>

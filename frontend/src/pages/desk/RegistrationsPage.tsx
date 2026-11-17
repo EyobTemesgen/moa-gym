@@ -1,25 +1,20 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '../../lib/api';
-import { RegisterStaffModal } from '../../components/registrations/RegisterStaffModal';
-import { BatchRegisterModal } from '../../components/registrations/BatchRegisterModal';
-import { GymRegistrantsPrintModal } from '../../components/registrations/GymRegistrantsPrintModal';
 import {
   Users,
   UserPlus,
   Printer,
   Search,
-  Filter,
   CheckCircle2,
-  XCircle,
-  FileSpreadsheet,
-  Clock,
-  Building2,
   Calendar,
+  Building2,
+  FileSpreadsheet,
   PenTool,
-  AlertCircle,
-  MoreVertical,
 } from 'lucide-react';
+import { RegisterStaffModal } from '../../components/registrations/RegisterStaffModal';
+import { BatchRegisterModal } from '../../components/registrations/BatchRegisterModal';
+import { GymRegistrantsPrintModal } from '../../components/registrations/GymRegistrantsPrintModal';
 
 interface Registrant {
   id: string;
@@ -29,17 +24,18 @@ interface Registrant {
   department: string;
   phone?: string;
   email?: string;
+  gender?: string;
   shiftPreference?: string;
   registeredAt: string;
   registeredBy?: string;
-  registrationSource: string;
+  registrationSource?: string;
   signatureConfirmed: boolean;
   signatureData?: string;
-  status: 'ACTIVE' | 'SUSPENDED' | 'CANCELLED';
+  status: string;
   remarks?: string;
   hrRecord?: {
     photoUrl?: string;
-    employmentStatus: string;
+    employmentStatus?: string;
   };
 }
 
@@ -98,26 +94,26 @@ export const RegistrationsPage: React.FC = () => {
     switch (shift) {
       case 'MORNING':
         return (
-          <span className="bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded text-[10px] font-semibold">
-            ጠዋት (06:00 - 08:30)
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+            Morning (06:00 - 08:30)
           </span>
         );
       case 'LUNCH':
         return (
-          <span className="bg-blue-50 text-blue-800 border border-blue-200 px-2 py-0.5 rounded text-[10px] font-semibold">
-            ምሳ (12:00 - 14:00)
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-sky-50 text-sky-800 border border-sky-200">
+            Lunch (12:00 - 14:00)
           </span>
         );
       case 'EVENING':
         return (
-          <span className="bg-indigo-50 text-indigo-800 border border-indigo-200 px-2 py-0.5 rounded text-[10px] font-semibold">
-            ማታ (17:00 - 20:00)
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-50 text-indigo-800 border border-indigo-200">
+            Evening (17:00 - 20:00)
           </span>
         );
       default:
         return (
-          <span className="bg-slate-50 text-slate-600 border border-slate-200 px-2 py-0.5 rounded text-[10px]">
-            ማንኛውም (Flexible)
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-700">
+            Flexible (Any)
           </span>
         );
     }
@@ -130,14 +126,14 @@ export const RegistrationsPage: React.FC = () => {
         <div>
           <div className="flex items-center gap-2.5">
             <h1 className="text-xl font-extrabold text-slate-900 tracking-tight">
-              ግብርና ሚ/ር ሰራተኞች የጂምናዚየም ተመዝጋቢዎች ስም ዝርዝር
+              Staff Gym Registrants Roster
             </h1>
             <span className="text-[11px] font-bold text-moa-green bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-              {stats?.totalRegistered ?? data?.total ?? 0} የተመዘገቡ
+              {stats?.totalRegistered ?? data?.total ?? 0} Enrolled
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            MoA Staff Gym Registrants Roster · የሰራተኞች የአካል ብቃት ማዕከል አገልግሎት ምዝገባና የተመዝጋቢዎች ማህደር
+            Ministry of Agriculture · Staff Wellness & Fitness Gymnasium Membership Directory
           </p>
         </div>
 
@@ -149,7 +145,7 @@ export const RegistrationsPage: React.FC = () => {
             className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl border border-slate-200 transition cursor-pointer"
           >
             <Printer className="h-4 w-4 text-slate-600" />
-            <span>ዝርዝር አትም (Print Roster)</span>
+            <span>Print Roster (PDF)</span>
           </button>
 
           <button
@@ -158,7 +154,7 @@ export const RegistrationsPage: React.FC = () => {
             className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold rounded-xl border border-emerald-200 transition cursor-pointer"
           >
             <FileSpreadsheet className="h-4 w-4 text-moa-green" />
-            <span>ፈጣን የቡድን ምዝገባ (Batch Entry)</span>
+            <span>Batch Paper Entry</span>
           </button>
 
           <button
@@ -167,7 +163,7 @@ export const RegistrationsPage: React.FC = () => {
             className="inline-flex items-center gap-1.5 px-4 py-2 bg-moa-green hover:bg-moa-green-dark text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer"
           >
             <UserPlus className="h-4 w-4" />
-            <span>+ አዲስ ተመዝጋቢ መዝግብ (Register Staff)</span>
+            <span>+ Register Staff</span>
           </button>
         </div>
       </div>
@@ -181,7 +177,7 @@ export const RegistrationsPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setNotification(null)}
-            className="text-slate-400 hover:text-slate-600"
+            className="text-slate-400 hover:text-slate-600 cursor-pointer"
           >
             ✕
           </button>
@@ -192,46 +188,46 @@ export const RegistrationsPage: React.FC = () => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">ድምር ተመዝጋቢዎች (Total)</span>
+            <span className="text-xs font-semibold text-slate-500">Total Registrants</span>
             <Users className="h-5 w-5 text-moa-green" />
           </div>
           <div className="text-2xl font-black text-slate-900 mt-2">
             {stats?.totalRegistered ?? data?.total ?? 0}
           </div>
-          <div className="text-[11px] text-slate-400 mt-0.5">የተመዘገቡ የግብርና ሚ/ር ሰራተኞች</div>
+          <div className="text-[11px] text-slate-400 mt-0.5">Enrolled MoA staff members</div>
         </div>
 
         <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">ንቁ ተጠቃሚዎች (Active)</span>
+            <span className="text-xs font-semibold text-slate-500">Active Members</span>
             <CheckCircle2 className="h-5 w-5 text-emerald-600" />
           </div>
           <div className="text-2xl font-black text-emerald-700 mt-2">
             {stats?.activeMembers ?? 0}
           </div>
-          <div className="text-[11px] text-emerald-600 mt-0.5 font-medium">በአገልግሎት ላይ የሚገኙ</div>
+          <div className="text-[11px] text-emerald-600 mt-0.5 font-medium">Eligible for gym access</div>
         </div>
 
         <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">የተወከሉ ዳይሬክቶሬቶች</span>
+            <span className="text-xs font-semibold text-slate-500">Directorates</span>
             <Building2 className="h-5 w-5 text-moa-blue" />
           </div>
           <div className="text-2xl font-black text-moa-blue mt-2">
             {stats?.totalDirectorates ?? data?.departments?.length ?? 0}
           </div>
-          <div className="text-[11px] text-slate-400 mt-0.5">የተለያዩ የስራ ክፍሎች</div>
+          <div className="text-[11px] text-slate-400 mt-0.5">Participating departments</div>
         </div>
 
         <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">ዛሬ የተመዘገቡ (Today)</span>
+            <span className="text-xs font-semibold text-slate-500">Registered Today</span>
             <Calendar className="h-5 w-5 text-moa-gold" />
           </div>
           <div className="text-2xl font-black text-slate-800 mt-2">
             {stats?.registeredToday ?? 0}
           </div>
-          <div className="text-[11px] text-slate-400 mt-0.5">በዛሬው ዕለት የገቡ አዳዲስ</div>
+          <div className="text-[11px] text-slate-400 mt-0.5">New intakes today</div>
         </div>
       </div>
 
@@ -245,7 +241,7 @@ export const RegistrationsPage: React.FC = () => {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="በስም፣ በዳይሬክቶሬት (የስራ ክፍል)፣ በመለያ ቁጥር ወይም በስልክ ፈልግ..."
+            placeholder="Search by name, department, employee ID, or phone..."
             className="w-full pl-9 pr-3 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-moa-green/30"
           />
         </div>
@@ -257,7 +253,7 @@ export const RegistrationsPage: React.FC = () => {
             onChange={(e) => setSelectedDept(e.target.value)}
             className="px-3 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-moa-green/30 bg-white"
           >
-            <option value="ALL">ሁሉም የስራ ክፍሎች (All Directorates)</option>
+            <option value="ALL">All Departments</option>
             {(data?.departments || []).map((dept) => (
               <option key={dept} value={dept}>
                 {dept}
@@ -271,42 +267,42 @@ export const RegistrationsPage: React.FC = () => {
             onChange={(e) => setSelectedStatus(e.target.value)}
             className="px-3 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-moa-green/30 bg-white"
           >
-            <option value="ALL">ሁሉም ሁኔታዎች (All Statuses)</option>
-            <option value="ACTIVE">ንቁ (Active)</option>
-            <option value="SUSPENDED">የታገዱ (Suspended)</option>
+            <option value="ALL">All Statuses</option>
+            <option value="ACTIVE">Active</option>
+            <option value="SUSPENDED">Suspended</option>
           </select>
         </div>
       </div>
 
-      {/* Registrants Table matching official paper format */}
+      {/* Registrants Table */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200 text-slate-700 font-bold">
-                <th className="py-3 px-3.5 w-14 text-center">ተ.ቁ</th>
-                <th className="py-3 px-4">ስም ዝርዝር (Full Name)</th>
-                <th className="py-3 px-4">የስራ ክፍል / ዳይሬክቶሬት (Department)</th>
-                <th className="py-3 px-3.5 w-28">መለያ ቁ. (ID)</th>
-                <th className="py-3 px-3.5 w-28">ስልክ ቁጥር</th>
-                <th className="py-3 px-3.5">የምርጫ ሰዓት (Shift)</th>
-                <th className="py-3 px-3.5 w-24">ቀን (Date)</th>
-                <th className="py-3 px-4 text-center w-28">ፊርማ (Signature)</th>
-                <th className="py-3 px-3 w-20 text-center">ሁኔታ</th>
-                <th className="py-3 px-4 text-right w-24">ድርጊት</th>
+                <th className="py-3 px-3.5 w-14 text-center">No.</th>
+                <th className="py-3 px-4">Full Name</th>
+                <th className="py-3 px-4">Department / Directorate</th>
+                <th className="py-3 px-3.5 w-28">Employee ID</th>
+                <th className="py-3 px-3.5 w-28">Phone</th>
+                <th className="py-3 px-3.5">Shift Preference</th>
+                <th className="py-3 px-3.5 w-24">Date</th>
+                <th className="py-3 px-4 text-center w-28">Signature</th>
+                <th className="py-3 px-3 w-20 text-center">Status</th>
+                <th className="py-3 px-4 text-right w-24">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {isLoading ? (
                 <tr>
                   <td colSpan={10} className="py-12 text-center text-slate-400">
-                    መረጃው በመጫን ላይ ነው (Loading registrants...)...
+                    Loading registrants...
                   </td>
                 </tr>
               ) : (data?.items || []).length === 0 ? (
                 <tr>
                   <td colSpan={10} className="py-12 text-center text-slate-400">
-                    ምንም የተመዘገበ ሰራተኛ አልተገኘም (No registered staff members found).
+                    No registered staff members found.
                   </td>
                 </tr>
               ) : (
@@ -315,12 +311,12 @@ export const RegistrationsPage: React.FC = () => {
 
                   return (
                     <tr key={row.id} className="hover:bg-slate-50/70 transition">
-                      {/* ተ.ቁ */}
+                      {/* No. */}
                       <td className="py-3 px-3.5 text-center font-bold font-mono text-slate-600 bg-slate-50/50">
                         {row.regNumber}
                       </td>
 
-                      {/* ስም ዝርዝር */}
+                      {/* Full Name */}
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-2.5">
                           {row.hrRecord?.photoUrl ? (
@@ -338,24 +334,24 @@ export const RegistrationsPage: React.FC = () => {
                             <div className="font-bold text-slate-900">{row.fullName}</div>
                             {row.registrationSource === 'PAPER_FORM' && (
                               <span className="text-[10px] text-amber-700 font-medium">
-                                📋 ከወረቀት ቅጽ
+                                📋 Paper Roster
                               </span>
                             )}
                           </div>
                         </div>
                       </td>
 
-                      {/* የስራ ክፍል */}
+                      {/* Department */}
                       <td className="py-3 px-4 font-semibold text-slate-800">
                         {row.department}
                       </td>
 
-                      {/* መለያ ቁጥር */}
+                      {/* Employee ID */}
                       <td className="py-3 px-3.5 font-mono text-[11px] text-slate-500">
                         {row.employeeId}
                       </td>
 
-                      {/* ስልክ */}
+                      {/* Phone */}
                       <td className="py-3 px-3.5 text-slate-600 font-mono text-[11px]">
                         {row.phone || '—'}
                       </td>
@@ -365,12 +361,12 @@ export const RegistrationsPage: React.FC = () => {
                         {getShiftBadge(row.shiftPreference)}
                       </td>
 
-                      {/* የተመዘገበበት ቀን */}
+                      {/* Date */}
                       <td className="py-3 px-3.5 text-slate-500 font-mono text-[11px]">
                         {new Date(row.registeredAt).toLocaleDateString('en-GB')}
                       </td>
 
-                      {/* ፊርማ */}
+                      {/* Signature */}
                       <td className="py-2 px-4 text-center">
                         {row.signatureData ? (
                           <img
@@ -381,14 +377,14 @@ export const RegistrationsPage: React.FC = () => {
                         ) : row.signatureConfirmed ? (
                           <span className="inline-flex items-center gap-1 text-[11px] font-bold text-moa-green">
                             <PenTool className="h-3 w-3" />
-                            <span>ተፈርሟል</span>
+                            <span>Signed</span>
                           </span>
                         ) : (
                           <span className="text-slate-300 font-mono text-[11px]">—</span>
                         )}
                       </td>
 
-                      {/* ሁኔታ */}
+                      {/* Status */}
                       <td className="py-3 px-3 text-center">
                         <span
                           className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
@@ -397,11 +393,11 @@ export const RegistrationsPage: React.FC = () => {
                               : 'bg-red-100 text-red-800'
                           }`}
                         >
-                          {isActive ? 'ንቁ' : 'የታገደ'}
+                          {isActive ? 'Active' : 'Suspended'}
                         </span>
                       </td>
 
-                      {/* ድርጊት */}
+                      {/* Action */}
                       <td className="py-3 px-4 text-right">
                         <button
                           type="button"
@@ -417,7 +413,7 @@ export const RegistrationsPage: React.FC = () => {
                               : 'text-emerald-700 hover:bg-emerald-50 border border-emerald-200'
                           }`}
                         >
-                          {isActive ? 'እገድ' : 'አንቃ'}
+                          {isActive ? 'Suspend' : 'Activate'}
                         </button>
                       </td>
                     </tr>
@@ -437,7 +433,7 @@ export const RegistrationsPage: React.FC = () => {
           queryClient.invalidateQueries({ queryKey: ['gymRegistrations'] });
           queryClient.invalidateQueries({ queryKey: ['registrationStats'] });
           setNotification(
-            `✓ ሰራተኛው "${newReg.fullName}" በተ.ቁ ${newReg.regNumber} በተሳካ ሁኔታ ተመዝግቧል።`,
+            `✓ Staff member "${newReg.fullName}" was successfully registered under Reg # ${newReg.regNumber}.`,
           );
         }}
       />
@@ -448,7 +444,7 @@ export const RegistrationsPage: React.FC = () => {
         onSuccess={() => {
           queryClient.invalidateQueries({ queryKey: ['gymRegistrations'] });
           queryClient.invalidateQueries({ queryKey: ['registrationStats'] });
-          setNotification('✓ የቡድን ምዝገባው በተሳካ ሁኔታ ተጠናቋል።');
+          setNotification('✓ Batch registration completed successfully.');
         }}
       />
 

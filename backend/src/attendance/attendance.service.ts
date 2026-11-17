@@ -9,7 +9,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { Cron } from '@nestjs/schedule';
 import { VerifyPassDto, CheckInDto, CheckOutDto } from './dto/verify-pass.dto';
-import { LockerStatus, EmploymentStatus } from '@prisma/client';
+import { LockerStatus, EmploymentStatus, Role } from '@prisma/client';
+import * as bcrypt from 'bcryptjs';
 
 export type GateVerificationStatus =
   | 'APPROVED'
@@ -90,12 +91,28 @@ export class AttendanceService {
       return {
         status: 'DENIED' as GateVerificationStatus,
         reason: 'MISSING_IDENTIFIER',
-        message: 'No QR pass or Employee ID provided for gate verification.',
+        message: 'No QR pass, Name, or Employee ID provided for gate verification.',
       };
     }
 
+    // Step 1.5: Match against Gym Registration (Supports Reg # ተ.ቁ, Employee ID, or Staff Name)
+    const asNum = parseInt(employeeId, 10);
+    const gymReg = await this.prisma.gymRegistration.findFirst({
+      where: {
+        OR: [
+          { employeeId: { equals: employeeId, mode: 'insensitive' } },
+          ...(isNaN(asNum) ? [] : [{ regNumber: asNum }]),
+          { fullName: { contains: employeeId, mode: 'insensitive' } },
+        ],
+      },
+    });
+
+    if (gymReg) {
+      employeeId = gymReg.employeeId;
+    }
+
     // Step 2: HR Whitelist Check
-    const hrRecord = await this.prisma.hrEmployeeRoster.findUnique({
+    let hrRecord = await this.prisma.hrEmployeeRoster.findUnique({
       where: { employeeId },
       include: {
         userAccount: {
@@ -109,11 +126,34 @@ export class AttendanceService {
       },
     });
 
+    // Auto-link registered staff if not yet on HR roster table
+    if (!hrRecord && gymReg) {
+      hrRecord = await this.prisma.hrEmployeeRoster.create({
+        data: {
+          employeeId: gymReg.employeeId,
+          fullName: gymReg.fullName,
+          department: gymReg.department,
+          phone: gymReg.phone || '+251 91 000 0000',
+          employmentStatus: EmploymentStatus.ACTIVE,
+        },
+        include: {
+          userAccount: {
+            include: {
+              attendanceLogs: {
+                where: { checkOutTime: null },
+                take: 1,
+              },
+            },
+          },
+        },
+      });
+    }
+
     if (!hrRecord) {
       return {
         status: 'DENIED' as GateVerificationStatus,
         reason: 'NOT_FOUND_IN_ROSTER',
-        message: `Employee ID "${employeeId}" was not found in the official MoA HR staff roster.`,
+        message: `Employee "${dto.employeeId}" was not found in the gym registration roster or HR staff records.`,
       };
     }
 
@@ -132,7 +172,27 @@ export class AttendanceService {
       };
     }
 
-    // Step 3: Account Claim Check
+    // Step 3: Account Check & Seamless Registration Auto-Activation
+    if (!hrRecord.userAccount && gymReg) {
+      const defaultPassword = await bcrypt.hash('Password123!', 10);
+      const newUser = await this.prisma.user.create({
+        data: {
+          employeeId: hrRecord.employeeId,
+          passwordHash: defaultPassword,
+          role: Role.STAFF_MEMBER,
+          waiverSigned: gymReg.signatureConfirmed,
+          waiverSignedAt: gymReg.registeredAt,
+        },
+        include: {
+          attendanceLogs: {
+            where: { checkOutTime: null },
+            take: 1,
+          },
+        },
+      });
+      hrRecord.userAccount = newUser;
+    }
+
     if (!hrRecord.userAccount) {
       return {
         status: 'UNREGISTERED' as GateVerificationStatus,
@@ -144,14 +204,14 @@ export class AttendanceService {
           photoUrl: hrRecord.photoUrl,
           employmentStatus: hrRecord.employmentStatus,
         },
-        message: 'Employee is verified active on HR roster but has not yet claimed their digital account.',
+        message: 'Employee is in HR records but has not registered for gym service yet.',
       };
     }
 
     const user = hrRecord.userAccount;
 
-    // Step 4: Waiver Compliance Check
-    if (!user.waiverSigned) {
+    // Step 4: Waiver / Registration Signature Compliance Check
+    if (!user.waiverSigned && (!gymReg || !gymReg.signatureConfirmed)) {
       return {
         status: 'DENIED' as GateVerificationStatus,
         reason: 'WAIVER_NOT_SIGNED',
@@ -161,7 +221,7 @@ export class AttendanceService {
           department: hrRecord.department,
           photoUrl: hrRecord.photoUrl,
         },
-        message: 'Mandatory PAR-Q health screening & liability waiver has not been submitted.',
+        message: 'Mandatory gym registration / waiver has not been confirmed.',
       };
     }
 
@@ -239,8 +299,9 @@ export class AttendanceService {
       throw new BadRequestException(verification.message || 'Cannot check in employee');
     }
 
+    const targetEmployeeId = verification.employee?.employeeId || dto.employeeId.trim();
     const user = await this.prisma.user.findUnique({
-      where: { employeeId: dto.employeeId.trim() },
+      where: { employeeId: targetEmployeeId },
     });
 
     if (!user) {

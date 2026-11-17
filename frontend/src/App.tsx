@@ -40,7 +40,7 @@ const RoleRootRedirect: React.FC = () => {
     );
   }
 
-  return <Navigate to="/terminal" replace />;
+  return <Navigate to="/registrations" replace />;
 };
 
 export const App: React.FC = () => {
@@ -120,6 +120,16 @@ export const App: React.FC = () => {
                 element={
                   <RoleGuard allowedRoles={['HR_ADMIN']}>
                     <HrRosterPage />
+                  </RoleGuard>
+                }
+              />
+
+              {/* Reports & Analytics */}
+              <Route
+                path="/reports"
+                element={
+                  <RoleGuard allowedRoles={['HR_ADMIN', 'GYM_ATTENDANT']}>
+                    <AnalyticsPage />
                   </RoleGuard>
                 }
               />

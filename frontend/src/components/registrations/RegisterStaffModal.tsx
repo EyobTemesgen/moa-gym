@@ -70,10 +70,9 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
 
     ctx.beginPath();
     ctx.moveTo(x, y);
-    ctx.strokeStyle = '#0B7A3B';
-    ctx.lineWidth = 2.5;
+    ctx.lineWidth = 2;
     ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
+    ctx.strokeStyle = '#07572A';
   };
 
   const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
@@ -99,22 +98,41 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
     setEmployeeId(emp.employeeId);
     setFullName(emp.fullName);
     setDepartment(emp.department);
-    setPhone(emp.phone || '');
-    setEmail(emp.email || '');
+    if (emp.phone) setPhone(emp.phone);
+    if (emp.email) setEmail(emp.email);
     setShowRosterSuggestions(false);
-    setRosterSearch(emp.fullName);
   };
+
+  const resetForm = () => {
+    setEmployeeId('');
+    setFullName('');
+    setDepartment('');
+    setPhone('');
+    setEmail('');
+    setRemarks('');
+    setShiftPreference('ANY');
+    setRosterSearch('');
+    setManualMode(false);
+    setErrorMsg(null);
+    clearCanvas();
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      resetForm();
+    }
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
 
     if (!fullName.trim()) {
-      setErrorMsg('የሰራተኛው ሙሉ ስም (Full Name) ያስፈልጋል');
+      setErrorMsg('Full Name is required');
       return;
     }
     if (!department.trim()) {
-      setErrorMsg('የስራ ክፍል (Directorate / Department) ያስፈልጋል');
+      setErrorMsg('Directorate / Department is required');
       return;
     }
 
@@ -166,14 +184,11 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
         {/* Modal Header */}
         <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
           <div>
-            <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-              <span>አዲስ የጂምናዚየም ተመዝጋቢ መዝግብ</span>
-              <span className="text-xs font-normal text-slate-500 font-sans">
-                / Register Staff for Gym Service
-              </span>
+            <h2 className="text-base font-bold text-slate-900">
+              Register Staff Member for Gym Service
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
-              ግብርና ሚ/ር ሰራተኞች የጂምናዚየም ተመዝጋቢዎች ስም ዝርዝር (Staff Gym Registrants Roster)
+              MoA Staff Gymnasium Official Membership Enrollment
             </p>
           </div>
           <button
@@ -199,7 +214,7 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
             <div className="flex items-center justify-between">
               <span className="font-bold text-slate-800 flex items-center gap-1.5">
                 <Search className="h-4 w-4 text-moa-green" />
-                <span>ሰራተኛውን ከHR ዝርዝር ፈልግ (MoA HR Roster Auto-complete)</span>
+                <span>Search Staff from MoA HR Roster</span>
               </span>
               <button
                 type="button"
@@ -212,7 +227,7 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
                 className="text-[11px] font-semibold text-moa-green hover:underline cursor-pointer flex items-center gap-1"
               >
                 <UserPlus className="h-3 w-3" />
-                <span>{manualMode ? 'ወደ HR ፈላጊ ተመለስ (Back to HR Search)' : 'በእጅ አስገባ (Type manually)'}</span>
+                <span>{manualMode ? 'Switch to HR Search' : 'Type Manually'}</span>
               </button>
             </div>
 
@@ -220,7 +235,7 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="የሰራተኛውን ስም ወይም መለያ ቁጥር ይተይቡ (Type name or EMP ID to search...)"
+                  placeholder="Type name or Employee ID to auto-fill..."
                   value={rosterSearch}
                   onChange={(e) => {
                     setRosterSearch(e.target.value);
@@ -253,7 +268,7 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
               </div>
             ) : (
               <p className="text-[11px] text-slate-500">
-                ሰራተኛው በHR ዝርዝር ላይ ከሌለ መረጃውን ከዚህ በታች በቀጥታ መሙላት ይችላሉ።
+                If the staff member is not found in the HR database, you can type their information directly below.
               </p>
             )}
           </div>
@@ -262,12 +277,12 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block font-semibold text-slate-700 mb-1">
-                የሰራተኛው ሙሉ ስም (Full Name) <span className="text-red-500">*</span>
+                Full Name <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 required
-                placeholder="ምሳሌ፡ መሰረት መብራቴ (Meseret Mebrate)"
+                placeholder="e.g. Meseret Mebrate"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-moa-green/30"
@@ -276,12 +291,12 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
 
             <div>
               <label className="block font-semibold text-slate-700 mb-1">
-                የስራ ክፍል / ዳይሬክቶሬት (Directorate) <span className="text-red-500">*</span>
+                Directorate / Department <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 required
-                placeholder="ምሳሌ፡ ምግብ ዋስትና (Food Security)"
+                placeholder="e.g. Food Security Directorate"
                 value={department}
                 onChange={(e) => setDepartment(e.target.value)}
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-moa-green/30"
@@ -290,11 +305,11 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
 
             <div>
               <label className="block font-semibold text-slate-700 mb-1">
-                የሰራተኛ መለያ ቁጥር (Employee ID)
+                Employee ID
               </label>
               <input
                 type="text"
-                placeholder="ምሳሌ፡ EMP-MOA-001"
+                placeholder="e.g. EMP-MOA-001"
                 value={employeeId}
                 onChange={(e) => setEmployeeId(e.target.value)}
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-moa-green/30"
@@ -303,7 +318,7 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
 
             <div>
               <label className="block font-semibold text-slate-700 mb-1">
-                ስልክ ቁጥር (Phone Number)
+                Phone Number
               </label>
               <input
                 type="tel"
@@ -316,41 +331,41 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
 
             <div>
               <label className="block font-semibold text-slate-700 mb-1">
-                የአካል ብቃት እንቅስቃሴ ሰዓት (Shift Preference)
+                Shift Preference
               </label>
               <select
                 value={shiftPreference}
                 onChange={(e) => setShiftPreference(e.target.value)}
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-moa-green/30"
               >
-                <option value="ANY">ማንኛውም ሰዓት (Any Time / Flexible)</option>
-                <option value="MORNING">የጠዋት ክፍለ ጊዜ (Morning: 06:00 - 08:30)</option>
-                <option value="LUNCH">የምሳ ሰዓት ክፍለ ጊዜ (Lunch: 12:00 - 14:00)</option>
-                <option value="EVENING">የማታ ክፍለ ጊዜ (Evening: 17:00 - 20:00)</option>
+                <option value="ANY">Flexible / Any Time</option>
+                <option value="MORNING">Morning (06:00 - 08:30)</option>
+                <option value="LUNCH">Lunch Hours (12:00 - 14:00)</option>
+                <option value="EVENING">Evening (17:00 - 20:00)</option>
               </select>
             </div>
 
             <div>
               <label className="block font-semibold text-slate-700 mb-1">
-                ፆታ (Gender)
+                Gender
               </label>
               <select
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-moa-green/30"
               >
-                <option value="MALE">ወንድ (Male)</option>
-                <option value="FEMALE">ሴት (Female)</option>
+                <option value="MALE">Male</option>
+                <option value="FEMALE">Female</option>
               </select>
             </div>
           </div>
 
-          {/* Signature / Confirmation Section (ፊርማ) */}
+          {/* Signature / Confirmation Section */}
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
             <div className="flex items-center justify-between">
               <label className="font-bold text-slate-800 flex items-center gap-1.5">
                 <PenTool className="h-4 w-4 text-moa-green" />
-                <span>የተመዝጋቢው ፊርማ (Registrant Signature)</span>
+                <span>Registrant Signature</span>
               </label>
 
               <div className="flex items-center gap-2">
@@ -363,7 +378,7 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
                       : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
                   }`}
                 >
-                  በወረቀት ላይ የተፈረመ (Paper Sheet)
+                  Paper Sheet Verified
                 </button>
                 <button
                   type="button"
@@ -374,7 +389,7 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
                       : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
                   }`}
                 >
-                  ዲጂታል ፊርማ (Draw Digital)
+                  Draw Digital Signature
                 </button>
               </div>
             </div>
@@ -388,7 +403,7 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
                   className="mt-0.5 rounded text-moa-green focus:ring-moa-green/30"
                 />
                 <span className="text-slate-700 leading-snug">
-                  <strong>የወረቀት ቅጽ ፊርማ ተረጋግጧል፡</strong> ሰራተኛው በኦፊሴላዊው የግብርና ሚ/ር ሰራተኞች የጂምናዚየም ምዝገባ ቅጽ ላይ በአካል ፈርመዋል።
+                  <strong>Paper Signature Verified:</strong> Staff member has personally signed the physical Ministry of Agriculture gymnasium registration paper form.
                 </span>
               </label>
             ) : (
@@ -409,7 +424,7 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
                   />
                   {!hasDrawnSignature && (
                     <div className="absolute inset-0 pointer-events-none flex items-center justify-center text-slate-300 text-xs font-medium">
-                      እባክዎ እዚህ ላይ ይፈርሙ (Sign here with stylus / mouse)
+                      Sign here using mouse or touch screen
                     </div>
                   )}
                 </div>
@@ -420,7 +435,7 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
                     className="inline-flex items-center gap-1 text-[11px] text-slate-500 hover:text-slate-800 cursor-pointer"
                   >
                     <RotateCcw className="h-3 w-3" />
-                    <span>ፊርማ አጥፋ (Clear)</span>
+                    <span>Clear Signature</span>
                   </button>
                 </div>
               </div>
@@ -430,11 +445,11 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
           {/* Optional Health / Fitness Remarks */}
           <div>
             <label className="block font-semibold text-slate-700 mb-1">
-              ተጨማሪ ማስታወሻ ወይም የጤና ሁኔታ (Optional Remarks / Medical Note)
+              Optional Medical / Fitness Remarks
             </label>
             <input
               type="text"
-              placeholder="ምሳሌ፡ የቀድሞ ጉዳት፣ የደም ግፊት ቁጥጥር፣ ወዘተ."
+              placeholder="e.g. Previous joint injury, medical clearance on file, etc."
               value={remarks}
               onChange={(e) => setRemarks(e.target.value)}
               className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-moa-green/30"
@@ -449,7 +464,7 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
               disabled={submitting}
               className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-xl font-semibold transition cursor-pointer"
             >
-              ሰርዝ (Cancel)
+              Cancel
             </button>
 
             <button
@@ -458,7 +473,7 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
               className="inline-flex items-center gap-1.5 px-5 py-2 bg-moa-green hover:bg-moa-green-dark text-white rounded-xl font-bold shadow-xs transition cursor-pointer disabled:opacity-50"
             >
               <Check className="h-4 w-4" />
-              <span>{submitting ? 'በመመዝገብ ላይ...' : 'መዝግብ (Complete Registration)'}</span>
+              <span>{submitting ? 'Registering...' : 'Complete Registration'}</span>
             </button>
           </div>
         </form>

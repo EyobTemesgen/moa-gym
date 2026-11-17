@@ -40,6 +40,10 @@ export class UsersService {
 
     const activeSession = user.attendanceLogs[0] || null;
 
+    const gymReg = await this.prisma.gymRegistration.findFirst({
+      where: { employeeId: user.employeeId },
+    });
+
     return {
       id: user.id,
       employeeId: user.employeeId,
@@ -49,6 +53,10 @@ export class UsersService {
       email: user.hrRecord.email,
       photoUrl: user.hrRecord.photoUrl,
       role: user.role,
+      regNumber: gymReg?.regNumber ?? null,
+      shiftPreference: gymReg?.shiftPreference ?? 'Flexible',
+      gymStatus: gymReg?.status ?? 'ACTIVE',
+      gymRegisteredAt: gymReg?.registeredAt ?? null,
       waiverSigned: user.waiverSigned,
       waiverSignedAt: user.waiverSignedAt,
       emergencyContactName: user.emergencyContactName,

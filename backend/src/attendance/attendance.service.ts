@@ -66,25 +66,32 @@ export class AttendanceService {
   async verifyEntrance(dto: VerifyPassDto) {
     let employeeId = dto.employeeId?.trim();
 
-    // Step 1: Cryptographic QR Check if QR Token is supplied
+    // Step 1: Process QR Token (supports Permanent Static Pass, JSON, or JWT)
     if (dto.qrToken) {
-      try {
-        const decoded: any = this.jwtService.verify(dto.qrToken);
-        if (decoded.type !== 'GYM_PASS') {
-          return {
-            status: 'DENIED' as GateVerificationStatus,
-            reason: 'INVALID_TOKEN_TYPE',
-            message: 'Presented QR code is not a valid MoA Gym Entry Pass',
-          };
-        }
-        employeeId = decoded.employeeId;
-      } catch (err: any) {
-        return {
-          status: 'DENIED' as GateVerificationStatus,
-          reason: 'EXPIRED_OR_INVALID_QR',
-          message: 'The QR Entry Pass has expired or is invalid. Please refresh the pass on staff device.',
-        };
+      let raw = dto.qrToken.trim();
+
+      // Check for JSON payload: e.g. { "type": "MOA_GYM_PASS", "employeeId": "EMP-MOA-001" }
+      if (raw.startsWith('{') && raw.endsWith('}')) {
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed.employeeId) raw = parsed.employeeId;
+          else if (parsed.id) raw = parsed.id;
+        } catch {}
       }
+
+      // Check if it's a JWT token (header.payload.signature)
+      if (raw.split('.').length === 3) {
+        try {
+          const decoded: any = this.jwtService.verify(raw, { ignoreExpiration: true });
+          if (decoded.employeeId) {
+            raw = decoded.employeeId;
+          }
+        } catch {
+          // If JWT decode fails, proceed with raw string
+        }
+      }
+
+      employeeId = raw;
     }
 
     if (!employeeId) {

@@ -110,13 +110,13 @@ export const LoginPage: React.FC = () => {
 
         <div className="mt-6 pt-5 border-t border-slate-100 text-center">
           <p className="text-xs text-slate-600 mb-2">
-            First time using the facility?
+            First time using the Gym? (አዲስ ተመዝጋቢ?)
           </p>
           <Link
             to="/claim"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-moa-green hover:text-moa-green-dark transition"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-moa-green hover:text-moa-green-dark transition bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200"
           >
-            Claim Account via MoA Employee ID →
+            Self-Register & Activate Gym Pass →
           </Link>
         </div>
 

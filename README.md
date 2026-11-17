@@ -6,47 +6,62 @@
 
 ---
 
-## 1. Overview & Core Business Rules
+## 1. Overview & Core Pillars
 
-**MoA-Gym** is an internal, on-premise resilient web application engineered for the Ministry of Agriculture (MoA) to digitize staff fitness center access, health screening compliance, daily locker tracking, group fitness scheduling, and live facility occupancy.
+**MoA-Gym** is an internal, resilient web application designed for the Ministry of Agriculture to streamline staff gym enrollment, gate verification, daily locker tracking, and facility utilization.
 
-- **Zero Billing or Commercial Logic**: Facility access is an internal employee wellness benefit. No payments, invoices, or subscriptions.
-- **Strict HR Whitelist Eligibility**: Only active MoA employees registered on the HR-approved staff roster may self-register or enter the gym.
-- **Zero Specialized Hardware Required**: Front-desk verification runs through a standard web browser camera (`html5-qrcode`) paired with a manual MoA Employee ID fallback.
-- **Anti-Screenshot Rotating QR Pass**: Staff mobile passes automatically refresh signed JWT tokens every 45 seconds (60-second expiration) with watermarks to prevent screenshot fraud.
-- **On-Premise / Intranet Resilience**: Completely self-contained Docker Compose stack (`PostgreSQL 16`, `NestJS 12`, `React 19 + Nginx`) requiring zero external cloud dependencies.
-- **Official Institutional Branding**: MoA tri-color gradient accent bar (`#F5B81C` Gold -> `#0B7A3B` Green -> `#145B8C` Blue), circular emblem with offline SVG fallback, and bilingual typography (Amharic & English).
+Aligned with the MoA Design Standard (`#00843D` primary, institutional gold `#FCDD09`, clean typography):
+
+1. **Staff Registration (`/registrations`) — Exclusive to `ADMIN`**:
+   * **Single Staff Intake**: Search MoA HR roster for instant auto-fill, or type manually.
+   * **Photo Capture**: Auto-sync from HR, local file upload (`.jpg`/`.png`), or live desk webcam snapshot.
+   * **Bulk Spreadsheet Import**: Drag-and-drop `.xlsx` (Excel) and `.csv` files with automatic English & Amharic column mapping, row validation preview, and downloadable template.
+   * **Clean Master Roster**: 6-column table (`Full Name`, `Directorate`, `Employee ID`, `Enrolled Date`, `Status`, `Action`) optimized for standard displays with zero horizontal scrolling.
+   * **Reporting & Export**: Official A4 Printable Master Roster with Ministry letterhead and full CSV export.
+
+2. **Gate Checking Fast Lane (`/terminal`) — Exclusive to `GYM_ATTENDANT`**:
+   * **Employee ID Fast Lane**: Attendant simply asks for Employee ID or Name. Cursor is auto-focused for instant typing.
+   * **2-Press Keyboard Flow**: `[Enter]` to verify $\rightarrow$ `[Enter]` to confirm check-in with auto-assigned locker (`L-01` to `L-30`). Takes 1.5 seconds.
+   * **Visual Verification**: Shows employee's official photo, full name, and directorate on screen.
+   * **Integrated Active Floor Roster**: Live list of currently present staff with 1-click **Check-Out** when returning locker keys.
+   * **Camera Scanner Option**: Optional webcam QR scanner toggle for digital mobile passes.
+
+3. **Staff Member Digital Access (`/dashboard`) — Exclusive to `STAFF_MEMBER`**:
+   * **Permanent Digital Member Card**: Official institutional badge with photo, directorate, and employee ID.
+   * **Static Offline QR Code**: Works without internet or mobile data; screenshot-friendly and printable.
+   * **Live Facility Meter**: Real-time gym occupancy gauge so staff can check crowd levels before visiting.
+
+4. **Reports & Analytics (`/reports`) — Exclusive to `ADMIN`**:
+   * Real-time facility occupancy metrics and peak attendance hours.
+   * Directorate participation breakdown.
+   * Filtered attendance logs exported to CSV.
 
 ---
 
 ## 2. Tech Stack
 
-- **Backend**: NestJS v11/v12, Prisma ORM v6, PostgreSQL 16, JWT & Passport RBAC, `@nestjs/schedule` (nightly 23:59 auto-checkout cron), Swagger OpenAPI (`/api/docs`), `class-validator`, `csv-parse`.
-- **Frontend**: React 19, Vite, TypeScript, Tailwind CSS, TanStack React Query (15s live polling), React Router v7, `html5-qrcode`, `qrcode.react`, Lucide icons.
-- **Containerization**: Docker Compose with multi-stage builds and Nginx reverse proxy.
+* **Backend**: NestJS v11/v12, Prisma ORM v6, PostgreSQL 16, JWT & Passport RBAC, `@nestjs/schedule` (auto-checkout timer), Swagger OpenAPI (`/api/docs`).
+* **Frontend**: React 19, Vite, TypeScript, Tailwind CSS, TanStack React Query, React Router v7, `html5-qrcode`, `qrcode.react`, `read-excel-file`, Lucide icons.
+* **Containerization**: Docker Compose with multi-stage builds and Nginx reverse proxy.
 
 ---
 
 ## 3. Pre-Seeded Default Accounts
 
-| Role | Name | Identifier / Email | Default Password |
-|---|---|---|---|
-| **ADMIN** | Dr. Girma Bekele | `EMP-ADM-01` / `admin@moa.gov.et` | `Password123!` |
-| **GYM_ATTENDANT** | Tigist Alemayehu | `EMP-DSK-01` / `desk@moa.gov.et` | `Password123!` |
-| **STAFF_MEMBER (Active)** | Dawit Yohannes | `EMP-MOA-001` / `dawit.y@moa.gov.et` | `Password123!` |
-| **STAFF_MEMBER (Pending Waiver)** | Selamawit Kebede | `EMP-MOA-002` / `selamawit.k@moa.gov.et` | `Password123!` |
-| **STAFF_MEMBER (Unclaimed Roster)** | Mulugeta Tadesse | `EMP-MOA-003` | *(Self-claim via `/claim`)* |
+| Role | Name | Identifier / Email | Default Password | Primary Screen |
+|---|---|---|---|---|
+| **ADMIN** | Dr. Girma Bekele | `EMP-ADM-01` / `admin@moa.gov.et` | `Password123!` | `/registrations` & `/reports` |
+| **GYM_ATTENDANT** | Tigist Alemayehu | `EMP-DSK-01` / `desk@moa.gov.et` | `Password123!` | `/terminal` (Gate Fast Lane) |
+| **STAFF_MEMBER** | Dawit Yohannes | `EMP-MOA-001` / `dawit.y@moa.gov.et` | `Password123!` | `/dashboard` (Digital Pass) |
 
 ---
 
 ## 4. Port Allocations & Setup
 
-To prevent port conflicts with other MoA projects (`asset-tracking-system` and `procurement-tracking-system`), the ports are allocated as:
-
-- **Frontend (Nginx / Vite)**: `http://localhost:3005`
-- **Backend API (NestJS)**: `http://localhost:5005`
-- **Swagger Documentation**: `http://localhost:5005/api/docs`
-- **PostgreSQL Database**: Port `5436` (internal `5432`)
+* **Frontend (React / Nginx)**: `http://localhost:3005`
+* **Backend API (NestJS)**: `http://localhost:5005`
+* **Swagger API Docs**: `http://localhost:5005/api/docs`
+* **PostgreSQL Database**: Port `5436` (internal `5432`)
 
 ### Running with Docker Compose
 
@@ -62,23 +77,18 @@ docker compose exec backend npm run prisma:seed
 
 ---
 
-## 5. Automated 6-Step Gate Verification Workflow
+## 5. Daily Gate Operations (Check-In & Check-Out)
 
-1. **Cryptographic Token Check**: Validates signature and non-expiration of presented QR pass JWT (`exp: 60s`).
-2. **HR Whitelist Check**: Queries `HrEmployeeRoster`. If missing or status != `ACTIVE`, rejects with `NOT_ACTIVE_EMPLOYEE`.
-3. **Account Claim Check**: If user has not created a password, returns `UNREGISTERED` with employee profile preview for assisted self-registration.
-4. **Waiver Compliance Check**: Confirms PAR-Q health questionnaire and liability agreement have been submitted.
-5. **Duplicate & Capacity Check**: Rejects if already checked in or if floor count >= `maxCapacity`.
-6. **Physical Confirmation & Approval**: Front-desk attendant verifies face/badge against photo on screen, selects optional daily locker (`L-01` to `L-30`), and authorizes entrance.
+* **Check-In**:
+  1. Staff member gives their MoA Employee ID (e.g. `EMP-MOA-001`) or shows their badge.
+  2. Attendant presses `[Enter]` to verify $\rightarrow$ system checks active membership and pre-selects an available locker.
+  3. Attendant presses `[Enter]` to confirm $\rightarrow$ entrance authorized, locker assigned, occupancy count +1.
 
----
-
-## 6. Nightly Auto-Checkout Cron
-
-At **23:59 EAT** every evening:
-- An automated cron job closes all active attendance sessions (`checkOutTime = now`, `autoClosed = true`).
-- All held lockers are released back to `AVAILABLE`.
-- Live gym floor count safely resets to 0 for the following morning.
+* **Check-Out**:
+  1. Staff member returns locker key when leaving.
+  2. Attendant clicks **Check Out** on their name in the active floor list (or re-enters ID).
+  3. Locker is returned to `AVAILABLE` and occupancy count -1.
+  * *(A background timer automatically closes any forgotten sessions after 2 hours).*
 
 ---
 

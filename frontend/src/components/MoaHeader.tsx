@@ -58,7 +58,7 @@ export const MoaHeader: React.FC<MoaHeaderProps> = ({ onOpenMobileSidebar }) => 
       {/* Official 4px MoA Tri-Color Accent Bar */}
       <div className="h-1 w-full bg-gradient-to-r from-[#FCDD09] via-[#00843D] to-[#145B8C]"></div>
 
-      <div className="px-4 sm:px-6 lg:px-8">
+      <div className="px-4">
         <div className="flex items-center justify-between h-14">
           {/* Left: Mobile toggle & Breadcrumb Page Title */}
           <div className="flex items-center gap-3 min-w-0">

@@ -29,12 +29,12 @@ export const Layout: React.FC = () => {
       >
         <MoaHeader onOpenMobileSidebar={() => setMobileOpen(true)} />
 
-        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <main className="flex-1 w-full px-4 py-5">
           <Outlet />
         </main>
 
         <footer className="bg-white border-t border-slate-200 mt-auto py-3">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-500 gap-2">
+          <div className="w-full px-4 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-500 gap-2">
             <p>© 2026 Federal Democratic Republic of Ethiopia – Ministry of Agriculture. Internal Staff Portal.</p>
             <div className="flex items-center gap-3">
               <span className="text-emerald-700 font-semibold">Strict HR Whitelist</span>

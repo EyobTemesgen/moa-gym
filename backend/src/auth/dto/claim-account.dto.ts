@@ -7,6 +7,11 @@ export class ClaimAccountDto {
   @IsString()
   employeeId: string;
 
+  @ApiProperty({ description: 'Official Full Name (First & Father name)', required: false, example: 'Tadesse Bekele' })
+  @IsOptional()
+  @IsString()
+  fullName?: string;
+
   @ApiProperty({ description: 'New account password (min 6 characters)', example: 'NewSecret123!' })
   @IsNotEmpty()
   @IsString()

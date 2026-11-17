@@ -17,7 +17,7 @@ interface AuthContextType {
   token: string | null;
   isLoading: boolean;
   login: (identifier: string, pass: string) => Promise<AuthUser>;
-  claimAccount: (employeeId: string, pass: string, shiftPreference?: string) => Promise<AuthUser>;
+  claimAccount: (employeeId: string, pass: string, shiftPreference?: string, fullName?: string) => Promise<AuthUser>;
   refreshProfile: () => Promise<void>;
   logout: () => void;
 }
@@ -86,10 +86,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     employeeId: string,
     pass: string,
     shiftPreference?: string,
+    fullName?: string,
   ): Promise<AuthUser> => {
     const res = await apiRequest<{ accessToken: string; user: AuthUser }>('/auth/claim', {
       method: 'POST',
-      body: JSON.stringify({ employeeId, password: pass, shiftPreference }),
+      body: JSON.stringify({ employeeId, password: pass, shiftPreference, fullName }),
     });
 
     setToken(res.accessToken);

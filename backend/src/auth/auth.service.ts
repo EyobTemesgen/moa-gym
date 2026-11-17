@@ -13,6 +13,84 @@ import { LoginDto } from './dto/login.dto';
 import { ClaimAccountDto } from './dto/claim-account.dto';
 import { EmploymentStatus, Role } from '@prisma/client';
 
+function cleanTokens(str: string): string[] {
+  if (!str) return [];
+  const titles = /^(dr|ato|wro|w\/ro|w\/t|wt|eng|engineer)\.?\s+/i;
+  const cleaned = str.replace(titles, '').toLowerCase();
+  return cleaned
+    .replace(/[^a-z0-9\u1200-\u137F\s]/gi, ' ')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+}
+
+function levenshteinDistance(a: string, b: string): number {
+  const m = a.length;
+  const n = b.length;
+  const dp: number[][] = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));
+
+  for (let i = 0; i <= m; i++) dp[i][0] = i;
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
+
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      if (a[i - 1] === b[j - 1]) {
+        dp[i][j] = dp[i - 1][j - 1];
+      } else {
+        dp[i][j] = Math.min(
+          dp[i - 1][j] + 1,
+          dp[i][j - 1] + 1,
+          dp[i - 1][j - 1] + 1,
+        );
+      }
+    }
+  }
+  return dp[m][n];
+}
+
+function tokenMatches(candidateToken: string, officialToken: string): boolean {
+  if (candidateToken === officialToken) return true;
+  if (candidateToken.length >= 4 && officialToken.startsWith(candidateToken)) return true;
+  if (officialToken.length >= 4 && candidateToken.startsWith(officialToken)) return true;
+  if (Math.abs(candidateToken.length - officialToken.length) <= 1 && candidateToken.length >= 4) {
+    if (levenshteinDistance(candidateToken, officialToken) <= 1) return true;
+  }
+  return false;
+}
+
+export function isNameMatching(officialName: string, candidateName: string): boolean {
+  const official = cleanTokens(officialName);
+  const candidate = cleanTokens(candidateName);
+
+  if (candidate.length === 0 || official.length === 0) {
+    return false;
+  }
+
+  // Exact phrase match
+  if (official.join(' ') === candidate.join(' ')) {
+    return true;
+  }
+
+  // Single name entered: check if it matches first name or any official token
+  if (candidate.length === 1) {
+    return official.some((tok) => tokenMatches(candidate[0], tok));
+  }
+
+  // First name and father's name match
+  const firstMatches = tokenMatches(candidate[0], official[0]);
+  const secondMatches = official.slice(1).some((tok) => tokenMatches(candidate[1], tok));
+
+  if (firstMatches && secondMatches) {
+    return true;
+  }
+
+  const matchedTokensCount = candidate.filter((cTok) =>
+    official.some((oTok) => tokenMatches(cTok, oTok))
+  ).length;
+
+  return matchedTokensCount >= Math.min(candidate.length, 2);
+}
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -78,7 +156,7 @@ export class AuthService {
     };
   }
 
-  async lookupRoster(employeeId: string) {
+  async lookupRoster(employeeId: string, fullName?: string) {
     const trimmed = employeeId.trim();
     const roster = await this.prisma.hrEmployeeRoster.findUnique({
       where: { employeeId: trimmed },
@@ -94,7 +172,25 @@ export class AuthService {
     });
 
     if (!roster) {
-      throw new NotFoundException(`Employee ID "${trimmed}" not found in HR roster`);
+      throw new NotFoundException(`Employee ID "${trimmed}" was not found in the MoA HR staff roster.`);
+    }
+
+    if (roster.employmentStatus !== EmploymentStatus.ACTIVE) {
+      throw new ForbiddenException(`Employee "${trimmed}" has non-active status (${roster.employmentStatus}) in HR roster.`);
+    }
+
+    if (roster.userAccount) {
+      throw new ConflictException(`An account for employee "${trimmed}" has already been claimed. Please sign in instead.`);
+    }
+
+    // Name verification check against HR roster
+    if (fullName && fullName.trim()) {
+      const matches = isNameMatching(roster.fullName, fullName.trim());
+      if (!matches) {
+        throw new BadRequestException(
+          `The name entered does not match the official MoA HR record registered for Employee ID "${trimmed}". Please enter your official First and Father's name as recorded in HR.`,
+        );
+      }
     }
 
     return {
@@ -125,6 +221,15 @@ export class AuthService {
 
     if (hrRecord.userAccount) {
       throw new ConflictException(`An account for employee "${trimmedId}" has already been claimed. Please log in.`);
+    }
+
+    if (dto.fullName && dto.fullName.trim()) {
+      const matches = isNameMatching(hrRecord.fullName, dto.fullName.trim());
+      if (!matches) {
+        throw new BadRequestException(
+          `The name entered does not match the official MoA HR record registered for Employee ID "${trimmedId}".`,
+        );
+      }
     }
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);

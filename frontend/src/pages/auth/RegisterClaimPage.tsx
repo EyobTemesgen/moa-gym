@@ -7,6 +7,7 @@ import { Search, CheckCircle2, AlertCircle, ArrowRight, Lock, UserCheck } from '
 
 export const RegisterClaimPage: React.FC = () => {
   const [employeeId, setEmployeeId] = useState('');
+  const [fullName, setFullName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [shiftPreference, setShiftPreference] = useState('MORNING');
@@ -20,14 +21,16 @@ export const RegisterClaimPage: React.FC = () => {
 
   const handleLookup = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!employeeId.trim()) return;
+    if (!employeeId.trim() || !fullName.trim()) return;
 
     setError(null);
     setIsVerifying(true);
     setVerifiedEmployee(null);
 
     try {
-      const data = await apiRequest(`/auth/lookup?employeeId=${encodeURIComponent(employeeId.trim())}`);
+      const data = await apiRequest(
+        `/auth/lookup?employeeId=${encodeURIComponent(employeeId.trim())}&fullName=${encodeURIComponent(fullName.trim())}`,
+      );
       if (data.isClaimed) {
         setError(`An account for ${data.fullName} (${data.employeeId}) has already been claimed. Please proceed to login.`);
         return;
@@ -38,7 +41,7 @@ export const RegisterClaimPage: React.FC = () => {
       }
       setVerifiedEmployee(data);
     } catch (err: any) {
-      setError(err.message || 'Employee ID not found on active MoA staff whitelist.');
+      setError(err.message || 'Employee ID and Name not found on active MoA staff whitelist.');
     } finally {
       setIsVerifying(false);
     }
@@ -58,7 +61,7 @@ export const RegisterClaimPage: React.FC = () => {
     setError(null);
     setIsSubmitting(true);
     try {
-      await claimAccount(verifiedEmployee.employeeId, password, shiftPreference);
+      await claimAccount(verifiedEmployee.employeeId, password, shiftPreference, fullName);
       navigate('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Failed to claim account');
@@ -88,7 +91,7 @@ export const RegisterClaimPage: React.FC = () => {
         )}
 
         {!verifiedEmployee ? (
-          // Step 1: Whitelist Employee ID Lookup
+          // Step 1: Whitelist Employee ID & Name Lookup
           <form onSubmit={handleLookup} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
@@ -100,21 +103,37 @@ export const RegisterClaimPage: React.FC = () => {
                   required
                   value={employeeId}
                   onChange={(e) => setEmployeeId(e.target.value.toUpperCase())}
-                  placeholder="e.g. EMP-MOA-003"
+                  placeholder="e.g. EMP-MOA-003 or MOA/1042/16"
                   className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-moa-green/30 focus:border-moa-green font-mono uppercase"
                 />
               </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Full Name (First & Father's Name)
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  required
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder="e.g. Abebe Kebede"
+                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-moa-green/30 focus:border-moa-green"
+                />
+              </div>
               <p className="text-[11px] text-slate-500 mt-1">
-                Your ID must be registered on the HR-approved staff roster.
+                Must match your official name on file with MoA HR / Basic Services.
               </p>
             </div>
 
             <button
               type="submit"
-              disabled={isVerifying || !employeeId.trim()}
+              disabled={isVerifying || !employeeId.trim() || !fullName.trim()}
               className="w-full py-2.5 px-4 bg-moa-green hover:bg-moa-green-dark text-white text-xs font-semibold rounded-lg shadow-sm transition flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
             >
-              {isVerifying ? 'Verifying with HR Roster...' : 'Verify Eligibility'}
+              {isVerifying ? 'Verifying with MoA Roster...' : 'Verify Staff Eligibility'}
               <Search className="h-4 w-4" />
             </button>
 
@@ -127,19 +146,28 @@ export const RegisterClaimPage: React.FC = () => {
         ) : (
           // Step 2: Confirmation & Password Creation
           <form onSubmit={handleClaimSubmit} className="space-y-4">
-            <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-3">
-              <div className="p-2 bg-emerald-100 rounded-lg text-moa-green">
-                <UserCheck className="h-5 w-5" />
+            <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-emerald-100 rounded-lg text-moa-green">
+                  <UserCheck className="h-5 w-5" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider block">
+                    Verified MoA Staff Member
+                  </span>
+                  <p className="text-xs font-bold text-slate-900">{verifiedEmployee.fullName}</p>
+                  <p className="text-[11px] text-slate-600 font-mono">
+                    {verifiedEmployee.employeeId} · {verifiedEmployee.department}
+                  </p>
+                </div>
               </div>
-              <div>
-                <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider block">
-                  Eligible MoA Staff Member
-                </span>
-                <p className="text-xs font-bold text-slate-900">{verifiedEmployee.fullName}</p>
-                <p className="text-[11px] text-slate-600 font-mono">
-                  {verifiedEmployee.employeeId} · {verifiedEmployee.department}
-                </p>
-              </div>
+              <button
+                type="button"
+                onClick={() => setVerifiedEmployee(null)}
+                className="text-[11px] text-slate-500 hover:text-slate-800 underline cursor-pointer shrink-0"
+              >
+                Change
+              </button>
             </div>
 
             <div>

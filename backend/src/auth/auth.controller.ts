@@ -18,9 +18,12 @@ export class AuthController {
   }
 
   @Get('lookup')
-  @ApiOperation({ summary: 'Check Employee ID eligibility against MoA HR roster' })
-  async lookup(@Query('employeeId') employeeId: string) {
-    return this.authService.lookupRoster(employeeId);
+  @ApiOperation({ summary: 'Check Employee ID and Name eligibility against MoA HR roster' })
+  async lookup(
+    @Query('employeeId') employeeId: string,
+    @Query('fullName') fullName?: string,
+  ) {
+    return this.authService.lookupRoster(employeeId, fullName);
   }
 
   @Post('claim')

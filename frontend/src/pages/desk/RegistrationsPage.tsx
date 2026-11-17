@@ -3,7 +3,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '../../lib/api';
 import {
   Users,
-  UserPlus,
   Plus,
   Printer,
   Search,
@@ -11,13 +10,9 @@ import {
   Calendar,
   Building2,
   FileSpreadsheet,
-  PenTool,
   Download,
   RotateCcw,
   X,
-  Clock,
-  ShieldCheck,
-  Check,
 } from 'lucide-react';
 import { RegisterStaffModal } from '../../components/registrations/RegisterStaffModal';
 import { BatchRegisterModal } from '../../components/registrations/BatchRegisterModal';
@@ -192,38 +187,6 @@ export const RegistrationsPage: React.FC = () => {
 
   const hasActiveFilters =
     search.trim() !== '' || selectedDept !== 'ALL' || activeTab !== 'ALL' || sortColumn !== 'regNumber' || sortDirection !== 'asc';
-
-  const getShiftBadge = (shift?: string) => {
-    switch (shift) {
-      case 'MORNING':
-        return (
-          <span className={`${pill} ${statusTone.morning}`}>
-            <Clock className="w-3 h-3 text-amber-700" />
-            <span>Morning (06:00 - 08:30)</span>
-          </span>
-        );
-      case 'LUNCH':
-        return (
-          <span className={`${pill} ${statusTone.lunch}`}>
-            <Clock className="w-3 h-3 text-sky-700" />
-            <span>Lunch (12:00 - 14:00)</span>
-          </span>
-        );
-      case 'EVENING':
-        return (
-          <span className={`${pill} ${statusTone.evening}`}>
-            <Clock className="w-3 h-3 text-indigo-700" />
-            <span>Evening (17:00 - 20:00)</span>
-          </span>
-        );
-      default:
-        return (
-          <span className={`${pill} ${statusTone.neutral}`}>
-            <span>Flexible / Any</span>
-          </span>
-        );
-    }
-  };
 
   return (
     <div className="space-y-5">
@@ -492,7 +455,7 @@ export const RegistrationsPage: React.FC = () => {
                   currentSortColumn={sortColumn}
                   currentSortDirection={sortDirection}
                   onSort={handleSort}
-                  thClassName="py-2.5 px-4 min-w-[200px]"
+                  thClassName="py-2.5 px-4"
                 />
                 <SortableHeader
                   label="Directorate / Department"
@@ -500,7 +463,7 @@ export const RegistrationsPage: React.FC = () => {
                   currentSortColumn={sortColumn}
                   currentSortDirection={sortDirection}
                   onSort={handleSort}
-                  thClassName="py-2.5 px-4 min-w-[200px]"
+                  thClassName="py-2.5 px-4"
                 />
                 <SortableHeader
                   label="Employee ID"
@@ -508,26 +471,16 @@ export const RegistrationsPage: React.FC = () => {
                   currentSortColumn={sortColumn}
                   currentSortDirection={sortDirection}
                   onSort={handleSort}
-                  thClassName="py-2.5 px-3.5 w-32"
-                />
-                <th className="py-2.5 px-3.5 w-28 text-slate-700 font-semibold">Phone</th>
-                <SortableHeader
-                  label="Shift Preference"
-                  columnKey="shiftPreference"
-                  currentSortColumn={sortColumn}
-                  currentSortDirection={sortDirection}
-                  onSort={handleSort}
-                  thClassName="py-2.5 px-3.5 min-w-[170px]"
+                  thClassName="py-2.5 px-3.5 w-36"
                 />
                 <SortableHeader
-                  label="Date"
+                  label="Enrolled Date"
                   columnKey="registeredAt"
                   currentSortColumn={sortColumn}
                   currentSortDirection={sortDirection}
                   onSort={handleSort}
-                  thClassName="py-2.5 px-3.5 w-28"
+                  thClassName="py-2.5 px-3.5 w-32"
                 />
-                <th className="py-2.5 px-4 text-center w-28 text-slate-700 font-semibold">Signature</th>
                 <SortableHeader
                   label="Status"
                   columnKey="status"
@@ -535,7 +488,7 @@ export const RegistrationsPage: React.FC = () => {
                   currentSortDirection={sortDirection}
                   onSort={handleSort}
                   align="center"
-                  thClassName="py-2.5 px-3 w-24 text-center"
+                  thClassName="py-2.5 px-3 w-28 text-center"
                 />
                 <th className={table.actionsHead}>Action</th>
               </tr>
@@ -543,14 +496,14 @@ export const RegistrationsPage: React.FC = () => {
             <tbody className="divide-y divide-slate-100 bg-white">
               {isLoading ? (
                 <tr>
-                  <td colSpan={9} className="py-16 text-center text-slate-400">
+                  <td colSpan={6} className="py-16 text-center text-slate-400">
                     <div className="inline-block animate-spin rounded-full h-6 w-6 border-2 border-emerald-600 border-t-transparent mb-2"></div>
                     <p className="text-xs">Loading registrants roster...</p>
                   </td>
                 </tr>
               ) : pager.pageItems.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="py-16 text-center">
+                  <td colSpan={6} className="py-16 text-center">
                     <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-2 text-slate-400">
                       <Users className="w-6 h-6 text-slate-400" />
                     </div>
@@ -576,7 +529,7 @@ export const RegistrationsPage: React.FC = () => {
 
                   return (
                     <tr key={row.id} className={table.row}>
-                      {/* Full Name & Avatar */}
+                      {/* Full Name & Avatar (with optional phone subtext) */}
                       <td className="py-2.5 px-4">
                         <div className="flex items-center gap-2.5">
                           {row.hrRecord?.photoUrl ? (
@@ -592,9 +545,9 @@ export const RegistrationsPage: React.FC = () => {
                           )}
                           <div className="min-w-0">
                             <div className="font-bold text-slate-900 truncate">{row.fullName}</div>
-                            {row.registrationSource === 'PAPER_FORM' && (
-                              <span className="text-[10px] text-amber-700 font-medium">
-                                📋 Paper Roster Intake
+                            {row.phone && (
+                              <span className="text-[11px] text-slate-400 font-mono block">
+                                {row.phone}
                               </span>
                             )}
                           </div>
@@ -611,37 +564,9 @@ export const RegistrationsPage: React.FC = () => {
                         <span className={table.code}>{row.employeeId}</span>
                       </td>
 
-                      {/* Phone */}
-                      <td className="py-2.5 px-3.5 text-slate-600 font-mono text-[11px]">
-                        {row.phone || '—'}
-                      </td>
-
-                      {/* Shift preference */}
-                      <td className="py-2.5 px-3.5">
-                        {getShiftBadge(row.shiftPreference)}
-                      </td>
-
                       {/* Date */}
                       <td className="py-2.5 px-3.5 text-slate-500 font-mono text-[11px]">
                         {new Date(row.registeredAt).toLocaleDateString('en-GB')}
-                      </td>
-
-                      {/* Signature */}
-                      <td className="py-2 px-4 text-center">
-                        {row.signatureData ? (
-                          <img
-                            src={row.signatureData}
-                            alt="Signature"
-                            className="h-6 max-w-[80px] mx-auto object-contain"
-                          />
-                        ) : row.signatureConfirmed ? (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#00843D]">
-                            <Check className="h-3.5 w-3.5 text-[#00843D]" />
-                            <span>Signed</span>
-                          </span>
-                        ) : (
-                          <span className="text-slate-300 font-mono text-[11px]">—</span>
-                        )}
                       </td>
 
                       {/* Status Pill */}

@@ -40,6 +40,10 @@ const RoleRootRedirect: React.FC = () => {
     );
   }
 
+  if (user.role === 'GYM_ATTENDANT') {
+    return <Navigate to="/terminal" replace />;
+  }
+
   return <Navigate to="/registrations" replace />;
 };
 
@@ -90,7 +94,7 @@ export const App: React.FC = () => {
               <Route
                 path="/registrations"
                 element={
-                  <RoleGuard allowedRoles={['GYM_ATTENDANT', 'HR_ADMIN', 'STAFF_MEMBER']}>
+                  <RoleGuard allowedRoles={['GYM_ATTENDANT', 'HR_ADMIN']}>
                     <RegistrationsPage />
                   </RoleGuard>
                 }
@@ -99,7 +103,7 @@ export const App: React.FC = () => {
               <Route
                 path="/terminal"
                 element={
-                  <RoleGuard allowedRoles={['GYM_ATTENDANT', 'HR_ADMIN']}>
+                  <RoleGuard allowedRoles={['GYM_ATTENDANT']}>
                     <CheckInTerminalPage />
                   </RoleGuard>
                 }
@@ -128,7 +132,7 @@ export const App: React.FC = () => {
               <Route
                 path="/reports"
                 element={
-                  <RoleGuard allowedRoles={['HR_ADMIN', 'GYM_ATTENDANT']}>
+                  <RoleGuard allowedRoles={['HR_ADMIN']}>
                     <AnalyticsPage />
                   </RoleGuard>
                 }

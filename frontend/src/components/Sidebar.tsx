@@ -163,16 +163,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           )}
 
-          {/* Core Operations: 1. Registration, 2. Gate Checking, 3. Reports */}
-          {(user.role === 'GYM_ATTENDANT' || user.role === 'HR_ADMIN') && (
+          {/* HR Administrator Navigation: Registration & Reports only */}
+          {user.role === 'HR_ADMIN' && (
             <div>
               {!collapsed && (
                 <div className="px-3 text-[10px] font-bold text-emerald-200/70 uppercase tracking-wider mb-2">
-                  Gym Operations
+                  Administration
                 </div>
               )}
               <div className="space-y-1.5">
-                {/* 1. Registration */}
+                {/* 1. Staff Registration */}
                 <NavLink
                   to="/registrations"
                   onClick={onCloseMobile}
@@ -192,27 +192,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   )}
                 </NavLink>
 
-                {/* 2. Gate Checking */}
-                <NavLink
-                  to="/terminal"
-                  onClick={onCloseMobile}
-                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${isActive('/terminal')
-                      ? 'bg-white/20 text-white shadow-xs'
-                      : 'text-white/80 hover:text-white hover:bg-white/10'
-                    }`}
-                  title={collapsed ? 'Gate Checking Terminal' : undefined}
-                >
-                  {isActive('/terminal') && <ActiveBar />}
-                  <ShieldCheck className="h-5 w-5 text-emerald-300 shrink-0" />
-                  {!collapsed && (
-                    <div className="flex flex-col">
-                      <span className="font-bold">Gate Checking</span>
-                      <span className="text-[10px] text-emerald-200/80 font-normal">Access Control & Verify</span>
-                    </div>
-                  )}
-                </NavLink>
-
-                {/* 3. Reports */}
+                {/* 2. Reports */}
                 <NavLink
                   to="/reports"
                   onClick={onCloseMobile}
@@ -226,8 +206,60 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <BarChart3 className="h-5 w-5 text-sky-300 shrink-0" />
                   {!collapsed && (
                     <div className="flex flex-col">
-                      <span className="font-bold">Reports</span>
-                      <span className="text-[10px] text-emerald-200/80 font-normal">Analytics & CSV Export</span>
+                      <span className="font-bold">Reports & Analytics</span>
+                      <span className="text-[10px] text-emerald-200/80 font-normal">Utilization & CSV Export</span>
+                    </div>
+                  )}
+                </NavLink>
+              </div>
+            </div>
+          )}
+
+          {/* Front Desk Attendant Navigation: Gate Checking & Registration Intake */}
+          {user.role === 'GYM_ATTENDANT' && (
+            <div>
+              {!collapsed && (
+                <div className="px-3 text-[10px] font-bold text-emerald-200/70 uppercase tracking-wider mb-2">
+                  Gate Operations
+                </div>
+              )}
+              <div className="space-y-1.5">
+                {/* 1. Gate Checking Terminal */}
+                <NavLink
+                  to="/terminal"
+                  onClick={onCloseMobile}
+                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${isActive('/terminal')
+                      ? 'bg-white/20 text-white shadow-xs'
+                      : 'text-white/80 hover:text-white hover:bg-white/10'
+                    }`}
+                  title={collapsed ? 'Gate Checking Terminal' : undefined}
+                >
+                  {isActive('/terminal') && <ActiveBar />}
+                  <ShieldCheck className="h-5 w-5 text-moa-gold shrink-0" />
+                  {!collapsed && (
+                    <div className="flex flex-col">
+                      <span className="font-bold">Gate Checking</span>
+                      <span className="text-[10px] text-emerald-200/80 font-normal">Access Control & Verify</span>
+                    </div>
+                  )}
+                </NavLink>
+
+                {/* 2. Staff Registration Intake */}
+                <NavLink
+                  to="/registrations"
+                  onClick={onCloseMobile}
+                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${isActive('/registrations')
+                      ? 'bg-white/20 text-white shadow-xs'
+                      : 'text-white/80 hover:text-white hover:bg-white/10'
+                    }`}
+                  title={collapsed ? 'Staff Registration' : undefined}
+                >
+                  {isActive('/registrations') && <ActiveBar />}
+                  <Users className="h-5 w-5 text-emerald-300 shrink-0" />
+                  {!collapsed && (
+                    <div className="flex flex-col">
+                      <span className="font-bold">Staff Registration</span>
+                      <span className="text-[10px] text-emerald-200/80 font-normal">Front Desk Intake</span>
                     </div>
                   )}
                 </NavLink>

@@ -26,6 +26,8 @@ export const LoginPage: React.FC = () => {
         } else {
           navigate('/dashboard');
         }
+      } else if (user.role === 'GYM_ATTENDANT') {
+        navigate('/terminal');
       } else {
         navigate('/registrations');
       }

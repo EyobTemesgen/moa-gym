@@ -9,6 +9,7 @@ export const RegisterClaimPage: React.FC = () => {
   const [employeeId, setEmployeeId] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [shiftPreference, setShiftPreference] = useState('MORNING');
   const [verifiedEmployee, setVerifiedEmployee] = useState<any | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -57,8 +58,8 @@ export const RegisterClaimPage: React.FC = () => {
     setError(null);
     setIsSubmitting(true);
     try {
-      await claimAccount(verifiedEmployee.employeeId, password);
-      navigate('/waiver');
+      await claimAccount(verifiedEmployee.employeeId, password, shiftPreference);
+      navigate('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Failed to claim account');
     } finally {
@@ -179,12 +180,27 @@ export const RegisterClaimPage: React.FC = () => {
               </div>
             </div>
 
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Preferred Workout Shift / የሰዓት ምርጫ
+              </label>
+              <select
+                value={shiftPreference}
+                onChange={(e) => setShiftPreference(e.target.value)}
+                className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-moa-green/30 focus:border-moa-green bg-white font-medium"
+              >
+                <option value="MORNING">ጠዋት / Morning (ከማለዳው 11:00 – 1:30 / 5:00 – 7:30 AM)</option>
+                <option value="EVENING">ማታ / Evening (ከ11:30 – ምሽት 3:00 / 5:30 – 9:00 PM)</option>
+                <option value="ANY">Flexible / ማንኛውም ሰዓት</option>
+              </select>
+            </div>
+
             <button
               type="submit"
               disabled={isSubmitting}
               className="w-full py-2.5 px-4 bg-moa-green hover:bg-moa-green-dark text-white text-xs font-semibold rounded-lg shadow-sm transition flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
             >
-              {isSubmitting ? 'Activating Account...' : 'Activate & Proceed to Waiver'}
+              {isSubmitting ? 'Activating Account...' : 'Activate & Generate Gym Pass'}
               <ArrowRight className="h-4 w-4" />
             </button>
 

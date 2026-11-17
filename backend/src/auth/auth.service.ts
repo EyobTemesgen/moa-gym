@@ -134,12 +134,40 @@ export class AuthService {
         employeeId: trimmedId,
         passwordHash: hashedPassword,
         role: Role.STAFF_MEMBER,
-        waiverSigned: false,
+        waiverSigned: true,
+        waiverSignedAt: new Date(),
       },
       include: {
         hrRecord: true,
       },
     });
+
+    // Ensure member is automatically enrolled into official GymRegistration directory
+    const existingReg = await this.prisma.gymRegistration.findFirst({
+      where: { employeeId: trimmedId },
+    });
+
+    if (!existingReg) {
+      await this.prisma.gymRegistration.create({
+        data: {
+          employeeId: trimmedId,
+          fullName: hrRecord.fullName,
+          department: hrRecord.department,
+          phone: hrRecord.phone,
+          email: hrRecord.email,
+          shiftPreference: dto.shiftPreference || 'MORNING',
+          registrationSource: 'SELF_SERVICE',
+          registeredBy: 'Self-Claim Intranet',
+          status: 'ACTIVE',
+          signatureConfirmed: true,
+        },
+      });
+    } else if (dto.shiftPreference) {
+      await this.prisma.gymRegistration.update({
+        where: { id: existingReg.id },
+        data: { shiftPreference: dto.shiftPreference },
+      });
+    }
 
     const payload = {
       sub: newUser.id,

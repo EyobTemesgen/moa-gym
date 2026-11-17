@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { IsNotEmpty, IsString, MinLength, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ClaimAccountDto {
@@ -12,4 +12,9 @@ export class ClaimAccountDto {
   @IsString()
   @MinLength(6)
   password: string;
+
+  @ApiProperty({ description: 'Preferred workout shift (MORNING, EVENING, ANY)', required: false, example: 'MORNING' })
+  @IsOptional()
+  @IsString()
+  shiftPreference?: string;
 }

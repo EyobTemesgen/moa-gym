@@ -14,14 +14,14 @@ export class LockersController {
   constructor(private readonly lockersService: LockersService) {}
 
   @Get()
-  @Roles(Role.GYM_ATTENDANT, Role.HR_ADMIN, Role.STAFF_MEMBER)
+  @Roles(Role.GYM_ATTENDANT, Role.ADMIN, Role.STAFF_MEMBER)
   @ApiOperation({ summary: 'Get current real-time locker availability grid' })
   async findAll() {
     return this.lockersService.findAll();
   }
 
   @Patch(':lockerNumber/status')
-  @Roles(Role.GYM_ATTENDANT, Role.HR_ADMIN)
+  @Roles(Role.GYM_ATTENDANT, Role.ADMIN)
   @ApiOperation({ summary: 'Update locker maintenance status' })
   async updateStatus(
     @Param('lockerNumber') lockerNumber: string,
@@ -31,7 +31,7 @@ export class LockersController {
   }
 
   @Post(':lockerNumber/release')
-  @Roles(Role.GYM_ATTENDANT, Role.HR_ADMIN)
+  @Roles(Role.GYM_ATTENDANT, Role.ADMIN)
   @ApiOperation({ summary: 'Manually free / clear an occupied locker' })
   async release(@Param('lockerNumber') lockerNumber: string) {
     return this.lockersService.forceRelease(lockerNumber);

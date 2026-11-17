@@ -131,7 +131,7 @@ export const LoginPage: React.FC = () => {
               onClick={() => handleQuickLogin('EMP-ADM-01')}
               className="px-2 py-1.5 bg-white border border-slate-200 rounded text-slate-700 hover:border-moa-green font-medium cursor-pointer"
             >
-              HR Admin
+              Admin
             </button>
             <button
               type="button"

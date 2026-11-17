@@ -24,7 +24,7 @@ export class HrRosterController {
   constructor(private readonly hrRosterService: HrRosterService) {}
 
   @Post('upload')
-  @Roles(Role.HR_ADMIN)
+  @Roles(Role.ADMIN)
   @ApiOperation({ summary: 'Bulk upload / synchronize MoA employee roster from CSV' })
   async uploadCsv(@Body('csvContent') csvContent: string) {
     if (!csvContent) {
@@ -34,7 +34,7 @@ export class HrRosterController {
   }
 
   @Get()
-  @Roles(Role.HR_ADMIN, Role.GYM_ATTENDANT)
+  @Roles(Role.ADMIN, Role.GYM_ATTENDANT)
   @ApiOperation({ summary: 'Get paginated employee eligibility roster' })
   async findAll(
     @Query('query') query?: string,
@@ -53,14 +53,14 @@ export class HrRosterController {
   }
 
   @Get('departments')
-  @Roles(Role.HR_ADMIN, Role.GYM_ATTENDANT)
+  @Roles(Role.ADMIN, Role.GYM_ATTENDANT)
   @ApiOperation({ summary: 'Get list of unique directorates / departments' })
   async getDepartments() {
     return this.hrRosterService.getDepartments();
   }
 
   @Patch(':employeeId/status')
-  @Roles(Role.HR_ADMIN)
+  @Roles(Role.ADMIN)
   @ApiOperation({ summary: 'Activate or suspend employee gym access status' })
   async updateStatus(
     @Param('employeeId') employeeId: string,

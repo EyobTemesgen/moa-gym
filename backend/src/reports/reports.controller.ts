@@ -15,14 +15,14 @@ export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
 
   @Get('analytics')
-  @Roles(Role.HR_ADMIN, Role.GYM_ATTENDANT)
+  @Roles(Role.ADMIN, Role.GYM_ATTENDANT)
   @ApiOperation({ summary: 'Aggregated gym utilization metrics, peak hours, and directorate breakdown' })
   async getAnalytics(@Query('days') days?: string) {
     return this.reportsService.getAnalytics(days ? parseInt(days, 10) : 30);
   }
 
   @Get('export-csv')
-  @Roles(Role.HR_ADMIN)
+  @Roles(Role.ADMIN)
   @ApiOperation({ summary: 'Export attendance logs as a downloaded CSV file' })
   async exportCsv(@Res() res: Response, @Query('days') days?: string) {
     const csvData = await this.reportsService.generateAttendanceCsv(days ? parseInt(days, 10) : 30);
@@ -40,7 +40,7 @@ export class ReportsController {
   }
 
   @Patch('config')
-  @Roles(Role.HR_ADMIN)
+  @Roles(Role.ADMIN)
   @ApiOperation({ summary: 'Update gym max capacity and liability waiver contract text' })
   async updateConfig(
     @Body('maxCapacity') maxCapacity?: number,

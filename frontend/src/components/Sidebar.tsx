@@ -121,8 +121,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           )}
 
-          {/* HR Administrator Navigation: Registration & Reports only */}
-          {user.role === 'HR_ADMIN' && (
+          {/* Admin Navigation: Registration & Reports only */}
+          {(user.role === 'ADMIN' || user.role === 'HR_ADMIN') && (
             <div>
               {!collapsed && (
                 <div className="px-3 text-[10px] font-bold text-emerald-200/70 uppercase tracking-wider mb-2">
@@ -226,7 +226,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <div className="text-xs font-bold text-white truncate">{user.fullName}</div>
                 <div className="text-[10px] font-mono text-emerald-200 truncate">
                   {user.employeeId} ·{' '}
-                  <span className="font-semibold text-moa-gold">{user.role}</span>
+                  <span className="font-semibold text-moa-gold">{user.role === 'HR_ADMIN' ? 'ADMIN' : user.role}</span>
                 </div>
               </div>
             )}

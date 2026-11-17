@@ -32,7 +32,7 @@ export class WellnessController {
   }
 
   @Post('classes')
-  @Roles(Role.GYM_ATTENDANT, Role.HR_ADMIN)
+  @Roles(Role.GYM_ATTENDANT, Role.ADMIN)
   @ApiOperation({ summary: 'Schedule a new wellness group session' })
   async createClass(@Body() dto: CreateClassDto) {
     return this.wellnessService.createClass(dto);
@@ -51,21 +51,21 @@ export class WellnessController {
   }
 
   @Get('equipment-issues')
-  @Roles(Role.GYM_ATTENDANT, Role.HR_ADMIN)
+  @Roles(Role.GYM_ATTENDANT, Role.ADMIN)
   @ApiOperation({ summary: 'List reported equipment defects and maintenance log' })
   async getIssues() {
     return this.wellnessService.getEquipmentIssues();
   }
 
   @Post('equipment-issues')
-  @Roles(Role.GYM_ATTENDANT, Role.HR_ADMIN, Role.STAFF_MEMBER)
+  @Roles(Role.GYM_ATTENDANT, Role.ADMIN, Role.STAFF_MEMBER)
   @ApiOperation({ summary: 'Report damaged or malfunctioning gym equipment' })
   async reportIssue(@Body() dto: CreateEquipmentIssueDto) {
     return this.wellnessService.reportEquipmentIssue(dto);
   }
 
   @Patch('equipment-issues/:id/status')
-  @Roles(Role.GYM_ATTENDANT, Role.HR_ADMIN)
+  @Roles(Role.GYM_ATTENDANT, Role.ADMIN)
   @ApiOperation({ summary: 'Update equipment repair status' })
   async updateIssueStatus(
     @Param('id') id: string,

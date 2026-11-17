@@ -30,7 +30,7 @@ export class AttendanceController {
   @Post('verify')
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.GYM_ATTENDANT, Role.HR_ADMIN)
+  @Roles(Role.GYM_ATTENDANT, Role.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Execute 6-step automated gate entrance check (QR pass or Employee ID)' })
   async verify(@Body() dto: VerifyPassDto) {
@@ -40,7 +40,7 @@ export class AttendanceController {
   @Post('check-in')
   @HttpCode(HttpStatus.CREATED)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.GYM_ATTENDANT, Role.HR_ADMIN)
+  @Roles(Role.GYM_ATTENDANT, Role.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Authorize entrance and assign optional daily locker' })
   async checkIn(@Req() req: any, @Body() dto: CheckInDto) {
@@ -50,7 +50,7 @@ export class AttendanceController {
   @Post('check-out')
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.GYM_ATTENDANT, Role.HR_ADMIN, Role.STAFF_MEMBER)
+  @Roles(Role.GYM_ATTENDANT, Role.ADMIN, Role.STAFF_MEMBER)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Record checkout and automatically release assigned locker' })
   async checkOut(@Body() dto: CheckOutDto) {

@@ -223,14 +223,14 @@ async function main() {
   // 4. Seed User Accounts
   const defaultPassword = await bcrypt.hash('Password123!', 10);
 
-  // 4.1 HR Admin user
+  // 4.1 Admin user
   await prisma.user.upsert({
     where: { employeeId: 'EMP-ADM-01' },
-    update: { role: Role.HR_ADMIN },
+    update: { role: Role.ADMIN },
     create: {
       employeeId: 'EMP-ADM-01',
       passwordHash: defaultPassword,
-      role: Role.HR_ADMIN,
+      role: Role.ADMIN,
       waiverSigned: true,
       waiverSignedAt: new Date(),
       emergencyContactName: 'Almaz Bekele',
@@ -553,7 +553,7 @@ async function main() {
 
   console.log('\n🎉 MoA Gym database seed completed successfully!');
   console.log('Credentials Summary:');
-  console.log('  HR Admin:      admin@moa.gov.et / Password123! (ID: EMP-ADM-01)');
+  console.log('  Admin:         admin@moa.gov.et / Password123! (ID: EMP-ADM-01)');
   console.log('  Gym Attendant: desk@moa.gov.et  / Password123! (ID: EMP-DSK-01)');
   console.log('  Staff Member:  dawit.y@moa.gov.et / Password123! (ID: EMP-MOA-001)');
 }

@@ -3,7 +3,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../lib/auth-context';
 
 interface RoleGuardProps {
-  allowedRoles?: Array<'HR_ADMIN' | 'GYM_ATTENDANT' | 'STAFF_MEMBER'>;
+  allowedRoles?: Array<'ADMIN' | 'HR_ADMIN' | 'GYM_ATTENDANT' | 'STAFF_MEMBER'>;
   requireWaiver?: boolean;
   children: React.ReactNode;
 }
@@ -31,12 +31,14 @@ export const RoleGuard: React.FC<RoleGuardProps> = ({
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
+  const normalizedUserRole = user.role === 'HR_ADMIN' ? 'ADMIN' : user.role;
+
+  if (allowedRoles && !allowedRoles.some(r => (r === 'HR_ADMIN' ? 'ADMIN' : r) === normalizedUserRole)) {
     // If not allowed, redirect to appropriate home
-    if (user.role === 'STAFF_MEMBER') {
+    if (normalizedUserRole === 'STAFF_MEMBER') {
       return <Navigate to="/dashboard" replace />;
     }
-    if (user.role === 'GYM_ATTENDANT') {
+    if (normalizedUserRole === 'GYM_ATTENDANT') {
       return <Navigate to="/terminal" replace />;
     }
     return <Navigate to="/registrations" replace />;

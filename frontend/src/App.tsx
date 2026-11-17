@@ -69,11 +69,11 @@ export const App: React.FC = () => {
               <Route path="/waiver" element={<Navigate to="/dashboard" replace />} />
               <Route path="/classes" element={<Navigate to="/" replace />} />
 
-              {/* HR Admin: Staff Registration Directory & Intake */}
+              {/* Admin: Staff Registration Directory & Intake */}
               <Route
                 path="/registrations"
                 element={
-                  <RoleGuard allowedRoles={['HR_ADMIN']}>
+                  <RoleGuard allowedRoles={['ADMIN', 'HR_ADMIN']}>
                     <RegistrationsPage />
                   </RoleGuard>
                 }
@@ -91,17 +91,17 @@ export const App: React.FC = () => {
               <Route
                 path="/active-floor"
                 element={
-                  <RoleGuard allowedRoles={['GYM_ATTENDANT', 'HR_ADMIN']}>
+                  <RoleGuard allowedRoles={['GYM_ATTENDANT', 'ADMIN', 'HR_ADMIN']}>
                     <ActiveFloorPage />
                   </RoleGuard>
                 }
               />
 
-              {/* HR Admin Management */}
+              {/* Admin Management */}
               <Route
                 path="/admin/roster"
                 element={
-                  <RoleGuard allowedRoles={['HR_ADMIN']}>
+                  <RoleGuard allowedRoles={['ADMIN', 'HR_ADMIN']}>
                     <HrRosterPage />
                   </RoleGuard>
                 }
@@ -111,7 +111,7 @@ export const App: React.FC = () => {
               <Route
                 path="/reports"
                 element={
-                  <RoleGuard allowedRoles={['HR_ADMIN']}>
+                  <RoleGuard allowedRoles={['ADMIN', 'HR_ADMIN']}>
                     <AnalyticsPage />
                   </RoleGuard>
                 }
@@ -120,7 +120,7 @@ export const App: React.FC = () => {
               <Route
                 path="/admin/analytics"
                 element={
-                  <RoleGuard allowedRoles={['HR_ADMIN', 'GYM_ATTENDANT']}>
+                  <RoleGuard allowedRoles={['ADMIN', 'HR_ADMIN', 'GYM_ATTENDANT']}>
                     <AnalyticsPage />
                   </RoleGuard>
                 }
@@ -129,7 +129,7 @@ export const App: React.FC = () => {
               <Route
                 path="/admin/settings"
                 element={
-                  <RoleGuard allowedRoles={['HR_ADMIN']}>
+                  <RoleGuard allowedRoles={['ADMIN', 'HR_ADMIN']}>
                     <SettingsPage />
                   </RoleGuard>
                 }

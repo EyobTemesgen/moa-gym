@@ -31,7 +31,7 @@
 
 | Role | Name | Identifier / Email | Default Password |
 |---|---|---|---|
-| **HR_ADMIN** | Dr. Girma Bekele | `EMP-ADM-01` / `admin@moa.gov.et` | `Password123!` |
+| **ADMIN** | Dr. Girma Bekele | `EMP-ADM-01` / `admin@moa.gov.et` | `Password123!` |
 | **GYM_ATTENDANT** | Tigist Alemayehu | `EMP-DSK-01` / `desk@moa.gov.et` | `Password123!` |
 | **STAFF_MEMBER (Active)** | Dawit Yohannes | `EMP-MOA-001` / `dawit.y@moa.gov.et` | `Password123!` |
 | **STAFF_MEMBER (Pending Waiver)** | Selamawit Kebede | `EMP-MOA-002` / `selamawit.k@moa.gov.et` | `Password123!` |

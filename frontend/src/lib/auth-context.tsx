@@ -8,7 +8,7 @@ export interface AuthUser {
   department: string;
   email?: string;
   photoUrl?: string;
-  role: 'HR_ADMIN' | 'GYM_ATTENDANT' | 'STAFF_MEMBER';
+  role: 'ADMIN' | 'GYM_ATTENDANT' | 'STAFF_MEMBER' | 'HR_ADMIN';
   waiverSigned: boolean;
 }
 

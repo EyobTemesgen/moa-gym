@@ -8,7 +8,7 @@ datasource db {
 }
 
 enum Role {
-  HR_ADMIN
+  ADMIN
   GYM_ATTENDANT
   STAFF_MEMBER
 }

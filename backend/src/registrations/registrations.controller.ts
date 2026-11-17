@@ -26,7 +26,7 @@ export class RegistrationsController {
   constructor(private readonly registrationsService: RegistrationsService) {}
 
   @Post()
-  @Roles(Role.GYM_ATTENDANT, Role.HR_ADMIN, Role.STAFF_MEMBER)
+  @Roles(Role.GYM_ATTENDANT, Role.ADMIN, Role.STAFF_MEMBER)
   @ApiOperation({ summary: 'Register a staff member for MoA Gym Service' })
   async create(@Body() dto: CreateRegistrationDto, @Request() req: any) {
     const registeredBy = req.user?.fullName
@@ -36,7 +36,7 @@ export class RegistrationsController {
   }
 
   @Post('batch')
-  @Roles(Role.GYM_ATTENDANT, Role.HR_ADMIN)
+  @Roles(Role.GYM_ATTENDANT, Role.ADMIN)
   @ApiOperation({ summary: 'Batch register multiple staff members (e.g. from physical paper forms)' })
   async createBatch(@Body() dto: BatchRegistrationDto, @Request() req: any) {
     const registeredBy = req.user?.fullName
@@ -46,7 +46,7 @@ export class RegistrationsController {
   }
 
   @Get()
-  @Roles(Role.GYM_ATTENDANT, Role.HR_ADMIN, Role.STAFF_MEMBER)
+  @Roles(Role.GYM_ATTENDANT, Role.ADMIN, Role.STAFF_MEMBER)
   @ApiOperation({ summary: 'List all registered gym members matching official paper roster' })
   @ApiQuery({ name: 'query', required: false, description: 'Search by Name, Employee ID, Directorate, or Phone' })
   @ApiQuery({ name: 'department', required: false, description: 'Filter by Directorate (የስራ ክፍል)' })
@@ -70,21 +70,21 @@ export class RegistrationsController {
   }
 
   @Get('stats')
-  @Roles(Role.GYM_ATTENDANT, Role.HR_ADMIN, Role.STAFF_MEMBER)
+  @Roles(Role.GYM_ATTENDANT, Role.ADMIN, Role.STAFF_MEMBER)
   @ApiOperation({ summary: 'Get summary statistics of registered gym members' })
   async getStats() {
     return this.registrationsService.getStats();
   }
 
   @Get(':id')
-  @Roles(Role.GYM_ATTENDANT, Role.HR_ADMIN)
+  @Roles(Role.GYM_ATTENDANT, Role.ADMIN)
   @ApiOperation({ summary: 'Get registration details for a specific member' })
   async findOne(@Param('id') id: string) {
     return this.registrationsService.findOne(id);
   }
 
   @Patch(':id/status')
-  @Roles(Role.GYM_ATTENDANT, Role.HR_ADMIN)
+  @Roles(Role.GYM_ATTENDANT, Role.ADMIN)
   @ApiOperation({ summary: 'Update gym registration membership status' })
   async updateStatus(
     @Param('id') id: string,

@@ -13,6 +13,7 @@ import { StaffDashboardPage } from './pages/staff/StaffDashboardPage';
 import { CheckInTerminalPage } from './pages/desk/CheckInTerminalPage';
 import { ActiveFloorPage } from './pages/desk/ActiveFloorPage';
 import { RegistrationsPage } from './pages/desk/RegistrationsPage';
+import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
 import { HrRosterPage } from './pages/admin/HrRosterPage';
 import { AnalyticsPage } from './pages/admin/AnalyticsPage';
 import { SettingsPage } from './pages/admin/SettingsPage';
@@ -39,7 +40,7 @@ const RoleRootRedirect: React.FC = () => {
     return <Navigate to="/terminal" replace />;
   }
 
-  return <Navigate to="/registrations" replace />;
+  return <Navigate to="/admin/dashboard" replace />;
 };
 
 export const App: React.FC = () => {
@@ -68,6 +69,16 @@ export const App: React.FC = () => {
 
               <Route path="/waiver" element={<Navigate to="/dashboard" replace />} />
               <Route path="/classes" element={<Navigate to="/" replace />} />
+
+              {/* Admin: Overview Dashboard */}
+              <Route
+                path="/admin/dashboard"
+                element={
+                  <RoleGuard allowedRoles={['ADMIN', 'HR_ADMIN']}>
+                    <AdminDashboardPage />
+                  </RoleGuard>
+                }
+              />
 
               {/* Admin: Staff Registration Directory & Intake */}
               <Route

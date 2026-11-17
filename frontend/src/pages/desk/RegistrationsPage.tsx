@@ -7,8 +7,6 @@ import {
   Printer,
   Search,
   CheckCircle2,
-  Calendar,
-  Building2,
   FileSpreadsheet,
   Download,
   RotateCcw,
@@ -17,7 +15,6 @@ import {
 import { RegisterStaffModal } from '../../components/registrations/RegisterStaffModal';
 import { BatchRegisterModal } from '../../components/registrations/BatchRegisterModal';
 import { GymRegistrantsPrintModal } from '../../components/registrations/GymRegistrantsPrintModal';
-import { StatCard } from '../../components/ui/StatCard';
 import { SortableHeader, SortDirection } from '../../components/ui/SortableHeader';
 import { usePagination, Pagination } from '../../components/ui/Pagination';
 import { btn, table, statusTone, pill } from '../../components/ui/theme';
@@ -49,8 +46,8 @@ export interface Registrant {
 type TabFilter = 'ALL' | 'ACTIVE' | 'MORNING' | 'LUNCH' | 'EVENING' | 'SUSPENDED';
 
 const TABS: { key: TabFilter; label: string }[] = [
-  { key: 'ALL', label: 'All Registrants' },
-  { key: 'ACTIVE', label: 'Active Members' },
+  { key: 'ALL', label: 'All Members' },
+  { key: 'ACTIVE', label: 'Active' },
   { key: 'MORNING', label: 'Morning Shift' },
   { key: 'LUNCH', label: 'Lunch Shift' },
   { key: 'EVENING', label: 'Evening Shift' },
@@ -83,17 +80,6 @@ export const RegistrationsPage: React.FC = () => {
       if (selectedDept !== 'ALL') params.append('department', selectedDept);
       return apiRequest(`/registrations?${params.toString()}`);
     },
-  });
-
-  // Fetch summary stats
-  const { data: stats } = useQuery<{
-    totalRegistered: number;
-    activeMembers: number;
-    totalDirectorates: number;
-    registeredToday: number;
-  }>({
-    queryKey: ['registrationStats'],
-    queryFn: () => apiRequest('/registrations/stats'),
   });
 
   // Toggle status mutation
@@ -195,14 +181,14 @@ export const RegistrationsPage: React.FC = () => {
         <div className="min-w-0">
           <div className="flex items-center gap-2.5 flex-wrap">
             <h1 className="text-xl font-bold text-slate-900 tracking-tight whitespace-nowrap">
-              Staff Gym Registrants Roster
+              Staff Gym Registrations
             </h1>
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-[#00843D] border border-emerald-200 shadow-2xs">
-              {stats?.totalRegistered ?? data?.total ?? 0} Enrolled
+              {data?.total ?? 0} Enrolled
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1 truncate">
-            Ministry of Agriculture · Staff Wellness & Fitness Gymnasium Membership Directory
+            Ministry of Agriculture · Staff gym membership records and directory
           </p>
         </div>
 
@@ -267,36 +253,6 @@ export const RegistrationsPage: React.FC = () => {
         </div>
       )}
 
-      {/* Summary KPI Cards Grid (Matching Asset Tracking StatCard) */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          label="Total Registrants"
-          value={stats?.totalRegistered ?? data?.total ?? 0}
-          subtitle="Enrolled MoA staff members"
-          icon={<Users className="h-5 w-5" />}
-        />
-        <StatCard
-          label="Active Members"
-          value={stats?.activeMembers ?? 0}
-          subtitle="Eligible for gate access"
-          valueColor="text-emerald-700"
-          icon={<CheckCircle2 className="h-5 w-5" />}
-        />
-        <StatCard
-          label="Directorates"
-          value={stats?.totalDirectorates ?? data?.departments?.length ?? 0}
-          subtitle="Participating work units"
-          valueColor="text-slate-900"
-          icon={<Building2 className="h-5 w-5" />}
-        />
-        <StatCard
-          label="Registered Today"
-          value={stats?.registeredToday ?? 0}
-          subtitle="New intakes today"
-          icon={<Calendar className="h-5 w-5" />}
-        />
-      </div>
-
       {/* Main Table Container Card */}
       <div className={table.card}>
         {/* Filter Tabs Bar (Asset Tracking Style Tab Switcher) */}
@@ -331,7 +287,7 @@ export const RegistrationsPage: React.FC = () => {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by name, department, employee ID, or phone..."
+              placeholder="Search by name, employee ID, directorate, or phone..."
               className={table.search}
             />
             {search && (
@@ -458,7 +414,7 @@ export const RegistrationsPage: React.FC = () => {
                   thClassName="py-2.5 px-4"
                 />
                 <SortableHeader
-                  label="Directorate / Department"
+                  label="Directorate"
                   columnKey="department"
                   currentSortColumn={sortColumn}
                   currentSortDirection={sortDirection}
@@ -474,7 +430,7 @@ export const RegistrationsPage: React.FC = () => {
                   thClassName="py-2.5 px-3.5 w-36"
                 />
                 <SortableHeader
-                  label="Enrolled Date"
+                  label="Registration Date"
                   columnKey="registeredAt"
                   currentSortColumn={sortColumn}
                   currentSortDirection={sortDirection}

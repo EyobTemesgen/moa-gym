@@ -178,27 +178,86 @@ export class RegistrationsService {
   }
 
   async getStats() {
-    const [total, active, depts, todayCount] = await Promise.all([
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    const [
+      total,
+      active,
+      suspended,
+      depts,
+      todayCount,
+      departmentGroups,
+      shiftGroups,
+      recentList,
+      activeFloorCount,
+    ] = await Promise.all([
       this.prisma.gymRegistration.count(),
       this.prisma.gymRegistration.count({ where: { status: 'ACTIVE' } }),
+      this.prisma.gymRegistration.count({ where: { status: 'SUSPENDED' } }),
       this.prisma.gymRegistration.findMany({
         select: { department: true },
         distinct: ['department'],
       }),
       this.prisma.gymRegistration.count({
-        where: {
-          registeredAt: {
-            gte: new Date(new Date().setHours(0, 0, 0, 0)),
+        where: { registeredAt: { gte: todayStart } },
+      }),
+      this.prisma.gymRegistration.groupBy({
+        by: ['department'],
+        _count: { department: true },
+        orderBy: { _count: { department: 'desc' } },
+        take: 8,
+      }),
+      this.prisma.gymRegistration.groupBy({
+        by: ['shiftPreference'],
+        _count: { shiftPreference: true },
+      }),
+      this.prisma.gymRegistration.findMany({
+        take: 6,
+        orderBy: { registeredAt: 'desc' },
+        include: {
+          hrRecord: {
+            select: {
+              photoUrl: true,
+              employmentStatus: true,
+            },
           },
         },
       }),
+      this.prisma.attendance.count({
+        where: { checkOutTime: null },
+      }),
     ]);
+
+    const shiftMap: Record<string, number> = {
+      MORNING: 0,
+      LUNCH: 0,
+      EVENING: 0,
+      FLEXIBLE: 0,
+    };
+
+    for (const g of shiftGroups) {
+      const key = (g.shiftPreference || 'FLEXIBLE').toUpperCase();
+      if (key in shiftMap) {
+        shiftMap[key] += g._count.shiftPreference;
+      } else {
+        shiftMap.FLEXIBLE += g._count.shiftPreference;
+      }
+    }
 
     return {
       totalRegistered: total,
       activeMembers: active,
+      suspendedMembers: suspended,
       totalDirectorates: depts.length,
       registeredToday: todayCount,
+      activeFloorCount,
+      departmentBreakdown: departmentGroups.map((d) => ({
+        department: d.department,
+        count: d._count.department,
+      })),
+      shiftBreakdown: shiftMap,
+      recentRegistrations: recentList,
     };
   }
 

@@ -11,6 +11,7 @@ import {
   ChevronLeft,
   ChevronRight,
   User,
+  LayoutDashboard,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -130,7 +131,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </div>
               )}
               <div className="space-y-1.5">
-                {/* 1. Staff Registration */}
+                {/* 1. Executive Dashboard */}
+                <NavLink
+                  to="/admin/dashboard"
+                  onClick={onCloseMobile}
+                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${isActive('/admin/dashboard')
+                      ? 'bg-white/20 text-white shadow-xs'
+                      : 'text-white/80 hover:text-white hover:bg-white/10'
+                    }`}
+                  title={collapsed ? 'Executive Dashboard' : undefined}
+                >
+                  {isActive('/admin/dashboard') && <ActiveBar />}
+                  <LayoutDashboard className="h-5 w-5 text-moa-gold shrink-0" />
+                  {!collapsed && (
+                    <div className="flex flex-col">
+                      <span className="font-bold">Dashboard</span>
+                      <span className="text-[10px] text-emerald-200/80 font-normal">Executive Overview & Stats</span>
+                    </div>
+                  )}
+                </NavLink>
+
+                {/* 2. Staff Registration */}
                 <NavLink
                   to="/registrations"
                   onClick={onCloseMobile}
@@ -138,19 +159,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       ? 'bg-white/20 text-white shadow-xs'
                       : 'text-white/80 hover:text-white hover:bg-white/10'
                     }`}
-                  title={collapsed ? 'Staff Registration' : undefined}
+                  title={collapsed ? 'Staff Registrations' : undefined}
                 >
                   {isActive('/registrations') && <ActiveBar />}
-                  <Users className="h-5 w-5 text-moa-gold shrink-0" />
+                  <Users className="h-5 w-5 text-emerald-200 shrink-0" />
                   {!collapsed && (
                     <div className="flex flex-col">
-                      <span className="font-bold">Staff Registration</span>
-                      <span className="text-[10px] text-emerald-200/80 font-normal">Registrants Roster & Intake</span>
+                      <span className="font-bold">Staff Registrations</span>
+                      <span className="text-[10px] text-emerald-200/80 font-normal">Directory & Member Intake</span>
                     </div>
                   )}
                 </NavLink>
 
-                {/* 2. Reports */}
+                {/* 3. Reports */}
                 <NavLink
                   to="/reports"
                   onClick={onCloseMobile}

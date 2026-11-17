@@ -100,7 +100,7 @@ export const AdminDashboardPage: React.FC = () => {
           label="Total Registrants"
           value={totalRegistered}
           subtitle="Enrolled MoA staff"
-          icon={<Users className="h-5 w-5" />}
+          icon={<Users className="h-4 w-4" />}
         />
 
         <StatCard
@@ -108,29 +108,29 @@ export const AdminDashboardPage: React.FC = () => {
           value={activeMembers}
           subtitle={`${activeRate}% active rate`}
           valueColor="text-emerald-700"
-          icon={<CheckCircle2 className="h-5 w-5" />}
+          icon={<CheckCircle2 className="h-4 w-4" />}
         />
 
         <StatCard
           label="Directorates"
           value={stats?.totalDirectorates ?? 0}
           subtitle="Participating units"
-          icon={<Building2 className="h-5 w-5" />}
+          icon={<Building2 className="h-4 w-4" />}
         />
 
         <StatCard
           label="Registered Today"
           value={stats?.registeredToday ?? 0}
           subtitle="New intakes today"
-          icon={<Calendar className="h-5 w-5" />}
+          icon={<Calendar className="h-4 w-4" />}
         />
 
         <StatCard
           label="Suspended"
           value={stats?.suspendedMembers ?? 0}
-          subtitle="Access temporarily on hold"
+          subtitle="Access on hold"
           valueColor={stats?.suspendedMembers ? 'text-amber-700' : 'text-slate-900'}
-          icon={<AlertCircle className="h-5 w-5" />}
+          icon={<AlertCircle className="h-4 w-4" />}
         />
       </div>
 

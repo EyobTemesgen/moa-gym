@@ -29,24 +29,31 @@ export const StatCard: React.FC<StatCardProps> = ({
 
   return (
     <div
-      className={`flex items-start gap-4 p-4 bg-white rounded-xl border border-slate-200 shadow-xs transition-shadow duration-200 ease-in-out hover:shadow-md ${className}`}
+      className={`p-4 bg-white rounded-xl border border-slate-200 shadow-xs transition-shadow duration-200 ease-in-out hover:shadow-md flex flex-col justify-between ${className}`}
       role="region"
     >
-      {icon && (
-        <div className="shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-50 text-[#00843D] border border-emerald-100">
-          {icon}
-        </div>
-      )}
-      <div className="flex-1 min-w-0">
-        <span className="text-xs font-semibold text-slate-500 block truncate">{label}</span>
-        <div className="flex items-center mt-1">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-xs font-semibold text-slate-500 leading-snug">
+          {label}
+        </span>
+        {icon && (
+          <div className="shrink-0 flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-50 text-[#00843D] border border-emerald-100">
+            {icon}
+          </div>
+        )}
+      </div>
+
+      <div className="mt-2">
+        <div className="flex items-baseline">
           <span className={`text-2xl sm:text-3xl font-extrabold tracking-tight tabular-nums ${valueColor}`}>
             {value}
           </span>
           {trendIcon && <span className="ml-2">{trendIcon}</span>}
         </div>
         {subtitle && (
-          <p className="text-[11px] text-slate-400 mt-0.5 truncate">{subtitle}</p>
+          <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
+            {subtitle}
+          </p>
         )}
       </div>
     </div>

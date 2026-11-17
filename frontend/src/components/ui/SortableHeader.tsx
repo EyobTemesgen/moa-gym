@@ -1,0 +1,64 @@
+import React from 'react';
+import { ArrowUpDown, Triangle } from 'lucide-react';
+
+export type SortDirection = 'asc' | 'desc';
+
+export interface SortableHeaderProps {
+  label: string;
+  columnKey: string;
+  currentSortColumn?: string | null;
+  currentSortDirection?: SortDirection;
+  onSort: (columnKey: string) => void;
+  align?: 'left' | 'right' | 'center';
+  className?: string;
+  thClassName?: string;
+  title?: string;
+  ariaLabel?: string;
+}
+
+export const SortableHeader: React.FC<SortableHeaderProps> = ({
+  label,
+  columnKey,
+  currentSortColumn,
+  currentSortDirection = 'asc',
+  onSort,
+  align = 'left',
+  className = '',
+  thClassName = '',
+  title,
+  ariaLabel,
+}) => {
+  const isSorted = currentSortColumn === columnKey;
+  const ariaSort = isSorted ? (currentSortDirection === 'asc' ? 'ascending' : 'descending') : 'none';
+
+  return (
+    <th className={thClassName} aria-sort={ariaSort} aria-label={ariaLabel}>
+      <button
+        type="button"
+        onClick={() => onSort(columnKey)}
+        aria-label={ariaLabel}
+        className={`group inline-flex items-center gap-1.5 font-semibold hover:text-slate-900 cursor-pointer select-none transition-colors ${
+          isSorted ? 'text-slate-900' : 'text-slate-600'
+        } ${
+          align === 'right' ? 'ml-auto flex-row-reverse' : align === 'center' ? 'mx-auto' : ''
+        } ${className}`}
+        title={title || `Sort by ${label}`}
+      >
+        <span>{label}</span>
+        {isSorted ? (
+          <Triangle
+            className={`h-2.5 w-2.5 shrink-0 fill-current text-slate-800 ${
+              currentSortDirection === 'asc' ? '' : 'rotate-180'
+            }`}
+            aria-hidden="true"
+          />
+        ) : (
+          <ArrowUpDown
+            className="w-3 h-3 text-slate-400 shrink-0 opacity-0 group-hover:opacity-100 transition"
+            aria-hidden="true"
+          />
+        )}
+      </button>
+    </th>
+  );
+};

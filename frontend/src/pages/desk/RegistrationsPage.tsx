@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '../../lib/api';
 import {
@@ -11,12 +11,23 @@ import {
   Building2,
   FileSpreadsheet,
   PenTool,
+  Download,
+  RotateCcw,
+  X,
+  Clock,
+  ShieldCheck,
+  Check,
 } from 'lucide-react';
 import { RegisterStaffModal } from '../../components/registrations/RegisterStaffModal';
 import { BatchRegisterModal } from '../../components/registrations/BatchRegisterModal';
 import { GymRegistrantsPrintModal } from '../../components/registrations/GymRegistrantsPrintModal';
+import { StatCard } from '../../components/ui/StatCard';
+import { SortableHeader, SortDirection } from '../../components/ui/SortableHeader';
+import { usePagination, Pagination } from '../../components/ui/Pagination';
+import { btn, table, statusTone, pill } from '../../components/ui/theme';
+import { downloadCsv } from '../../utils/csv';
 
-interface Registrant {
+export interface Registrant {
   id: string;
   regNumber: number;
   employeeId: string;
@@ -39,11 +50,24 @@ interface Registrant {
   };
 }
 
+type TabFilter = 'ALL' | 'ACTIVE' | 'MORNING' | 'LUNCH' | 'EVENING' | 'SUSPENDED';
+
+const TABS: { key: TabFilter; label: string }[] = [
+  { key: 'ALL', label: 'All Registrants' },
+  { key: 'ACTIVE', label: 'Active Members' },
+  { key: 'MORNING', label: 'Morning Shift' },
+  { key: 'LUNCH', label: 'Lunch Shift' },
+  { key: 'EVENING', label: 'Evening Shift' },
+  { key: 'SUSPENDED', label: 'Suspended' },
+];
+
 export const RegistrationsPage: React.FC = () => {
   const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState<TabFilter>('ALL');
   const [search, setSearch] = useState('');
   const [selectedDept, setSelectedDept] = useState('ALL');
-  const [selectedStatus, setSelectedStatus] = useState('ALL');
+  const [sortColumn, setSortColumn] = useState<string>('regNumber');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [isBatchModalOpen, setIsBatchModalOpen] = useState(false);
@@ -56,12 +80,11 @@ export const RegistrationsPage: React.FC = () => {
     total: number;
     departments: string[];
   }>({
-    queryKey: ['gymRegistrations', search, selectedDept, selectedStatus],
+    queryKey: ['gymRegistrations', search, selectedDept],
     queryFn: () => {
       const params = new URLSearchParams();
       if (search.trim()) params.append('query', search.trim());
       if (selectedDept !== 'ALL') params.append('department', selectedDept);
-      if (selectedStatus !== 'ALL') params.append('status', selectedStatus);
       return apiRequest(`/registrations?${params.toString()}`);
     },
   });
@@ -90,45 +113,127 @@ export const RegistrationsPage: React.FC = () => {
     },
   });
 
+  // Tab Filtering & Sorting
+  const filteredAndSortedItems = useMemo(() => {
+    let items = (data?.items || []).slice();
+
+    // Tab filter
+    if (activeTab === 'ACTIVE') {
+      items = items.filter((item) => item.status === 'ACTIVE');
+    } else if (activeTab === 'SUSPENDED') {
+      items = items.filter((item) => item.status === 'SUSPENDED');
+    } else if (activeTab === 'MORNING') {
+      items = items.filter((item) => item.shiftPreference === 'MORNING');
+    } else if (activeTab === 'LUNCH') {
+      items = items.filter((item) => item.shiftPreference === 'LUNCH');
+    } else if (activeTab === 'EVENING') {
+      items = items.filter((item) => item.shiftPreference === 'EVENING');
+    }
+
+    // Sorting
+    items.sort((a, b) => {
+      let valA: any = (a as any)[sortColumn];
+      let valB: any = (b as any)[sortColumn];
+
+      if (sortColumn === 'registeredAt') {
+        valA = new Date(valA).getTime();
+        valB = new Date(valB).getTime();
+      } else if (typeof valA === 'string') {
+        valA = valA.toLowerCase();
+        valB = (valB || '').toLowerCase();
+      }
+
+      if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+      if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    return items;
+  }, [data?.items, activeTab, sortColumn, sortDirection]);
+
+  // Client-side pagination
+  const pager = usePagination<Registrant>(filteredAndSortedItems, {
+    pageSize: 10,
+    resetKey: `${activeTab}-${selectedDept}-${search}`,
+  });
+
+  const handleSort = (columnKey: string) => {
+    if (sortColumn === columnKey) {
+      setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortColumn(columnKey);
+      setSortDirection('asc');
+    }
+  };
+
+  const handleExportCsv = () => {
+    const rows = filteredAndSortedItems.map((r) => ({
+      'Reg No': r.regNumber,
+      'Full Name': r.fullName,
+      'Department': r.department,
+      'Employee ID': r.employeeId,
+      'Phone': r.phone || '',
+      'Shift Preference': r.shiftPreference || 'Flexible',
+      'Registration Date': new Date(r.registeredAt).toLocaleDateString('en-GB'),
+      'Signature': r.signatureConfirmed ? 'Verified' : 'Pending',
+      'Status': r.status,
+    }));
+    downloadCsv(`moa-gym-registrations-${new Date().toISOString().slice(0, 10)}.csv`, rows);
+  };
+
+  const clearAllFilters = () => {
+    setActiveTab('ALL');
+    setSelectedDept('ALL');
+    setSearch('');
+    setSortColumn('regNumber');
+    setSortDirection('asc');
+  };
+
+  const hasActiveFilters =
+    search.trim() !== '' || selectedDept !== 'ALL' || activeTab !== 'ALL' || sortColumn !== 'regNumber' || sortDirection !== 'asc';
+
   const getShiftBadge = (shift?: string) => {
     switch (shift) {
       case 'MORNING':
         return (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">
-            Morning (06:00 - 08:30)
+          <span className={`${pill} ${statusTone.morning}`}>
+            <Clock className="w-3 h-3 text-amber-700" />
+            <span>Morning (06:00 - 08:30)</span>
           </span>
         );
       case 'LUNCH':
         return (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-sky-50 text-sky-800 border border-sky-200">
-            Lunch (12:00 - 14:00)
+          <span className={`${pill} ${statusTone.lunch}`}>
+            <Clock className="w-3 h-3 text-sky-700" />
+            <span>Lunch (12:00 - 14:00)</span>
           </span>
         );
       case 'EVENING':
         return (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-50 text-indigo-800 border border-indigo-200">
-            Evening (17:00 - 20:00)
+          <span className={`${pill} ${statusTone.evening}`}>
+            <Clock className="w-3 h-3 text-indigo-700" />
+            <span>Evening (17:00 - 20:00)</span>
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-700">
-            Flexible (Any)
+          <span className={`${pill} ${statusTone.neutral}`}>
+            <span>Flexible / Any</span>
           </span>
         );
     }
   };
 
   return (
-    <div className="space-y-6">
-      {/* Top Title Banner */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="space-y-5">
+      {/* Page Title & Main Action Buttons (Asset Tracking style) */}
+      <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2.5">
-            <h1 className="text-xl font-extrabold text-slate-900 tracking-tight">
+            <h1 className="text-xl font-bold text-slate-900 tracking-tight">
               Staff Gym Registrants Roster
             </h1>
-            <span className="text-[11px] font-bold text-moa-green bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+            <span className="text-[11px] font-bold text-[#00843D] bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
               {stats?.totalRegistered ?? data?.total ?? 0} Enrolled
             </span>
           </div>
@@ -137,30 +242,43 @@ export const RegistrationsPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-wrap items-center gap-2.5">
+        {/* Action Buttons Toolbar */}
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={handleExportCsv}
+            title="Export filtered records to CSV"
+            className={btn.secondary}
+          >
+            <Download className="h-4 w-4 text-slate-600" />
+            <span>Export CSV</span>
+          </button>
+
           <button
             type="button"
             onClick={() => setIsPrintModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl border border-slate-200 transition cursor-pointer"
+            title="Print official A4 roster report"
+            className={btn.secondary}
           >
             <Printer className="h-4 w-4 text-slate-600" />
-            <span>Print Roster (PDF)</span>
+            <span>Print Roster</span>
           </button>
 
           <button
             type="button"
             onClick={() => setIsBatchModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold rounded-xl border border-emerald-200 transition cursor-pointer"
+            title="Batch enter paper registration forms"
+            className={btn.secondary}
           >
-            <FileSpreadsheet className="h-4 w-4 text-moa-green" />
-            <span>Batch Paper Entry</span>
+            <FileSpreadsheet className="h-4 w-4 text-emerald-700" />
+            <span>Batch Intake</span>
           </button>
 
           <button
             type="button"
             onClick={() => setIsRegisterModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 bg-moa-green hover:bg-moa-green-dark text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer"
+            title="Register a new staff member"
+            className={btn.primary}
           >
             <UserPlus className="h-4 w-4" />
             <span>+ Register Staff</span>
@@ -168,10 +286,11 @@ export const RegistrationsPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Success Notification Alert */}
       {notification && (
-        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-xs font-semibold text-emerald-900 flex items-center justify-between">
+        <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg text-xs font-semibold text-emerald-900 flex items-center justify-between shadow-2xs">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="h-5 w-5 text-moa-green shrink-0" />
+            <CheckCircle2 className="h-4 w-4 text-[#00843D] shrink-0" />
             <span>{notification}</span>
           </div>
           <button
@@ -179,162 +298,318 @@ export const RegistrationsPage: React.FC = () => {
             onClick={() => setNotification(null)}
             className="text-slate-400 hover:text-slate-600 cursor-pointer"
           >
-            ✕
+            <X className="h-4 w-4" />
           </button>
         </div>
       )}
 
-      {/* Summary KPI Cards */}
+      {/* Summary KPI Cards Grid (Matching Asset Tracking StatCard) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Total Registrants</span>
-            <Users className="h-5 w-5 text-moa-green" />
-          </div>
-          <div className="text-2xl font-black text-slate-900 mt-2">
-            {stats?.totalRegistered ?? data?.total ?? 0}
-          </div>
-          <div className="text-[11px] text-slate-400 mt-0.5">Enrolled MoA staff members</div>
-        </div>
-
-        <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Active Members</span>
-            <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-          </div>
-          <div className="text-2xl font-black text-emerald-700 mt-2">
-            {stats?.activeMembers ?? 0}
-          </div>
-          <div className="text-[11px] text-emerald-600 mt-0.5 font-medium">Eligible for gym access</div>
-        </div>
-
-        <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Directorates</span>
-            <Building2 className="h-5 w-5 text-moa-blue" />
-          </div>
-          <div className="text-2xl font-black text-moa-blue mt-2">
-            {stats?.totalDirectorates ?? data?.departments?.length ?? 0}
-          </div>
-          <div className="text-[11px] text-slate-400 mt-0.5">Participating departments</div>
-        </div>
-
-        <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Registered Today</span>
-            <Calendar className="h-5 w-5 text-moa-gold" />
-          </div>
-          <div className="text-2xl font-black text-slate-800 mt-2">
-            {stats?.registeredToday ?? 0}
-          </div>
-          <div className="text-[11px] text-slate-400 mt-0.5">New intakes today</div>
-        </div>
+        <StatCard
+          label="Total Registrants"
+          value={stats?.totalRegistered ?? data?.total ?? 0}
+          subtitle="Enrolled MoA staff members"
+          icon={<Users className="h-5 w-5" />}
+        />
+        <StatCard
+          label="Active Members"
+          value={stats?.activeMembers ?? 0}
+          subtitle="Eligible for gate access"
+          valueColor="text-emerald-700"
+          icon={<CheckCircle2 className="h-5 w-5" />}
+        />
+        <StatCard
+          label="Directorates"
+          value={stats?.totalDirectorates ?? data?.departments?.length ?? 0}
+          subtitle="Participating work units"
+          valueColor="text-slate-900"
+          icon={<Building2 className="h-5 w-5" />}
+        />
+        <StatCard
+          label="Registered Today"
+          value={stats?.registeredToday ?? 0}
+          subtitle="New intakes today"
+          icon={<Calendar className="h-5 w-5" />}
+        />
       </div>
 
-      {/* Filter and Search Bar */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div className="relative flex-1 max-w-md w-full">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-            <Search className="h-4 w-4" />
+      {/* Main Table Container Card */}
+      <div className={table.card}>
+        {/* Filter Tabs Bar (Asset Tracking Style Tab Switcher) */}
+        <div className="border-b border-slate-200 bg-slate-50/70 px-4 pt-2.5 flex items-center gap-1 overflow-x-auto">
+          {TABS.map((tab) => {
+            const isTabActive = activeTab === tab.key;
+            return (
+              <button
+                key={tab.key}
+                type="button"
+                onClick={() => setActiveTab(tab.key)}
+                className={`px-3 py-1.5 rounded-t-[4px] text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
+                  isTabActive
+                    ? 'bg-white border-t-2 border-t-[#00843D] border-x border-slate-200 text-slate-900 shadow-2xs -mb-px'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 border-t-2 border-transparent'
+                }`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Search & Select Toolbar */}
+        <div className="p-4 bg-white border-b border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+          {/* Search Box */}
+          <div className="relative flex-1 max-w-md w-full">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+              <Search className="h-4 w-4" />
+            </div>
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search by name, department, employee ID, or phone..."
+              className={table.search}
+            />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch('')}
+                className="absolute inset-y-0 right-0 pr-2.5 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
           </div>
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name, department, employee ID, or phone..."
-            className="w-full pl-9 pr-3 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-moa-green/30"
-          />
+
+          {/* Department Select & Refresh */}
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <select
+              value={selectedDept}
+              onChange={(e) => setSelectedDept(e.target.value)}
+              className="px-3 py-2 text-xs border border-slate-300 rounded-[4px] focus:outline-none focus:border-emerald-700 bg-white text-slate-700 font-medium"
+            >
+              <option value="ALL">All Directorates</option>
+              {(data?.departments || []).map((dept) => (
+                <option key={dept} value={dept}>
+                  {dept}
+                </option>
+              ))}
+            </select>
+
+            <button
+              type="button"
+              onClick={() => {
+                queryClient.invalidateQueries({ queryKey: ['gymRegistrations'] });
+                queryClient.invalidateQueries({ queryKey: ['registrationStats'] });
+              }}
+              title="Refresh list"
+              className={btn.secondary}
+            >
+              <RotateCcw className="h-3.5 w-3.5 text-slate-600" />
+            </button>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2.5 w-full sm:w-auto">
-          {/* Directorate Dropdown */}
-          <select
-            value={selectedDept}
-            onChange={(e) => setSelectedDept(e.target.value)}
-            className="px-3 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-moa-green/30 bg-white"
-          >
-            <option value="ALL">All Departments</option>
-            {(data?.departments || []).map((dept) => (
-              <option key={dept} value={dept}>
-                {dept}
-              </option>
-            ))}
-          </select>
+        {/* Active Filter Pills Bar (Asset Tracking Style) */}
+        {hasActiveFilters && (
+          <div className="px-4 py-2 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center gap-2">
+            <span className="text-[11px] font-semibold text-slate-500">Active filters:</span>
 
-          {/* Status Dropdown */}
-          <select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            className="px-3 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-moa-green/30 bg-white"
-          >
-            <option value="ALL">All Statuses</option>
-            <option value="ACTIVE">Active</option>
-            <option value="SUSPENDED">Suspended</option>
-          </select>
-        </div>
-      </div>
+            {search && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-emerald-50 text-emerald-800 text-[11px] font-medium border border-emerald-200">
+                <span>Search: "{search}"</span>
+                <button
+                  type="button"
+                  onClick={() => setSearch('')}
+                  className="hover:text-emerald-950 cursor-pointer"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
 
-      {/* Registrants Table */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+            {selectedDept !== 'ALL' && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-emerald-50 text-emerald-800 text-[11px] font-medium border border-emerald-200">
+                <span>Directorate: {selectedDept}</span>
+                <button
+                  type="button"
+                  onClick={() => setSelectedDept('ALL')}
+                  className="hover:text-emerald-950 cursor-pointer"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+
+            {activeTab !== 'ALL' && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-emerald-50 text-emerald-800 text-[11px] font-medium border border-emerald-200">
+                <span>Tab: {TABS.find((t) => t.key === activeTab)?.label}</span>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('ALL')}
+                  className="hover:text-emerald-950 cursor-pointer"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+
+            {(sortColumn !== 'regNumber' || sortDirection !== 'asc') && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-emerald-50 text-emerald-800 text-[11px] font-medium border border-emerald-200">
+                <span>Sorted by {sortColumn} ({sortDirection})</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSortColumn('regNumber');
+                    setSortDirection('asc');
+                  }}
+                  className="hover:text-emerald-950 cursor-pointer"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+
+            <button
+              type="button"
+              onClick={clearAllFilters}
+              className="text-[11px] text-emerald-700 hover:text-emerald-900 font-semibold underline ml-auto cursor-pointer"
+            >
+              Clear all filters
+            </button>
+          </div>
+        )}
+
+        {/* Registrants Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr className="bg-slate-50 border-b border-slate-200 text-slate-700 font-bold">
-                <th className="py-3 px-3.5 w-14 text-center">No.</th>
-                <th className="py-3 px-4">Full Name</th>
-                <th className="py-3 px-4">Department / Directorate</th>
-                <th className="py-3 px-3.5 w-28">Employee ID</th>
-                <th className="py-3 px-3.5 w-28">Phone</th>
-                <th className="py-3 px-3.5">Shift Preference</th>
-                <th className="py-3 px-3.5 w-24">Date</th>
-                <th className="py-3 px-4 text-center w-28">Signature</th>
-                <th className="py-3 px-3 w-20 text-center">Status</th>
-                <th className="py-3 px-4 text-right w-24">Action</th>
+          <table className="w-full text-left border-collapse text-[13px]">
+            <thead className={table.headRow}>
+              <tr>
+                <SortableHeader
+                  label="No."
+                  columnKey="regNumber"
+                  currentSortColumn={sortColumn}
+                  currentSortDirection={sortDirection}
+                  onSort={handleSort}
+                  align="center"
+                  thClassName="py-2.5 px-3 w-16 text-center"
+                />
+                <SortableHeader
+                  label="Full Name"
+                  columnKey="fullName"
+                  currentSortColumn={sortColumn}
+                  currentSortDirection={sortDirection}
+                  onSort={handleSort}
+                  thClassName="py-2.5 px-4 min-w-[200px]"
+                />
+                <SortableHeader
+                  label="Directorate / Department"
+                  columnKey="department"
+                  currentSortColumn={sortColumn}
+                  currentSortDirection={sortDirection}
+                  onSort={handleSort}
+                  thClassName="py-2.5 px-4 min-w-[200px]"
+                />
+                <SortableHeader
+                  label="Employee ID"
+                  columnKey="employeeId"
+                  currentSortColumn={sortColumn}
+                  currentSortDirection={sortDirection}
+                  onSort={handleSort}
+                  thClassName="py-2.5 px-3.5 w-32"
+                />
+                <th className="py-2.5 px-3.5 w-28 text-slate-700 font-semibold">Phone</th>
+                <SortableHeader
+                  label="Shift Preference"
+                  columnKey="shiftPreference"
+                  currentSortColumn={sortColumn}
+                  currentSortDirection={sortDirection}
+                  onSort={handleSort}
+                  thClassName="py-2.5 px-3.5 min-w-[170px]"
+                />
+                <SortableHeader
+                  label="Date"
+                  columnKey="registeredAt"
+                  currentSortColumn={sortColumn}
+                  currentSortDirection={sortDirection}
+                  onSort={handleSort}
+                  thClassName="py-2.5 px-3.5 w-28"
+                />
+                <th className="py-2.5 px-4 text-center w-28 text-slate-700 font-semibold">Signature</th>
+                <SortableHeader
+                  label="Status"
+                  columnKey="status"
+                  currentSortColumn={sortColumn}
+                  currentSortDirection={sortDirection}
+                  onSort={handleSort}
+                  align="center"
+                  thClassName="py-2.5 px-3 w-24 text-center"
+                />
+                <th className={table.actionsHead}>Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 bg-white">
               {isLoading ? (
                 <tr>
-                  <td colSpan={10} className="py-12 text-center text-slate-400">
-                    Loading registrants...
+                  <td colSpan={10} className="py-16 text-center text-slate-400">
+                    <div className="inline-block animate-spin rounded-full h-6 w-6 border-2 border-emerald-600 border-t-transparent mb-2"></div>
+                    <p className="text-xs">Loading registrants roster...</p>
                   </td>
                 </tr>
-              ) : (data?.items || []).length === 0 ? (
+              ) : pager.pageItems.length === 0 ? (
                 <tr>
-                  <td colSpan={10} className="py-12 text-center text-slate-400">
-                    No registered staff members found.
+                  <td colSpan={10} className="py-16 text-center">
+                    <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-2 text-slate-400">
+                      <Users className="w-6 h-6 text-slate-400" />
+                    </div>
+                    <p className="text-sm font-bold text-slate-800">No registrants match your search</p>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Try adjusting the search query, shift tab, or directorate filter.
+                    </p>
+                    {hasActiveFilters && (
+                      <button
+                        type="button"
+                        onClick={clearAllFilters}
+                        className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] border border-slate-300 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 transition cursor-pointer"
+                      >
+                        <X className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Clear all filters</span>
+                      </button>
+                    )}
                   </td>
                 </tr>
               ) : (
-                (data?.items || []).map((row) => {
+                pager.pageItems.map((row: Registrant) => {
                   const isActive = row.status === 'ACTIVE';
 
                   return (
-                    <tr key={row.id} className="hover:bg-slate-50/70 transition">
-                      {/* No. */}
-                      <td className="py-3 px-3.5 text-center font-bold font-mono text-slate-600 bg-slate-50/50">
-                        {row.regNumber}
+                    <tr key={row.id} className={table.row}>
+                      {/* No. (Monospace Badge) */}
+                      <td className="py-2.5 px-3 text-center">
+                        <span className="inline-flex items-center justify-center px-2 py-0.5 rounded-[4px] bg-slate-100 font-mono font-bold text-xs text-slate-700">
+                          {row.regNumber}
+                        </span>
                       </td>
 
-                      {/* Full Name */}
-                      <td className="py-3 px-4">
+                      {/* Full Name & Avatar */}
+                      <td className="py-2.5 px-4">
                         <div className="flex items-center gap-2.5">
                           {row.hrRecord?.photoUrl ? (
                             <img
                               src={row.hrRecord.photoUrl}
                               alt={row.fullName}
-                              className="h-8 w-8 rounded-full object-cover ring-1 ring-slate-200"
+                              className="h-8 w-8 rounded-full object-cover ring-1 ring-slate-200 shrink-0"
                             />
                           ) : (
-                            <div className="h-8 w-8 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs ring-1 ring-emerald-200">
+                            <div className="h-8 w-8 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs ring-1 ring-emerald-200 shrink-0">
                               {row.fullName.charAt(0)}
                             </div>
                           )}
-                          <div>
-                            <div className="font-bold text-slate-900">{row.fullName}</div>
+                          <div className="min-w-0">
+                            <div className="font-bold text-slate-900 truncate">{row.fullName}</div>
                             {row.registrationSource === 'PAPER_FORM' && (
                               <span className="text-[10px] text-amber-700 font-medium">
-                                📋 Paper Roster
+                                📋 Paper Roster Intake
                               </span>
                             )}
                           </div>
@@ -342,27 +617,27 @@ export const RegistrationsPage: React.FC = () => {
                       </td>
 
                       {/* Department */}
-                      <td className="py-3 px-4 font-semibold text-slate-800">
+                      <td className="py-2.5 px-4 font-semibold text-slate-800">
                         {row.department}
                       </td>
 
                       {/* Employee ID */}
-                      <td className="py-3 px-3.5 font-mono text-[11px] text-slate-500">
-                        {row.employeeId}
+                      <td className="py-2.5 px-3.5">
+                        <span className={table.code}>{row.employeeId}</span>
                       </td>
 
                       {/* Phone */}
-                      <td className="py-3 px-3.5 text-slate-600 font-mono text-[11px]">
+                      <td className="py-2.5 px-3.5 text-slate-600 font-mono text-[11px]">
                         {row.phone || '—'}
                       </td>
 
                       {/* Shift preference */}
-                      <td className="py-3 px-3.5">
+                      <td className="py-2.5 px-3.5">
                         {getShiftBadge(row.shiftPreference)}
                       </td>
 
                       {/* Date */}
-                      <td className="py-3 px-3.5 text-slate-500 font-mono text-[11px]">
+                      <td className="py-2.5 px-3.5 text-slate-500 font-mono text-[11px]">
                         {new Date(row.registeredAt).toLocaleDateString('en-GB')}
                       </td>
 
@@ -375,8 +650,8 @@ export const RegistrationsPage: React.FC = () => {
                             className="h-6 max-w-[80px] mx-auto object-contain"
                           />
                         ) : row.signatureConfirmed ? (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-moa-green">
-                            <PenTool className="h-3 w-3" />
+                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#00843D]">
+                            <Check className="h-3.5 w-3.5 text-[#00843D]" />
                             <span>Signed</span>
                           </span>
                         ) : (
@@ -384,21 +659,19 @@ export const RegistrationsPage: React.FC = () => {
                         )}
                       </td>
 
-                      {/* Status */}
-                      <td className="py-3 px-3 text-center">
+                      {/* Status Pill */}
+                      <td className="py-2.5 px-3 text-center">
                         <span
-                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                            isActive
-                              ? 'bg-emerald-100 text-emerald-800'
-                              : 'bg-red-100 text-red-800'
+                          className={`${pill} ${
+                            isActive ? statusTone.active : statusTone.suspended
                           }`}
                         >
                           {isActive ? 'Active' : 'Suspended'}
                         </span>
                       </td>
 
-                      {/* Action */}
-                      <td className="py-3 px-4 text-right">
+                      {/* Action Cell (Pinned) */}
+                      <td className={table.actionsCell}>
                         <button
                           type="button"
                           onClick={() =>
@@ -407,13 +680,12 @@ export const RegistrationsPage: React.FC = () => {
                               status: isActive ? 'SUSPENDED' : 'ACTIVE',
                             })
                           }
-                          className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition cursor-pointer ${
-                            isActive
-                              ? 'text-red-700 hover:bg-red-50 border border-red-200'
-                              : 'text-emerald-700 hover:bg-emerald-50 border border-emerald-200'
-                          }`}
+                          className={btn.row}
+                          title={isActive ? 'Suspend membership' : 'Activate membership'}
                         >
-                          {isActive ? 'Suspend' : 'Activate'}
+                          <span className={isActive ? 'text-rose-700' : 'text-emerald-700'}>
+                            {isActive ? 'Suspend' : 'Activate'}
+                          </span>
                         </button>
                       </td>
                     </tr>
@@ -423,6 +695,9 @@ export const RegistrationsPage: React.FC = () => {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Footer (Matching Asset Tracking Style) */}
+        <Pagination pager={pager} label="registrants" />
       </div>
 
       {/* Modals */}
@@ -433,7 +708,7 @@ export const RegistrationsPage: React.FC = () => {
           queryClient.invalidateQueries({ queryKey: ['gymRegistrations'] });
           queryClient.invalidateQueries({ queryKey: ['registrationStats'] });
           setNotification(
-            `✓ Staff member "${newReg.fullName}" was successfully registered under Reg # ${newReg.regNumber}.`,
+            `Staff member "${newReg.fullName}" was successfully registered under Reg # ${newReg.regNumber}.`,
           );
         }}
       />
@@ -444,15 +719,15 @@ export const RegistrationsPage: React.FC = () => {
         onSuccess={() => {
           queryClient.invalidateQueries({ queryKey: ['gymRegistrations'] });
           queryClient.invalidateQueries({ queryKey: ['registrationStats'] });
-          setNotification('✓ Batch registration completed successfully.');
+          setNotification('Batch registration completed successfully.');
         }}
       />
 
       <GymRegistrantsPrintModal
         isOpen={isPrintModalOpen}
         onClose={() => setIsPrintModalOpen(false)}
-        items={data?.items || []}
-        totalCount={data?.total || 0}
+        items={filteredAndSortedItems}
+        totalCount={filteredAndSortedItems.length}
         selectedDepartment={selectedDept}
       />
     </div>

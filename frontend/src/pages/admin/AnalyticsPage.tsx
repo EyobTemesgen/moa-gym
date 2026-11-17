@@ -7,10 +7,11 @@ import {
   Users,
   Clock,
   ShieldCheck,
-  Building,
+  Building2,
   TrendingUp,
-  AlertCircle,
 } from 'lucide-react';
+import { StatCard } from '../../components/ui/StatCard';
+import { btn } from '../../components/ui/theme';
 
 interface AnalyticsData {
   periodDays: number;
@@ -56,23 +57,28 @@ export const AnalyticsPage: React.FC = () => {
   );
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="space-y-5">
+      {/* Page Header (Asset Tracking Style) */}
+      <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-            Facility Utilization Analytics & Export
-          </h1>
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+              Facility Utilization & Attendance Analytics
+            </h1>
+            <span className="text-[11px] font-bold text-[#00843D] bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+              Institutional Reports
+            </span>
+          </div>
           <p className="text-xs text-slate-500 mt-1">
             Aggregated attendance patterns, peak workout hours, and directorate wellness engagement.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           <select
             value={days}
             onChange={(e) => setDays(Number(e.target.value))}
-            className="px-3 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-moa-green/30 bg-white"
+            className="px-3 py-2 text-xs border border-slate-300 rounded-[4px] focus:outline-none focus:border-emerald-700 bg-white font-medium text-slate-700"
           >
             <option value={7}>Last 7 Days</option>
             <option value={30}>Last 30 Days</option>
@@ -82,7 +88,8 @@ export const AnalyticsPage: React.FC = () => {
           <button
             type="button"
             onClick={handleDownloadCsv}
-            className="inline-flex items-center gap-1.5 px-4 py-2 bg-moa-green hover:bg-moa-green-dark text-white text-xs font-semibold rounded-xl shadow-xs transition cursor-pointer"
+            className={btn.primary}
+            title="Download CSV attendance report"
           >
             <Download className="h-4 w-4" />
             <span>Export CSV Report</span>
@@ -90,75 +97,50 @@ export const AnalyticsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* KPI Cards */}
+      {/* KPI Cards Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-slate-500">Total Gym Visits</span>
-            <div className="p-2 bg-emerald-50 text-moa-green rounded-xl">
-              <TrendingUp className="h-4 w-4" />
-            </div>
-          </div>
-          <div className="text-2xl font-bold font-mono text-slate-900">
-            {isLoading ? '--' : analytics?.summary.totalVisits}
-          </div>
-          <p className="text-[11px] text-slate-400 mt-1">Logged check-ins in period</p>
-        </div>
-
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-slate-500">Unique Staff Active</span>
-            <div className="p-2 bg-blue-50 text-moa-blue rounded-xl">
-              <Users className="h-4 w-4" />
-            </div>
-          </div>
-          <div className="text-2xl font-bold font-mono text-slate-900">
-            {isLoading ? '--' : analytics?.summary.uniqueStaffAttendees}
-          </div>
-          <p className="text-[11px] text-slate-400 mt-1">
-            Out of {analytics?.summary.activeRosterEligible ?? 0} eligible
-          </p>
-        </div>
-
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-slate-500">Waivers Completed</span>
-            <div className="p-2 bg-emerald-50 text-moa-green rounded-xl">
-              <ShieldCheck className="h-4 w-4" />
-            </div>
-          </div>
-          <div className="text-2xl font-bold font-mono text-slate-900">
-            {isLoading ? '--' : analytics?.summary.waiversCompleted}
-          </div>
-          <p className="text-[11px] text-slate-400 mt-1">Compliant for entrance</p>
-        </div>
-
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-slate-500">Auto-Closed (23:59)</span>
-            <div className="p-2 bg-amber-50 text-amber-600 rounded-xl">
-              <Clock className="h-4 w-4" />
-            </div>
-          </div>
-          <div className="text-2xl font-bold font-mono text-slate-900">
-            {isLoading ? '--' : analytics?.summary.autoClosedSessions}
-          </div>
-          <p className="text-[11px] text-slate-400 mt-1">Closed by nightly cron</p>
-        </div>
+        <StatCard
+          label="Total Gym Visits"
+          value={isLoading ? '--' : analytics?.summary.totalVisits ?? 0}
+          subtitle="Logged check-ins in period"
+          valueColor="text-slate-900"
+          icon={<TrendingUp className="h-5 w-5" />}
+        />
+        <StatCard
+          label="Unique Staff Active"
+          value={isLoading ? '--' : analytics?.summary.uniqueStaffAttendees ?? 0}
+          subtitle={`Out of ${analytics?.summary.activeRosterEligible ?? 0} eligible`}
+          valueColor="text-emerald-700"
+          icon={<Users className="h-5 w-5" />}
+        />
+        <StatCard
+          label="Waivers Completed"
+          value={isLoading ? '--' : analytics?.summary.waiversCompleted ?? 0}
+          subtitle="Compliant for entrance"
+          valueColor="text-slate-900"
+          icon={<ShieldCheck className="h-5 w-5" />}
+        />
+        <StatCard
+          label="Auto-Closed (23:59)"
+          value={isLoading ? '--' : analytics?.summary.autoClosedSessions ?? 0}
+          subtitle="Closed by nightly safety cron"
+          valueColor="text-amber-800"
+          icon={<Clock className="h-5 w-5" />}
+        />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Directorate Breakdown */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs">
           <div className="flex items-center gap-2 mb-4">
-            <div className="p-2 bg-slate-50 rounded-xl text-moa-green">
-              <Building className="h-4 w-4" />
+            <div className="p-2 bg-emerald-50 rounded-lg text-[#00843D]">
+              <Building2 className="h-4 w-4" />
             </div>
             <div>
               <h3 className="text-sm font-bold text-slate-900">
                 Participation by Directorate
               </h3>
-              <p className="text-xs text-slate-500">Distribution of gym sessions across MoA branches</p>
+              <p className="text-xs text-slate-500">Distribution of gym sessions across MoA work units</p>
             </div>
           </div>
 
@@ -168,14 +150,14 @@ export const AnalyticsPage: React.FC = () => {
               return (
                 <div key={dept.department} className="space-y-1">
                   <div className="flex justify-between text-xs">
-                    <span className="font-medium text-slate-800 truncate max-w-xs">
+                    <span className="font-semibold text-slate-800 truncate max-w-xs">
                       {dept.department}
                     </span>
                     <span className="font-mono font-bold text-slate-600">{dept.count} visits</span>
                   </div>
-                  <div className="w-full bg-slate-100 rounded-full h-2">
+                  <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
                     <div
-                      className="bg-moa-green h-2 rounded-full transition-all duration-500"
+                      className="bg-[#00843D] h-2 rounded-full transition-all duration-500"
                       style={{ width: `${pct}%` }}
                     ></div>
                   </div>
@@ -186,9 +168,9 @@ export const AnalyticsPage: React.FC = () => {
         </div>
 
         {/* Peak Hours Histogram */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs">
           <div className="flex items-center gap-2 mb-4">
-            <div className="p-2 bg-slate-50 rounded-xl text-moa-blue">
+            <div className="p-2 bg-slate-100 rounded-lg text-slate-700">
               <Clock className="h-4 w-4" />
             </div>
             <div>
@@ -206,7 +188,7 @@ export const AnalyticsPage: React.FC = () => {
                     {h.visits}
                   </span>
                   <div
-                    className="w-full bg-moa-blue/80 hover:bg-moa-blue rounded-t transition-all duration-300"
+                    className="w-full bg-emerald-700/80 hover:bg-[#00843D] rounded-t transition-all duration-300"
                     style={{ height: `${Math.max(4, heightPct)}%` }}
                   ></div>
                   <span className="text-[9px] font-mono text-slate-400 rotate-[-45deg] origin-top-left mt-1">

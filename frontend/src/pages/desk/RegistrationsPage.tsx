@@ -178,14 +178,14 @@ export const RegistrationsPage: React.FC = () => {
         <div className="min-w-0">
           <div className="flex items-center gap-2.5 flex-wrap">
             <h1 className="text-xl font-bold text-slate-900 tracking-tight whitespace-nowrap">
-              Staff Registrations for gym service
+              Staff Registrations
             </h1>
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-[#00843D] border border-emerald-200 shadow-2xs">
               {data?.total ?? 0} Enrolled
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1 truncate">
-            Ministry of Agriculture · Staff gym membership records and directory
+            Staff gym membership records and directory
           </p>
         </div>
 

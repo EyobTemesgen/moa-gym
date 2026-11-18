@@ -20,12 +20,12 @@ export const MoaHeader: React.FC<MoaHeaderProps> = ({ onOpenMobileSidebar }) => 
       case '/admin/dashboard':
         return {
           title: 'Dashboard',
-          subtitle: 'Ministry of Agriculture · Staff gym executive summary and metrics',
+          subtitle: 'Staff gym executive summary and metrics',
         };
       case '/registrations':
         return {
-          title: 'Staff Registrations for gym service',
-          subtitle: 'Ministry of Agriculture · Staff gym membership records and directory',
+          title: 'Staff Registrations',
+          subtitle: 'Staff gym membership records and directory',
         };
       case '/terminal':
         return {
@@ -36,7 +36,7 @@ export const MoaHeader: React.FC<MoaHeaderProps> = ({ onOpenMobileSidebar }) => 
       case '/admin/analytics':
         return {
           title: 'Reports',
-          subtitle: 'Ministry of Agriculture · Attendance summaries and exportable records',
+          subtitle: 'Attendance summaries and exportable records',
         };
       case '/dashboard':
         return {
@@ -45,8 +45,8 @@ export const MoaHeader: React.FC<MoaHeaderProps> = ({ onOpenMobileSidebar }) => 
         };
       default:
         return {
-          title: 'MoA Staff Gym & Wellness Portal',
-          subtitle: 'Ministry of Agriculture Institutional Wellness Facility',
+          title: 'MoA Gym',
+          subtitle: 'Staff Wellness Facility',
         };
     }
   };
@@ -76,7 +76,7 @@ export const MoaHeader: React.FC<MoaHeaderProps> = ({ onOpenMobileSidebar }) => 
             {!user && (
               <Link to="/" className="flex items-center gap-2">
                 <MoaLogo className="h-9 w-9 shrink-0" size={36} />
-                <span className="font-bold text-xs text-slate-900">MoA Gym Portal</span>
+                <span className="font-bold text-xs text-slate-900">MoA Gym</span>
               </Link>
             )}
 

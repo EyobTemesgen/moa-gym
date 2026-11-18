@@ -161,7 +161,7 @@ export const RegisterClaimPage: React.FC = () => {
             MoA Gym Self-Registration
           </h2>
           <p className="text-xs text-slate-500 mt-1">
-            የግብርና ሚኒስቴር የአካል ብቃት ማዕከል ሰራተኞች ምዝገባ
+            Staff Wellness & Fitness Access
           </p>
         </div>
 

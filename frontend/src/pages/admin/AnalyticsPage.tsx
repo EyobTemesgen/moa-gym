@@ -70,7 +70,7 @@ export const AnalyticsPage: React.FC = () => {
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1 truncate">
-            Ministry of Agriculture · Gymnasium attendance summaries and exportable records
+            Gymnasium attendance summaries and exportable records
           </p>
         </div>
 

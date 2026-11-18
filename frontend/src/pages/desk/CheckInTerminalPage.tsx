@@ -254,7 +254,7 @@ export const CheckInTerminalPage: React.FC = () => {
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1 truncate">
-            Ministry of Agriculture Gymnasium · Rapid Employee ID Entrance & Departure Control
+            Rapid Employee ID Entrance & Departure Control
           </p>
         </div>
 

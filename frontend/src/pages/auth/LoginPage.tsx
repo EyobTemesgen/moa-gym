@@ -45,10 +45,10 @@ export const LoginPage: React.FC = () => {
         <div className="text-center mb-6">
           <MoaLogo className="mx-auto h-16 w-16 mb-3" size={64} />
           <h2 className="text-xl font-bold text-slate-900 tracking-tight">
-            MoA Staff Gym Portal
+            MoA Gym
           </h2>
           <p className="text-xs text-slate-500 mt-1">
-            Ministry of Agriculture · Staff Wellness & Fitness Center
+            Staff Wellness & Fitness Center
           </p>
         </div>
 

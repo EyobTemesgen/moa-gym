@@ -71,7 +71,7 @@ export const AdminDashboardPage: React.FC = () => {
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Ministry of Agriculture · Staff Wellness & Fitness Gymnasium Executive Dashboard
+            Staff Wellness & Fitness Executive Dashboard
           </p>
         </div>
 

@@ -35,7 +35,7 @@ export const Layout: React.FC = () => {
 
         <footer className="bg-white border-t border-slate-200 mt-auto py-3">
           <div className="w-full px-4 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-500 gap-2">
-            <p>© 2026 Federal Democratic Republic of Ethiopia – Ministry of Agriculture. Internal Staff Portal.</p>
+            <p>© 2026 Ministry of Agriculture (MoA) · Staff Gym</p>
             <div className="flex items-center gap-3">
               <span className="text-emerald-700 font-semibold">Strict HR Whitelist</span>
               <span>·</span>

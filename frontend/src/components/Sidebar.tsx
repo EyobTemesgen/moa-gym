@@ -16,6 +16,7 @@ import {
   LogOut,
   Calendar,
   Video,
+  X,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -121,6 +122,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
             className="hidden lg:flex p-1.5 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition cursor-pointer"
           >
             {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          </button>
+
+          {/* Mobile Close Button */}
+          <button
+            type="button"
+            onClick={onCloseMobile}
+            title="Close navigation"
+            className="lg:hidden p-1.5 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition cursor-pointer"
+            aria-label="Close navigation menu"
+          >
+            <X className="h-5 w-5" />
           </button>
         </div>
 

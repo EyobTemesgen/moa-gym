@@ -9,7 +9,45 @@ export interface AuthUser {
   email?: string;
   photoUrl?: string;
   role: 'ADMIN' | 'GYM_ATTENDANT' | 'STAFF_MEMBER' | 'HR_ADMIN';
+  memberType?: string;
   waiverSigned: boolean;
+}
+
+export interface RegisterStaffPayload {
+  memberType: 'INTERNAL' | 'EXTERNAL';
+  firstName: string;
+  lastName: string;
+  username?: string;
+  email: string;
+  department: string;
+  organization?: string;
+  employeeId?: string;
+  phone?: string;
+  gender?: string;
+  password: string;
+  shiftPreference?: string;
+  daysPerWeek?: number;
+  workoutDays?: string[];
+  fitnessGoal?: string;
+  lockerNumber?: string;
+  monthlyFee?: number;
+  paymentMethod?: string;
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
+}
+
+export interface RegistrationResult {
+  user: AuthUser;
+  registration: {
+    id: string;
+    regNumber: number;
+    memberType: string;
+    shiftPreference: string;
+    daysPerWeek: number;
+    monthlyFee: number;
+    lockerNumber?: string | null;
+    paymentMethod?: string;
+  };
 }
 
 interface AuthContextType {
@@ -18,6 +56,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (identifier: string, pass: string) => Promise<AuthUser>;
   claimAccount: (employeeId: string, pass: string, shiftPreference?: string, fullName?: string) => Promise<AuthUser>;
+  registerStaff: (payload: RegisterStaffPayload) => Promise<RegistrationResult>;
   refreshProfile: () => Promise<void>;
   logout: () => void;
 }
@@ -100,6 +139,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return res.user;
   };
 
+  const registerStaff = async (payload: RegisterStaffPayload): Promise<RegistrationResult> => {
+    const res = await apiRequest<{ accessToken: string; user: AuthUser; registration: any }>('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+
+    setToken(res.accessToken);
+    setUser(res.user);
+    localStorage.setItem('moa_gym_token', res.accessToken);
+    localStorage.setItem('moa_gym_user', JSON.stringify(res.user));
+    return { user: res.user, registration: res.registration };
+  };
+
   const refreshProfile = async () => {
     try {
       const profile = await apiRequest('/users/me');
@@ -136,6 +188,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoading,
         login,
         claimAccount,
+        registerStaff,
         refreshProfile,
         logout,
       }}

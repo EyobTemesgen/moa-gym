@@ -50,6 +50,7 @@ model User {
   hrRecord              HrEmployeeRoster @relation(fields: [employeeId], references: [employeeId])
   passwordHash          String
   role                  Role             @default(STAFF_MEMBER)
+  memberType            String           @default("INTERNAL")
   waiverSigned          Boolean          @default(false)
   waiverSignedAt        DateTime?
   parqResponses         Json?
@@ -130,6 +131,14 @@ model GymRegistration {
   email              String?
   gender             String?           // MALE / FEMALE
   shiftPreference    String?           // MORNING / LUNCH / EVENING / ANY
+  memberType         String            @default("INTERNAL") // INTERNAL (MoA Staff) / EXTERNAL (Community / Partner)
+  organization       String?           // Organization or Institution for External members
+  daysPerWeek        Int               @default(3) // 2, 3, 4, 5, 6 days per week
+  workoutDays        String?           // Comma-separated list of days (e.g. "MON,WED,FRI")
+  monthlyFee         Float             @default(0) // Calculated ETB fee
+  paymentMethod      String?           // PAYROLL_DEDUCTION, TELEBIRR, CBE_BIRR, CASH_DESK
+  fitnessGoal        String?           // General Fitness, Muscle Building, Cardio/Aerobics, Posture Relief
+  lockerNumber       String?           // Assigned locker number e.g. L-04
   registeredAt       DateTime          @default(now())
   registeredBy       String?           // Attendant or Admin name/ID
   registrationSource String            @default("FRONT_DESK") // FRONT_DESK, SELF_SERVICE, PAPER_BATCH
@@ -144,4 +153,5 @@ model GymRegistration {
   @@index([department])
   @@index([status])
   @@index([regNumber])
+  @@index([memberType])
 }

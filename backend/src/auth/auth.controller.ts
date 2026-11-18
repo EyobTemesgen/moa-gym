@@ -4,6 +4,7 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { ClaimAccountDto } from './dto/claim-account.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { RegisterStaffDto } from './dto/register.dto';
 
 @ApiTags('Auth')
 @Controller('api/auth')
@@ -22,6 +23,20 @@ export class AuthController {
   @ApiOperation({ summary: 'List all distinct MoA directorates from staff roster' })
   async getDepartments() {
     return this.authService.getDepartments();
+  }
+
+  @Get('available-lockers')
+  @ApiOperation({ summary: 'Public list of lockers and availability for self-serve registration' })
+  async getAvailableLockers() {
+    return this.authService.getAvailableLockers();
+  }
+
+  @Post('register')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Self-service registration for internal staff and external members' })
+  @ApiResponse({ status: 201, description: 'Account and gym registration created, session started' })
+  async register(@Body() registerDto: RegisterStaffDto) {
+    return this.authService.register(registerDto);
   }
 
   @Get('lookup-by-name')

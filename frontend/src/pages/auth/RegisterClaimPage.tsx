@@ -172,6 +172,16 @@ export const RegisterClaimPage: React.FC = () => {
           </div>
         )}
 
+        {/* New Self-Serve Portal Pill */}
+        <div className="mb-4 text-center">
+          <Link
+            to="/register"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-lg text-xs font-semibold hover:bg-emerald-100 transition"
+          >
+            <span>✨ Use New Self-Serve Registration Flow (with Shift, Fee & Locker) →</span>
+          </Link>
+        </div>
+
         {!verifiedEmployee ? (
           <div>
             {/* Search Mode Toggle Tabs */}

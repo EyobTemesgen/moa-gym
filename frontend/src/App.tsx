@@ -8,6 +8,7 @@ import { RoleGuard } from './components/RoleGuard';
 // Pages
 import { LoginPage } from './pages/auth/LoginPage';
 import { RegisterClaimPage } from './pages/auth/RegisterClaimPage';
+import { DedicatedSignUpPage } from './pages/auth/DedicatedSignUpPage';
 import { OnboardingWaiverPage } from './pages/staff/OnboardingWaiverPage';
 import { StaffDashboardPage } from './pages/staff/StaffDashboardPage';
 import { CheckInTerminalPage } from './pages/desk/CheckInTerminalPage';
@@ -52,10 +53,11 @@ export const App: React.FC = () => {
           <Routes>
             {/* Public Auth Routes */}
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<DedicatedSignUpPage />} />
+            <Route path="/signup" element={<DedicatedSignUpPage />} />
+            <Route path="/join" element={<DedicatedSignUpPage />} />
             <Route path="/claim" element={<RegisterClaimPage />} />
-            <Route path="/signup" element={<Navigate to="/claim" replace />} />
-            <Route path="/register" element={<Navigate to="/claim" replace />} />
-            <Route path="/register/claim" element={<Navigate to="/claim" replace />} />
+            <Route path="/register/claim" element={<RegisterClaimPage />} />
 
             {/* Authenticated Application Shell */}
             <Route element={<Layout />}>

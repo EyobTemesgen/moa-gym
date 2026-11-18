@@ -12,7 +12,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { LoginDto } from './dto/login.dto';
 import { ClaimAccountDto } from './dto/claim-account.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
-import { EmploymentStatus, Role } from '@prisma/client';
+import { RegisterStaffDto } from './dto/register.dto';
+import { EmploymentStatus, Role, LockerStatus } from '@prisma/client';
 
 function cleanTokens(str: string): string[] {
   if (!str) return [];
@@ -414,6 +415,196 @@ export class AuthService {
       message: `Password updated successfully for ${user.hrRecord.fullName}. You can now sign in with your new password.`,
       employeeId: user.employeeId,
       fullName: user.hrRecord.fullName,
+    };
+  }
+
+  async getAvailableLockers() {
+    const lockers = await this.prisma.locker.findMany({
+      orderBy: { lockerNumber: 'asc' },
+      select: {
+        id: true,
+        lockerNumber: true,
+        status: true,
+      },
+    });
+    return lockers;
+  }
+
+  calculateGymFee(memberType: 'INTERNAL' | 'EXTERNAL', daysPerWeek: number): number {
+    const days = Math.min(Math.max(daysPerWeek || 3, 1), 6);
+    if (memberType === 'EXTERNAL') {
+      // External community / corporate rate (ETB/month)
+      if (days <= 2) return 800;
+      if (days === 3) return 1200;
+      if (days === 4) return 1600;
+      return 2200; // 5 or 6 days / Full Access
+    } else {
+      // Internal MoA staff subsidized rate (ETB/month)
+      if (days <= 2) return 250;
+      if (days === 3) return 350;
+      if (days === 4) return 450;
+      return 600; // 5 or 6 days / Full Access
+    }
+  }
+
+  async register(dto: RegisterStaffDto) {
+    const memberType = dto.memberType === 'EXTERNAL' ? 'EXTERNAL' : 'INTERNAL';
+    const fullName = `${dto.firstName.trim()} ${dto.lastName.trim()}`;
+    const email = dto.email.trim().toLowerCase();
+    const phone = (dto.phone || '').trim();
+    const daysPerWeek = Number(dto.daysPerWeek) || 3;
+    const workoutDays = Array.isArray(dto.workoutDays)
+      ? dto.workoutDays.join(',')
+      : dto.workoutDays || 'MON,WED,FRI';
+    const monthlyFee = this.calculateGymFee(memberType, daysPerWeek);
+
+    // Resolve or generate Employee ID / External Member ID
+    let employeeId = (dto.employeeId || dto.username || '').trim();
+    if (!employeeId) {
+      const randNum = Math.floor(1000 + Math.random() * 9000);
+      employeeId = memberType === 'INTERNAL' ? `EMP-MOA-${randNum}` : `EXT-MOA-${randNum}`;
+    }
+
+    // Check if an active account already exists for this ID or Email
+    const existingUser = await this.prisma.user.findFirst({
+      where: {
+        OR: [
+          { employeeId },
+          { hrRecord: { email } },
+        ],
+      },
+      include: { hrRecord: true },
+    });
+
+    if (existingUser) {
+      throw new ConflictException(
+        `An account already exists for ${existingUser.hrRecord.fullName} (${existingUser.employeeId}). Please sign in instead.`,
+      );
+    }
+
+    // Ensure HR roster record exists
+    const existingRoster = await this.prisma.hrEmployeeRoster.findUnique({
+      where: { employeeId },
+    });
+
+    const departmentName = memberType === 'EXTERNAL'
+      ? (dto.organization ? `External - ${dto.organization.trim()}` : (dto.department?.trim() || 'Community Trainee'))
+      : (dto.department?.trim() || 'General Ministry Staff');
+
+    if (!existingRoster) {
+      await this.prisma.hrEmployeeRoster.create({
+        data: {
+          employeeId,
+          fullName,
+          department: departmentName,
+          phone: phone || '+251 90 000 0000',
+          email,
+          employmentStatus: EmploymentStatus.ACTIVE,
+        },
+      });
+    } else {
+      // Update contact details
+      await this.prisma.hrEmployeeRoster.update({
+        where: { employeeId },
+        data: {
+          email,
+          ...(phone ? { phone } : {}),
+        },
+      });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+
+    // Create User record
+    const newUser = await this.prisma.user.create({
+      data: {
+        employeeId,
+        passwordHash: hashedPassword,
+        role: Role.STAFF_MEMBER,
+        memberType,
+        waiverSigned: true,
+        waiverSignedAt: new Date(),
+        emergencyContactName: dto.emergencyContactName?.trim() || null,
+        emergencyContactPhone: dto.emergencyContactPhone?.trim() || null,
+      },
+      include: { hrRecord: true },
+    });
+
+    // Handle locker assignment if requested
+    let assignedLocker: string | null = null;
+    if (dto.lockerNumber && dto.lockerNumber.trim()) {
+      const targetLocker = await this.prisma.locker.findUnique({
+        where: { lockerNumber: dto.lockerNumber.trim() },
+      });
+      if (targetLocker && targetLocker.status === LockerStatus.AVAILABLE) {
+        await this.prisma.locker.update({
+          where: { lockerNumber: targetLocker.lockerNumber },
+          data: {
+            status: LockerStatus.OCCUPIED,
+            assignedUserId: newUser.id,
+          },
+        });
+        assignedLocker = targetLocker.lockerNumber;
+      }
+    }
+
+    // Create GymRegistration record
+    const newRegistration = await this.prisma.gymRegistration.create({
+      data: {
+        employeeId,
+        fullName,
+        department: departmentName,
+        phone,
+        email,
+        gender: dto.gender || null,
+        shiftPreference: dto.shiftPreference || 'MORNING',
+        memberType,
+        organization: dto.organization?.trim() || (memberType === 'INTERNAL' ? 'Ministry of Agriculture' : null),
+        daysPerWeek,
+        workoutDays,
+        monthlyFee,
+        paymentMethod: dto.paymentMethod || (memberType === 'INTERNAL' ? 'PAYROLL_DEDUCTION' : 'TELEBIRR'),
+        fitnessGoal: dto.fitnessGoal?.trim() || null,
+        lockerNumber: assignedLocker,
+        registrationSource: 'SELF_SERVICE',
+        registeredBy: 'Self-Serve Portal',
+        status: 'ACTIVE',
+        signatureConfirmed: true,
+      },
+    });
+
+    // Create JWT Session
+    const payload = {
+      sub: newUser.id,
+      employeeId: newUser.employeeId,
+      role: newUser.role,
+    };
+    const token = this.jwtService.sign(payload);
+
+    return {
+      accessToken: token,
+      user: {
+        id: newUser.id,
+        employeeId: newUser.employeeId,
+        fullName: newUser.hrRecord.fullName,
+        department: newUser.hrRecord.department,
+        email: newUser.hrRecord.email,
+        photoUrl: newUser.hrRecord.photoUrl,
+        role: newUser.role,
+        memberType,
+        waiverSigned: newUser.waiverSigned,
+      },
+      registration: {
+        id: newRegistration.id,
+        regNumber: newRegistration.regNumber,
+        memberType: newRegistration.memberType,
+        shiftPreference: newRegistration.shiftPreference,
+        daysPerWeek: newRegistration.daysPerWeek,
+        monthlyFee: newRegistration.monthlyFee,
+        lockerNumber: newRegistration.lockerNumber,
+        paymentMethod: newRegistration.paymentMethod,
+      },
     };
   }
 }

@@ -692,9 +692,9 @@ export const CheckInTerminalPage: React.FC = () => {
             {/* Header with Live Occupancy Counter */}
             <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Flame className="w-4 h-4 text-amber-600" />
+                <Users className="w-4 h-4 text-emerald-700" />
                 <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wide">
-                  Currently on Gym Floor ({currentCount})
+                  Active In Facility ({currentCount})
                 </h3>
               </div>
               <span className="text-[11px] font-mono text-emerald-800 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">

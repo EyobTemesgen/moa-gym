@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../lib/auth-context';
 import { apiRequest } from '../../lib/api';
+import { MoaLogo } from '../../components/MoaLogo';
 import {
   ShieldCheck,
   Building2,
@@ -233,26 +234,20 @@ export const DedicatedSignUpPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0c3924] via-[#115033] to-[#0a2f1c] flex flex-col justify-start items-center pt-2 sm:pt-3 pb-6 px-4 sm:px-6 lg:px-8 selection:bg-emerald-500 selection:text-white relative">
-      {/* Background Decorative Rings */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
-
-      {/* MoA Header Badge & Branding - Compact Bar */}
-      <div className="flex items-center justify-center gap-2 mb-2 z-10 text-center">
-        <div className="w-7 h-7 bg-white rounded-lg shadow-sm flex items-center justify-center border border-emerald-100/50">
-          <ShieldCheck className="w-4 h-4 text-emerald-700" />
-        </div>
-        <h1 className="text-sm sm:text-base font-bold tracking-tight text-white drop-shadow-sm">
-          MoA Wellness & Fitness Center
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-start items-center pt-3 sm:pt-4 pb-8 px-4 sm:px-6 lg:px-8 relative">
+      {/* MoA Header Badge & Branding - Matching Login Page */}
+      <div className="text-center mb-3">
+        <MoaLogo className="mx-auto h-12 w-12 mb-1.5" size={48} />
+        <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+          MoA Gym Registration
         </h1>
-        <span className="text-[11px] text-emerald-200/80 font-medium hidden sm:inline">
-          · Ministry of Agriculture
-        </span>
+        <p className="text-xs text-slate-500 mt-0.5">
+          Staff Wellness & Fitness Center · Ministry of Agriculture
+        </p>
       </div>
 
       {/* Main Container Card */}
-      <div className="bg-white rounded-2xl shadow-2xl p-4 sm:p-5 max-w-xl w-full border border-slate-100 z-10 transition-all">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-md p-5 sm:p-6 max-w-xl w-full z-10 transition-all">
         {/* Step Progress Indicators */}
         <div className="mb-3">
           <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500 mb-1">

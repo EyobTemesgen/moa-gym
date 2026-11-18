@@ -519,18 +519,52 @@ export const DedicatedSignUpPage: React.FC = () => {
       {/* Main Container Card */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-md p-5 sm:p-6 max-w-xl w-full z-10 transition-all">
         {/* Step Progress Indicators */}
-        <div className="mb-3">
-          <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500 mb-1">
-            <span className={step >= 1 ? 'text-emerald-700 font-bold' : ''}>1. Profile</span>
-            <span className={step >= 2 ? 'text-emerald-700 font-bold' : ''}>2. Schedule & Fee</span>
-            <span className={step >= 3 ? 'text-emerald-700 font-bold' : ''}>3. Locker</span>
-            <span className={step >= 4 ? 'text-emerald-700 font-bold' : ''}>4. Complete</span>
-          </div>
-          <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden flex">
-            <div
-              className="bg-emerald-600 h-full transition-all duration-300"
-              style={{ width: `${(step / 4) * 100}%` }}
-            />
+        <div className="mb-5 pb-3.5 border-b border-slate-100">
+          <div className="grid grid-cols-4 gap-1.5 sm:gap-2">
+            {[
+              { num: 1, label: 'Profile' },
+              { num: 2, label: 'Schedule & Fee' },
+              { num: 3, label: 'Locker' },
+              { num: 4, label: 'Complete' },
+            ].map((s) => {
+              const isActive = step === s.num;
+              const isDone = step > s.num;
+              return (
+                <div key={s.num} className="flex flex-col items-center">
+                  <div className="flex items-center gap-1 sm:gap-1.5 mb-1.5">
+                    <span
+                      className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold transition-all shrink-0 ${
+                        isActive
+                          ? 'bg-[#00843D] text-white shadow-2xs ring-2 ring-emerald-500/20'
+                          : isDone
+                          ? 'bg-emerald-100 text-[#00843D] font-bold'
+                          : 'bg-slate-100 text-slate-400 font-medium'
+                      }`}
+                    >
+                      {isDone ? '✓' : s.num}
+                    </span>
+                    <span
+                      className={`text-xs sm:text-sm transition-colors truncate ${
+                        isActive
+                          ? 'text-[#00843D] font-bold'
+                          : isDone
+                          ? 'text-slate-700 font-semibold'
+                          : 'text-slate-400 font-medium'
+                      }`}
+                    >
+                      {s.label}
+                    </span>
+                  </div>
+                  <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full transition-all duration-300 ${
+                        isActive || isDone ? 'bg-[#00843D]' : 'bg-transparent'
+                      }`}
+                    />
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 

@@ -97,20 +97,24 @@ export const MemberCardModal: React.FC<MemberCardModalProps> = ({
             id="moa-gym-single-card"
             className="overflow-y-auto flex-1 flex flex-col items-center text-center print:overflow-visible"
           >
-            {/* Top Emblem & Header */}
-            <div className="w-full bg-[#00843D] px-4 py-2.5 text-white relative shrink-0">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-[#FCDD09]"></div>
-              <div className="flex items-center justify-center gap-1.5 mb-0.5">
-                <MoaLogo className="h-4.5 w-4.5 text-white brightness-0 invert" />
-                <span className="text-[11px] font-black uppercase tracking-wider text-white">
-                  Ministry of Agriculture
+            {/* Top Emblem & Header - Sleek & Compact Horizontal Bar */}
+            <div className="w-full bg-[#00843D] px-3.5 py-2 text-white relative shrink-0">
+              <div className="absolute top-0 left-0 right-0 h-0.5 bg-[#FCDD09]" />
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <MoaLogo className="h-6 w-6 text-white brightness-0 invert shrink-0" size={24} />
+                  <div className="text-left min-w-0">
+                    <p className="text-[10px] font-black uppercase tracking-wider text-white truncate leading-tight">
+                      Ministry of Agriculture
+                    </p>
+                    <p className="text-[8.5px] font-semibold text-emerald-100 uppercase tracking-tight truncate">
+                      Staff Wellness Gymnasium
+                    </p>
+                  </div>
+                </div>
+                <span className="shrink-0 text-[8px] font-bold uppercase tracking-wider bg-white/20 text-white px-2 py-0.5 rounded-full border border-white/25">
+                  Entry Pass
                 </span>
-              </div>
-              <h2 className="text-[10px] font-semibold text-emerald-100 uppercase tracking-wider">
-                Staff Wellness & Fitness Gymnasium
-              </h2>
-              <div className="inline-block mt-1 px-2 py-0.5 rounded-full text-[8.5px] font-bold uppercase tracking-wider bg-white/20 text-white backdrop-blur-xs">
-                Official Digital Entry Pass
               </div>
             </div>
 

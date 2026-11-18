@@ -81,7 +81,7 @@ export const App: React.FC = () => {
                 }
               />
 
-              {/* Trainee Manuals & Video Training Guides */}
+              {/* Exercise Video Guides */}
               <Route
                 path="/guides"
                 element={
@@ -94,7 +94,7 @@ export const App: React.FC = () => {
               {/* Aliases */}
               <Route path="/waiver" element={<Navigate to="/dashboard" replace />} />
               <Route path="/classes" element={<Navigate to="/schedule" replace />} />
-              <Route path="/manuals" element={<Navigate to="/guides" replace />} />
+              <Route path="/videos" element={<Navigate to="/guides" replace />} />
               <Route path="/training" element={<Navigate to="/guides" replace />} />
 
               {/* Admin: Overview Dashboard */}

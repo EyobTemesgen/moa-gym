@@ -4,6 +4,7 @@ import { useAuth } from '../../lib/auth-context';
 import { useToast } from '../../context/ToastContext';
 import { apiRequest } from '../../lib/api';
 import { MoaLogo } from '../../components/MoaLogo';
+import { QRCodeSVG } from 'qrcode.react';
 import {
   ShieldCheck,
   Building2,
@@ -29,6 +30,9 @@ import {
   Upload,
   X,
   RefreshCw,
+  Copy,
+  Printer,
+  QrCode,
 } from 'lucide-react';
 
 interface LockerItem {
@@ -99,6 +103,21 @@ export const DedicatedSignUpPage: React.FC = () => {
 
   // Result after registration
   const [registrationResult, setRegistrationResult] = useState<any | null>(null);
+  const [copiedCode, setCopiedCode] = useState(false);
+
+  const handleCopyPassCode = (code: string) => {
+    try {
+      navigator.clipboard.writeText(code);
+      setCopiedCode(true);
+      setTimeout(() => setCopiedCode(false), 2500);
+    } catch (e) {
+      console.warn('Clipboard write failed', e);
+    }
+  };
+
+  const handlePrintPass = () => {
+    window.print();
+  };
 
   // Load official MoA directorates on mount
   useEffect(() => {
@@ -1440,117 +1459,241 @@ export const DedicatedSignUpPage: React.FC = () => {
           </form>
         )}
 
-        {/* STEP 4: SUCCESS & ONBOARDING CONFIRMATION */}
-        {step === 4 && registrationResult && (
-          <div className="space-y-6 text-center py-2">
-            <div className="w-16 h-16 bg-emerald-100 text-emerald-700 rounded-2xl mx-auto flex items-center justify-center shadow-inner">
-              <CheckCircle2 className="w-9 h-9" />
-            </div>
+        {/* STEP 4: SUCCESS & GATE PASS CREDENTIALS */}
+        {step === 4 && registrationResult && (() => {
+          const passCode =
+            registrationResult.user?.employeeId ||
+            `REG-${String(registrationResult.registration?.regNumber || '001').padStart(4, '0')}`;
+          const regNumberFormatted = `REG-${String(
+            registrationResult.registration?.regNumber || '001'
+          ).padStart(4, '0')}`;
+          const memberPhoto = photoUrl || registrationResult.user?.photoUrl;
 
-            <div>
-              <h2 className="text-2xl font-bold text-slate-900">Welcome to MoA Gym!</h2>
-              <p className="text-xs text-slate-500 mt-1">
-                Your self-service registration has been activated. You are now an official member.
-              </p>
-            </div>
+          return (
+            <div className="space-y-5 text-center py-1 animate-fadeIn">
+              {/* Header Greeting */}
+              <div className="w-14 h-14 bg-emerald-100 text-[#00843D] rounded-full mx-auto flex items-center justify-center shadow-inner">
+                <CheckCircle2 className="w-8 h-8" />
+              </div>
 
-            {/* Summary Credentials Card */}
-            <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200 text-left space-y-2.5 text-xs">
-              {(photoUrl || registrationResult.user?.photoUrl) && (
-                <div className="flex items-center gap-3 pb-2.5 border-b border-slate-200/80">
-                  <img
-                    src={photoUrl || registrationResult.user?.photoUrl}
-                    alt="Member"
-                    className="w-12 h-12 rounded-xl object-cover ring-2 ring-[#00843D] shadow-xs shrink-0"
-                  />
-                  <div>
-                    <div className="font-bold text-slate-900 text-xs">{registrationResult.user?.fullName}</div>
-                    <div className="text-[11px] text-emerald-800 font-medium">Digital Gate Pass Photo Attached</div>
+              <div>
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+                  Registration Successful!
+                </h2>
+                <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+                  Your membership has been activated. Below is your official <strong className="text-slate-800">Digital Gate Pass</strong> and <strong className="text-slate-800">Pass Code</strong> for entering the facility.
+                </p>
+              </div>
+
+              {/* Notice Banner */}
+              <div className="p-3 bg-amber-50/90 border border-amber-200 rounded-[4px] text-left text-xs text-amber-900 flex items-start gap-2.5">
+                <Sparkles className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <div className="leading-relaxed">
+                  <strong className="font-bold text-amber-950">Save Your Gate Pass:</strong> Screenshot, copy, or print this pass. You will need your <strong>Pass Code</strong> or <strong>QR Code</strong> at the entrance terminal scanner to check in and unlock your locker.
+                </div>
+              </div>
+
+              {/* Official Digital Gate Pass Card */}
+              <div
+                id="moa-registration-pass"
+                className="bg-white border-2 border-emerald-600/30 rounded-[4px] shadow-md overflow-hidden text-left"
+              >
+                {/* Official MoA Header Bar */}
+                <div className="bg-[#00843D] px-4 py-2.5 text-white relative">
+                  <div className="absolute top-0 left-0 right-0 h-0.5 bg-[#FCDD09]" />
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <MoaLogo className="h-6 w-6 text-white brightness-0 invert shrink-0" size={24} />
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-black uppercase tracking-wider text-white leading-tight">
+                          Ministry of Agriculture
+                        </p>
+                        <p className="text-[8.5px] font-semibold text-emerald-100 uppercase tracking-tight">
+                          Fitness Center · Official Gate Pass
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-[9px] font-bold uppercase tracking-wider bg-white/20 text-white px-2 py-0.5 rounded-[4px] border border-white/20">
+                      Active Member
+                    </span>
                   </div>
                 </div>
-              )}
-              <div className="flex items-center justify-between pb-2 border-b border-slate-200/80">
-                <span className="text-slate-500">Official Reg Number:</span>
-                <span className="font-mono font-bold text-emerald-800 text-sm">
-                  REG-{String(registrationResult.registration?.regNumber || '001').padStart(4, '0')}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-slate-500">Member Name:</span>
-                <span className="font-semibold text-slate-900">{registrationResult.user?.fullName}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-slate-500">Category / Affiliation:</span>
-                <span className="font-semibold text-slate-800">
-                  {registrationResult.registration?.memberType === 'INTERNAL'
-                    ? 'MoA Staff'
-                    : 'External Member'}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-slate-500">Selected Shift:</span>
-                <span className="font-semibold text-slate-800">
-                  {registrationResult.registration?.shiftPreference === 'MORNING'
-                    ? 'Morning Shift (6:00 AM – 8:30 AM)'
-                    : 'Evening Shift (5:30 PM – 9:00 PM)'}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-slate-500">Workout Schedule:</span>
-                <span className="font-semibold text-slate-800">
-                  {registrationResult.registration?.daysPerWeek} Days / Week
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-slate-500">Monthly Fee:</span>
-                <span className="font-bold text-emerald-700">
-                  {registrationResult.registration?.memberType === 'INTERNAL'
-                    ? 'Free (MoA Institutional Benefit)'
-                    : `${registrationResult.registration?.monthlyFee} ETB / Month`}
-                </span>
-              </div>
-              {registrationResult.registration?.lockerNumber && (
-                <div className="flex items-center justify-between pt-2 border-t border-slate-200/80">
-                  <span className="text-slate-500">Assigned Locker:</span>
-                  <span className="font-bold text-emerald-800">
-                    Locker {registrationResult.registration?.lockerNumber}
-                  </span>
+
+                {/* Card Content */}
+                <div className="p-4 sm:p-5 space-y-4">
+                  {/* Photo & Member Core Info */}
+                  <div className="flex items-center gap-3.5 pb-3 border-b border-slate-100">
+                    <div className="relative shrink-0">
+                      {memberPhoto ? (
+                        <img
+                          src={memberPhoto}
+                          alt="Member"
+                          className="w-14 h-14 sm:w-16 sm:h-16 rounded-[4px] object-cover ring-2 ring-[#00843D] shadow-xs"
+                        />
+                      ) : (
+                        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-[4px] bg-emerald-50 text-[#00843D] flex items-center justify-center font-bold text-xl border border-emerald-200">
+                          <User className="w-7 h-7 text-[#00843D]" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-bold text-slate-900 text-sm sm:text-base leading-snug truncate">
+                        {registrationResult.user?.fullName}
+                      </h3>
+                      <p className="text-xs text-slate-500 font-medium truncate">
+                        {registrationResult.user?.department || (registrationResult.registration?.memberType === 'INTERNAL' ? 'Ministry of Agriculture Staff' : 'External Member')}
+                      </p>
+                      <div className="flex items-center gap-2 mt-1 flex-wrap">
+                        <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-[4px] border border-emerald-200">
+                          {regNumberFormatted}
+                        </span>
+                        <span className="text-[10px] font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-[4px]">
+                          {registrationResult.registration?.shiftPreference === 'MORNING'
+                            ? 'Morning Shift (6:00 – 8:30 AM)'
+                            : 'Evening Shift (5:30 – 9:00 PM)'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Primary Gate Pass Code Highlight Box */}
+                  <div className="p-3 sm:p-3.5 bg-slate-50 border border-slate-200 rounded-[4px]">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                        Gate Entry Pass Code
+                      </span>
+                      <span className="text-[10px] text-emerald-700 font-semibold flex items-center gap-1">
+                        <ShieldCheck className="w-3 h-3" />
+                        Verified for Gate Terminal
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="font-mono text-lg sm:text-xl font-black text-slate-900 tracking-wider">
+                        {passCode}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleCopyPassCode(passCode)}
+                        className="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 font-semibold text-xs rounded-[4px] shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
+                      >
+                        {copiedCode ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-[#00843D]" />
+                            <span className="text-[#00843D] font-bold">Copied!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5 text-slate-500" />
+                            <span>Copy Code</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Scannable Gate QR Code & Locker / Schedule details */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 items-center">
+                    <div className="flex flex-col items-center justify-center p-3 bg-white border border-slate-200 rounded-[4px] text-center">
+                      <div className="p-1 bg-white inline-block">
+                        <QRCodeSVG
+                          value={passCode}
+                          size={116}
+                          level="H"
+                          includeMargin={true}
+                        />
+                      </div>
+                      <span className="text-[10px] font-semibold text-slate-500 mt-1 flex items-center gap-1">
+                        <QrCode className="w-3 h-3 text-[#00843D]" />
+                        Scan at Terminal Scanner
+                      </span>
+                    </div>
+
+                    <div className="space-y-2 text-xs">
+                      <div className="p-2.5 bg-slate-50 rounded-[4px] border border-slate-200/80">
+                        <span className="text-[10px] text-slate-500 uppercase font-semibold block">
+                          Assigned Locker
+                        </span>
+                        <span className="font-bold text-slate-900 text-sm">
+                          {registrationResult.registration?.lockerNumber
+                            ? `Locker #${registrationResult.registration.lockerNumber}`
+                            : 'No Locker Assigned'}
+                        </span>
+                      </div>
+                      <div className="p-2.5 bg-slate-50 rounded-[4px] border border-slate-200/80">
+                        <span className="text-[10px] text-slate-500 uppercase font-semibold block">
+                          Workout Schedule
+                        </span>
+                        <span className="font-bold text-slate-900 text-xs">
+                          {registrationResult.registration?.daysPerWeek} Days / Week ({registrationResult.registration?.memberType === 'INTERNAL' ? 'MoA Benefit · Free' : `${registrationResult.registration?.monthlyFee} ETB/mo`})
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              )}
-            </div>
+              </div>
 
-            {/* Quick Action Navigation */}
-            <div className="space-y-2.5 pt-2">
-              <button
-                type="button"
-                onClick={() => navigate('/dashboard')}
-                className="w-full py-3 px-4 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-sm rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <span>Go to Staff Dashboard</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
+              {/* Action Buttons: Save/Print & Continue */}
+              <div className="space-y-2 pt-2">
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={handlePrintPass}
+                    className="py-2.5 px-3 bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 font-bold text-xs uppercase tracking-wider rounded-[4px] shadow-2xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <Printer className="w-4 h-4 text-slate-600" />
+                    <span>Print / Save Pass</span>
+                  </button>
 
-              <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleCopyPassCode(passCode)}
+                    className="py-2.5 px-3 bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 font-bold text-xs uppercase tracking-wider rounded-[4px] shadow-2xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    {copiedCode ? (
+                      <>
+                        <Check className="w-4 h-4 text-[#00843D]" />
+                        <span className="text-[#00843D]">Code Copied</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-4 h-4 text-slate-600" />
+                        <span>Copy Pass Code</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
                 <button
                   type="button"
-                  onClick={() => navigate('/guides')}
-                  className="py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                  onClick={() => navigate('/dashboard')}
+                  className="w-full py-3 px-4 bg-[#00843D] hover:bg-[#07572A] text-white font-bold text-xs uppercase tracking-wider rounded-[4px] shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  <Video className="w-4 h-4 text-emerald-700" />
-                  <span>Exercise Videos</span>
+                  <span>Continue to Member Dashboard</span>
+                  <ArrowRight className="w-4 h-4" />
                 </button>
-                <button
-                  type="button"
-                  onClick={() => navigate('/schedule')}
-                  className="py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  <Calendar className="w-4 h-4 text-emerald-700" />
-                  <span>Gym Schedule</span>
-                </button>
+
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => navigate('/guides')}
+                    className="py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-[4px] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <Video className="w-3.5 h-3.5 text-[#00843D]" />
+                    <span>Exercise Videos</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => navigate('/schedule')}
+                    className="py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-[4px] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <Calendar className="w-3.5 h-3.5 text-[#00843D]" />
+                    <span>Gym Schedule</span>
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* Persistent "Already have an account? Sign in" Footer across Steps 1, 2, and 3 */}
         {step < 4 && (

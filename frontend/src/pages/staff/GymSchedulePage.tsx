@@ -281,7 +281,7 @@ export const GymSchedulePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Clean Horizontal Day Selector (Mon – Sat) */}
+      {/* Clean Horizontal Day Selector (Mon – Sat) matching MoA / ATS Standard */}
       <div className="bg-white rounded-xl border border-slate-200 p-1.5 shadow-xs">
         <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
           {weekDays.map((d) => {
@@ -291,22 +291,24 @@ export const GymSchedulePage: React.FC = () => {
                 key={d.key}
                 type="button"
                 onClick={() => setSelectedDate(d.dateStr)}
-                className={`flex flex-col items-center justify-center py-2.5 px-2 rounded-lg transition-all cursor-pointer text-center relative ${
+                className={`flex flex-col items-center justify-center py-2.5 px-2 rounded-lg transition-all cursor-pointer text-center relative select-none ${
                   isSelected
-                    ? 'bg-slate-900 text-white font-bold shadow-xs'
-                    : 'bg-slate-50/70 text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+                    ? 'bg-[#00843D] text-white font-bold shadow-xs'
+                    : 'bg-slate-50/70 text-slate-700 hover:bg-slate-100 hover:text-slate-900 border border-transparent hover:border-slate-200'
                 }`}
               >
                 {d.isToday && (
                   <span
                     className={`absolute top-1 right-1 text-[8px] font-bold px-1 rounded-xs uppercase tracking-wider ${
-                      isSelected ? 'bg-moa-gold text-slate-950' : 'bg-emerald-100 text-emerald-800'
+                      isSelected ? 'bg-white/25 text-white' : 'bg-emerald-100 text-emerald-800'
                     }`}
                   >
                     Today
                   </span>
                 )}
-                <span className="text-[11px] font-medium">{d.short} · {d.amharic}</span>
+                <span className={`text-[11px] font-medium ${isSelected ? 'text-emerald-100' : 'text-slate-500'}`}>
+                  {d.short} · {d.name}
+                </span>
                 <span className={`text-sm font-bold mt-0.5 ${isSelected ? 'text-white' : 'text-slate-900'}`}>
                   {d.dayNumber} {d.monthName}
                 </span>
@@ -318,20 +320,20 @@ export const GymSchedulePage: React.FC = () => {
 
       {/* Minimal Filter Bar */}
       <div className="bg-white rounded-xl border border-slate-200 p-3 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        {/* Shift Filter Tabs */}
+        {/* Shift Filter Tabs matching ATS / MoA standard */}
         <div className="flex items-center gap-1 text-xs">
           {[
             { key: 'ALL', label: 'All Shifts' },
-            { key: 'MORNING', label: 'ጠዋት / Morning' },
-            { key: 'EVENING', label: 'ማታ / Evening' },
+            { key: 'MORNING', label: 'Morning Shift' },
+            { key: 'EVENING', label: 'Evening Shift' },
           ].map((tab) => (
             <button
               key={tab.key}
               type="button"
               onClick={() => setShiftFilter(tab.key as any)}
-              className={`px-3 py-1.5 rounded-lg font-medium transition cursor-pointer ${
+              className={`px-3 py-1.5 rounded-lg font-medium transition cursor-pointer select-none ${
                 shiftFilter === tab.key
-                  ? 'bg-slate-900 text-white font-semibold shadow-2xs'
+                  ? 'bg-[#00843D] text-white font-semibold shadow-xs'
                   : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
               }`}
             >
@@ -342,7 +344,7 @@ export const GymSchedulePage: React.FC = () => {
 
         {/* Selected Day Meta */}
         <div className="text-xs text-slate-500 flex items-center gap-2">
-          <span>{selectedDayInfo?.name} ({selectedDayInfo?.amharic}), {selectedDayInfo?.dayNumber} {selectedDayInfo?.monthName}</span>
+          <span>{selectedDayInfo?.name}, {selectedDayInfo?.dayNumber} {selectedDayInfo?.monthName}</span>
           <button
             type="button"
             onClick={() => refetch()}

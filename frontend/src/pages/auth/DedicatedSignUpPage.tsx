@@ -576,14 +576,14 @@ export const DedicatedSignUpPage: React.FC = () => {
                       key={d.key}
                       type="button"
                       onClick={() => toggleDay(d.key)}
-                      className={`py-2 px-2 rounded-xl text-center border text-xs font-semibold transition-all ${
+                      className={`py-2 px-2 rounded-xl text-center border text-xs font-semibold transition-all cursor-pointer ${
                         isChecked
-                          ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
+                          ? 'bg-[#00843D] text-white border-[#00843D] shadow-xs'
                           : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-slate-300'
                       }`}
                     >
                       <div className="font-bold text-xs">{d.name}</div>
-                      <div className="text-[10px] opacity-75">{d.key}</div>
+                      <div className={`text-[10px] ${isChecked ? 'text-emerald-100' : 'opacity-75'}`}>{d.key}</div>
                     </button>
                   );
                 })}
@@ -703,9 +703,9 @@ export const DedicatedSignUpPage: React.FC = () => {
                   setWantsLocker(false);
                   setSelectedLocker('');
                 }}
-                className={`p-3 rounded-xl border text-left transition-all ${
+                className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
                   !wantsLocker
-                    ? 'border-slate-800 bg-slate-50 ring-2 ring-slate-400/20'
+                    ? 'border-emerald-600 bg-emerald-50/60 ring-2 ring-emerald-500/20'
                     : 'border-slate-200 bg-white hover:border-slate-300'
                 }`}
               >

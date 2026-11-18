@@ -345,11 +345,11 @@ export const TraineeGuidesPage: React.FC = () => {
           />
         </div>
 
-        {/* Clean Segmented Filter Tabs */}
+        {/* Clean Segmented Filter Tabs matching MoA / ATS Standard */}
         <div className="flex items-center gap-1 overflow-x-auto pb-1 md:pb-0 text-xs">
           {[
             { key: 'ALL', label: 'All Guides' },
-            { key: 'AMHARIC', label: '🇪🇹 በአማርኛ' },
+            { key: 'AMHARIC', label: 'Amharic Audio' },
             { key: 'Beginner', label: 'Beginner' },
             { key: 'Strength', label: 'Strength' },
             { key: 'Cardio', label: 'Cardio & Abs' },
@@ -359,9 +359,9 @@ export const TraineeGuidesPage: React.FC = () => {
               key={tab.key}
               type="button"
               onClick={() => setSelectedCategory(tab.key)}
-              className={`px-3 py-1.5 rounded-lg font-medium whitespace-nowrap transition cursor-pointer ${
+              className={`px-3 py-1.5 rounded-lg font-medium whitespace-nowrap transition cursor-pointer select-none ${
                 selectedCategory === tab.key
-                  ? 'bg-slate-900 text-white font-semibold shadow-2xs'
+                  ? 'bg-[#00843D] text-white font-semibold shadow-xs'
                   : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
               }`}
             >

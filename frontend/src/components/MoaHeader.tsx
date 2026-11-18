@@ -10,14 +10,14 @@ import {
   KeyRound,
   LogOut,
   ChevronDown,
-  LayoutDashboard,
-  ShieldCheck,
   UserCog,
-  QrCode,
   Building2,
-  Users,
-  BarChart3,
-  Flame,
+  HelpCircle,
+  Phone,
+  Mail,
+  MapPin,
+  Clock,
+  X,
 } from 'lucide-react';
 import { getTodayGcAndEc } from '../utils/eth-date';
 import { ChangePasswordModal } from './auth/ChangePasswordModal';
@@ -41,6 +41,7 @@ export const MoaHeader: React.FC<MoaHeaderProps> = ({ onOpenMobileSidebar }) => 
 
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
   // Close user dropdown on outside click or escape
@@ -260,109 +261,7 @@ export const MoaHeader: React.FC<MoaHeaderProps> = ({ onOpenMobileSidebar }) => 
 
                       {/* Menu Actions */}
                       <div className="p-1.5 space-y-0.5 text-xs">
-                        {/* Role-Specific Shortcuts */}
-                        {user.role === 'STAFF_MEMBER' && (
-                          <button
-                            type="button"
-                            role="menuitem"
-                            onClick={() => {
-                              setShowUserMenu(false);
-                              navigate('/dashboard');
-                            }}
-                            className="w-full flex items-center gap-2.5 px-3 py-2 text-left font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-900 rounded-lg transition cursor-pointer"
-                          >
-                            <QrCode className="w-4 h-4 text-emerald-700 shrink-0" />
-                            <span>My Entry Pass</span>
-                          </button>
-                        )}
-
-                        {user.role === 'GYM_ATTENDANT' && (
-                          <>
-                            <button
-                              type="button"
-                              role="menuitem"
-                              onClick={() => {
-                                setShowUserMenu(false);
-                                navigate('/terminal');
-                              }}
-                              className="w-full flex items-center gap-2.5 px-3 py-2 text-left font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-900 rounded-lg transition cursor-pointer"
-                            >
-                              <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0" />
-                              <span>Gate Terminal</span>
-                            </button>
-
-                            <button
-                              type="button"
-                              role="menuitem"
-                              onClick={() => {
-                                setShowUserMenu(false);
-                                navigate('/active-floor');
-                              }}
-                              className="w-full flex items-center gap-2.5 px-3 py-2 text-left font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-900 rounded-lg transition cursor-pointer"
-                            >
-                              <KeyRound className="w-4 h-4 text-emerald-700 shrink-0" />
-                              <span>Locker Control</span>
-                            </button>
-                          </>
-                        )}
-
-                        {(user.role === 'ADMIN' || user.role === 'HR_ADMIN') && (
-                          <>
-                            <button
-                              type="button"
-                              role="menuitem"
-                              onClick={() => {
-                                setShowUserMenu(false);
-                                navigate('/admin/dashboard');
-                              }}
-                              className="w-full flex items-center gap-2.5 px-3 py-2 text-left font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-900 rounded-lg transition cursor-pointer"
-                            >
-                              <LayoutDashboard className="w-4 h-4 text-emerald-700 shrink-0" />
-                              <span>Dashboard</span>
-                            </button>
-
-                            <button
-                              type="button"
-                              role="menuitem"
-                              onClick={() => {
-                                setShowUserMenu(false);
-                                navigate('/registrations');
-                              }}
-                              className="w-full flex items-center gap-2.5 px-3 py-2 text-left font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-900 rounded-lg transition cursor-pointer"
-                            >
-                              <Users className="w-4 h-4 text-emerald-700 shrink-0" />
-                              <span>Member Directory</span>
-                            </button>
-
-                            <button
-                              type="button"
-                              role="menuitem"
-                              onClick={() => {
-                                setShowUserMenu(false);
-                                navigate('/reports');
-                              }}
-                              className="w-full flex items-center gap-2.5 px-3 py-2 text-left font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-900 rounded-lg transition cursor-pointer"
-                            >
-                              <BarChart3 className="w-4 h-4 text-emerald-700 shrink-0" />
-                              <span>Reports</span>
-                            </button>
-
-                            <button
-                              type="button"
-                              role="menuitem"
-                              onClick={() => {
-                                setShowUserMenu(false);
-                                navigate('/admin/users');
-                              }}
-                              className="w-full flex items-center gap-2.5 px-3 py-2 text-left font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-900 rounded-lg transition cursor-pointer"
-                            >
-                              <UserCog className="w-4 h-4 text-emerald-700 shrink-0" />
-                              <span>User Management</span>
-                            </button>
-                          </>
-                        )}
-
-                        {/* Change Password Dialog Trigger */}
+                        {/* 1. Auth: Change Password */}
                         <button
                           type="button"
                           role="menuitem"
@@ -374,6 +273,36 @@ export const MoaHeader: React.FC<MoaHeaderProps> = ({ onOpenMobileSidebar }) => 
                         >
                           <KeyRound className="w-4 h-4 text-emerald-700 shrink-0" />
                           <span>Change Password</span>
+                        </button>
+
+                        {/* 2. Admin: User Management */}
+                        {(user.role === 'ADMIN' || user.role === 'HR_ADMIN') && (
+                          <button
+                            type="button"
+                            role="menuitem"
+                            onClick={() => {
+                              setShowUserMenu(false);
+                              navigate('/admin/users');
+                            }}
+                            className="w-full flex items-center gap-2.5 px-3 py-2 text-left font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-900 rounded-lg transition cursor-pointer"
+                          >
+                            <UserCog className="w-4 h-4 text-emerald-700 shrink-0" />
+                            <span>User Management</span>
+                          </button>
+                        )}
+
+                        {/* 3. Help & Support */}
+                        <button
+                          type="button"
+                          role="menuitem"
+                          onClick={() => {
+                            setShowUserMenu(false);
+                            setIsHelpOpen(true);
+                          }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 text-left font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-900 rounded-lg transition cursor-pointer"
+                        >
+                          <HelpCircle className="w-4 h-4 text-emerald-700 shrink-0" />
+                          <span>Help & Support</span>
                         </button>
                       </div>
 
@@ -406,6 +335,104 @@ export const MoaHeader: React.FC<MoaHeaderProps> = ({ onOpenMobileSidebar }) => 
         isOpen={isChangePasswordOpen}
         onClose={() => setIsChangePasswordOpen(false)}
       />
+
+      {/* Help & Support Modal */}
+      {isHelpOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs animate-in fade-in"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsHelpOpen(false);
+          }}
+        >
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 relative">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-emerald-50 text-[#00843D] border border-emerald-200 flex items-center justify-center">
+                  <HelpCircle className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">
+                    MoA Gym Help & Support
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Staff Wellness & Fitness Center assistance
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsHelpOpen(false)}
+                className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-100 transition cursor-pointer"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="mt-4 space-y-3.5 text-xs text-slate-700">
+              {/* Facility & Front Desk Assistance */}
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                <div className="font-bold text-slate-900 flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-[#00843D]" />
+                  <span>Facility Location & Front Desk</span>
+                </div>
+                <p className="text-slate-600 leading-relaxed text-[11px]">
+                  Ministry of Agriculture Headquarters, Main Building, Ground Floor Gymnasium. Front desk attendants are on duty during all active operating sessions.
+                </p>
+                <div className="pt-2 border-t border-slate-200/70 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-[11px] text-slate-800">
+                  <div className="flex items-center gap-1.5 font-medium">
+                    <Phone className="h-3.5 w-3.5 text-emerald-700" />
+                    <span>Internal Phone: Ext. 2145</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 font-medium">
+                    <Mail className="h-3.5 w-3.5 text-emerald-700" />
+                    <span>support@moa.gov.et</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Operating Shift Hours */}
+              <div className="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-100 space-y-2">
+                <div className="font-bold text-emerald-950 flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-[#00843D]" />
+                  <span>Gym Working Sessions</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-[11px] font-mono text-slate-800">
+                  <div className="bg-white p-2 rounded-lg border border-emerald-200/60">
+                    <div className="font-bold text-[#00843D] font-sans">Morning Session</div>
+                    <div>06:00 AM – 08:30 AM</div>
+                    <div className="text-[10px] text-slate-500 font-sans">ከማለዳው 12:00 – 2:30</div>
+                  </div>
+                  <div className="bg-white p-2 rounded-lg border border-emerald-200/60">
+                    <div className="font-bold text-indigo-700 font-sans">Evening Session</div>
+                    <div>05:30 PM – 09:00 PM</div>
+                    <div className="text-[10px] text-slate-500 font-sans">ከምሽቱ 11:30 – 3:00</div>
+                  </div>
+                </div>
+                <div className="text-[10px] text-slate-500 pt-0.5">
+                  Monday – Saturday · Sunday closed for sanitization.
+                </div>
+              </div>
+
+              {/* 30 Lockers Reminder */}
+              <div className="p-3 rounded-lg border border-slate-200 bg-white text-[11px] text-slate-600 leading-relaxed">
+                <strong>Locker Notice:</strong> 30 daily lockers (L-01 to L-30) are issued upon gate terminal verification. Please return keys to the front desk before leaving. Lockers reset nightly at 23:59.
+              </div>
+            </div>
+
+            <div className="mt-5 pt-3 border-t border-slate-100 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setIsHelpOpen(false)}
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs rounded-lg transition cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

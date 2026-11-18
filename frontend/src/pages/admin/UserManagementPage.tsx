@@ -2,16 +2,13 @@ import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '../../lib/api';
 import {
-  Users,
   ShieldCheck,
-  ShieldAlert,
   Search,
   KeyRound,
   UserPlus,
   RefreshCw,
   CheckCircle2,
   AlertCircle,
-  UserCheck,
   UserX,
   X,
   Mail,
@@ -220,10 +217,6 @@ export const UserManagementPage: React.FC = () => {
   });
 
   const users = data?.items || [];
-  const adminCount = users.filter((u) => u.role === 'ADMIN').length;
-  const attendantCount = users.filter((u) => u.role === 'GYM_ATTENDANT').length;
-  const memberCount = users.filter((u) => u.role === 'STAFF_MEMBER').length;
-  const inactiveCount = users.filter((u) => u.status !== 'ACTIVE').length;
 
   return (
     <div className="space-y-6">
@@ -268,49 +261,6 @@ export const UserManagementPage: React.FC = () => {
             <UserPlus className="h-4 w-4" />
             <span>Add user</span>
           </button>
-        </div>
-      </div>
-
-      {/* Metric Cards Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Total Logins</span>
-            <Users className="h-4 w-4 text-emerald-700" />
-          </div>
-          <div className="text-2xl font-bold text-slate-900 mt-2 tabular-nums">
-            {data?.total ?? 0}
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Administrators</span>
-            <ShieldAlert className="h-4 w-4 text-moa-gold" />
-          </div>
-          <div className="text-2xl font-bold text-slate-900 mt-2 tabular-nums text-moa-gold">
-            {adminCount}
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Gate Attendants</span>
-            <ShieldCheck className="h-4 w-4 text-sky-600" />
-          </div>
-          <div className="text-2xl font-bold text-slate-900 mt-2 tabular-nums text-sky-700">
-            {attendantCount}
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Staff Members</span>
-            <UserCheck className="h-4 w-4 text-emerald-600" />
-          </div>
-          <div className="text-2xl font-bold text-slate-900 mt-2 tabular-nums text-emerald-700">
-            {memberCount}
-          </div>
         </div>
       </div>
 

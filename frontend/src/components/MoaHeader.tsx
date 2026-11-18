@@ -108,8 +108,8 @@ export const MoaHeader: React.FC<MoaHeaderProps> = ({ onOpenMobileSidebar }) => 
         };
       case '/schedule':
         return {
-          title: 'Gym Schedule',
-          subtitle: 'Weekly class timetable, shift rotations, and session booking',
+          title: 'Gym Timetable',
+          subtitle: 'Daily operating sessions (Morning: 6:00–8:30 AM, Evening: 5:30–9:00 PM)',
         };
       case '/guides':
         return {

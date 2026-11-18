@@ -1,731 +1,586 @@
-import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAuth } from '../../lib/auth-context';
-import { useToast } from '../../context/ToastContext';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { apiRequest } from '../../lib/api';
 import {
-  Calendar,
   Clock,
   Users,
+  Key,
   CheckCircle2,
+  Calendar,
+  Sparkles,
+  Video,
+  ShieldCheck,
   AlertCircle,
-  Plus,
-  X,
-  UserCheck,
-  Check,
   RefreshCw,
+  Sun,
+  Moon,
+  ArrowRight,
+  Flame,
+  Info,
 } from 'lucide-react';
 
-interface Participant {
-  bookingId: string;
-  userId: string;
-  employeeId: string;
-  fullName: string;
-  department: string;
-  photoUrl?: string;
-  attended: boolean;
+interface OccupancyData {
+  current: number;
+  maxCapacity: number;
+  percentage: number;
 }
 
-interface WellnessClass {
-  id: string;
-  title: string;
-  instructorName: string;
-  scheduledDate: string;
-  startTime: string;
-  endTime: string;
-  capacity: number;
-  bookedCount: number;
-  isFull: boolean;
-  isBookedByMe: boolean;
-  participants: Participant[];
-  category?: string;
-  ethiopianTime?: string;
-}
-
-const DAYS_OF_WEEK = [
-  { key: 1, name: 'Monday', amharic: 'ሰኞ', short: 'Mon' },
-  { key: 2, name: 'Tuesday', amharic: 'ማክሰኞ', short: 'Tue' },
-  { key: 3, name: 'Wednesday', amharic: 'ረቡዕ', short: 'Wed' },
-  { key: 4, name: 'Thursday', amharic: 'ሐሙስ', short: 'Thu' },
-  { key: 5, name: 'Friday', amharic: 'ዓርብ', short: 'Fri' },
-  { key: 6, name: 'Saturday', amharic: 'ቅዳሜ', short: 'Sat' },
+const WEEKLY_SCHEDULE = [
+  {
+    dayIndex: 1,
+    name: 'Monday',
+    amharic: 'ሰኞ',
+    short: 'Mon',
+    morning: '06:00 AM – 08:30 AM',
+    morningEt: 'ከማለዳው 12:00 – 2:30',
+    evening: '05:30 PM – 09:00 PM',
+    eveningEt: 'ከምሽቱ 11:30 – 3:00',
+    isOpen: true,
+  },
+  {
+    dayIndex: 2,
+    name: 'Tuesday',
+    amharic: 'ማክሰኞ',
+    short: 'Tue',
+    morning: '06:00 AM – 08:30 AM',
+    morningEt: 'ከማለዳው 12:00 – 2:30',
+    evening: '05:30 PM – 09:00 PM',
+    eveningEt: 'ከምሽቱ 11:30 – 3:00',
+    isOpen: true,
+  },
+  {
+    dayIndex: 3,
+    name: 'Wednesday',
+    amharic: 'ረቡዕ',
+    short: 'Wed',
+    morning: '06:00 AM – 08:30 AM',
+    morningEt: 'ከማለዳው 12:00 – 2:30',
+    evening: '05:30 PM – 09:00 PM',
+    eveningEt: 'ከምሽቱ 11:30 – 3:00',
+    isOpen: true,
+  },
+  {
+    dayIndex: 4,
+    name: 'Thursday',
+    amharic: 'ሐሙስ',
+    short: 'Thu',
+    morning: '06:00 AM – 08:30 AM',
+    morningEt: 'ከማለዳው 12:00 – 2:30',
+    evening: '05:30 PM – 09:00 PM',
+    eveningEt: 'ከምሽቱ 11:30 – 3:00',
+    isOpen: true,
+  },
+  {
+    dayIndex: 5,
+    name: 'Friday',
+    amharic: 'ዓርብ',
+    short: 'Fri',
+    morning: '06:00 AM – 08:30 AM',
+    morningEt: 'ከማለዳው 12:00 – 2:30',
+    evening: '05:30 PM – 09:00 PM',
+    eveningEt: 'ከምሽቱ 11:30 – 3:00',
+    isOpen: true,
+  },
+  {
+    dayIndex: 6,
+    name: 'Saturday',
+    amharic: 'ቅዳሜ',
+    short: 'Sat',
+    morning: '06:00 AM – 08:30 AM',
+    morningEt: 'ከማለዳው 12:00 – 2:30',
+    evening: '05:30 PM – 09:00 PM',
+    eveningEt: 'ከምሽቱ 11:30 – 3:00',
+    isOpen: true,
+  },
+  {
+    dayIndex: 0,
+    name: 'Sunday',
+    amharic: 'እሁድ',
+    short: 'Sun',
+    morning: 'Closed (ዝግ)',
+    morningEt: 'ሙሉ ቀን ዝግ',
+    evening: 'Closed (ዝግ)',
+    eveningEt: 'ሙሉ ቀን ዝግ',
+    isOpen: false,
+  },
 ];
 
 export const GymSchedulePage: React.FC = () => {
-  const { user } = useAuth();
-  const queryClient = useQueryClient();
+  const [currentTime, setCurrentTime] = useState(new Date());
 
-  const today = new Date();
-  const currentDayIndex = today.getDay();
-  
-  const monday = new Date(today);
-  const diffToMonday = currentDayIndex === 0 ? -6 : 1 - currentDayIndex;
-  monday.setDate(today.getDate() + diffToMonday);
-  monday.setHours(0, 0, 0, 0);
+  // Update clock every 30 seconds
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 30000);
+    return () => clearInterval(timer);
+  }, []);
 
-  const weekDays = DAYS_OF_WEEK.map((d, idx) => {
-    const dayDate = new Date(monday);
-    dayDate.setDate(monday.getDate() + idx);
-    const dateStr = dayDate.toISOString().split('T')[0];
-    const isToday = dayDate.toDateString() === today.toDateString();
-    return {
-      ...d,
-      date: dayDate,
-      dateStr,
-      isToday,
-      dayNumber: dayDate.getDate(),
-      monthName: dayDate.toLocaleString('default', { month: 'short' }),
-    };
+  // Live gym occupancy data
+  const { data: occupancy, isLoading: isOccupancyLoading, refetch } = useQuery<OccupancyData>({
+    queryKey: ['liveOccupancy'],
+    queryFn: () => apiRequest('/attendance/occupancy'),
+    refetchInterval: 12000,
   });
 
-  const defaultDateStr = weekDays.find((d) => d.isToday)?.dateStr || weekDays[0].dateStr;
-  const [selectedDate, setSelectedDate] = useState<string>(defaultDateStr);
-  const [shiftFilter, setShiftFilter] = useState<'ALL' | 'MORNING' | 'EVENING'>('ALL');
+  const currentCount = occupancy?.current ?? 0;
+  const maxCapacity = occupancy?.maxCapacity ?? 40;
+  const occupancyPct = Math.min(100, Math.round((currentCount / maxCapacity) * 100));
 
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [viewParticipantsClass, setViewParticipantsClass] = useState<WellnessClass | null>(null);
-  const toast = useToast();
+  // Determine current facility status
+  const currentDayIndex = currentTime.getDay(); // 0 = Sunday, 1 = Monday, ...
+  const currentHours = currentTime.getHours();
+  const currentMinutes = currentTime.getMinutes();
+  const timeInMinutes = currentHours * 60 + currentMinutes;
 
-  const [newTitle, setNewTitle] = useState('');
-  const [newInstructor, setNewInstructor] = useState('Coach Henok');
-  const [newStartTime, setNewStartTime] = useState('06:30');
-  const [newEndTime, setNewEndTime] = useState('07:30');
-  const [newCapacity, setNewCapacity] = useState(15);
+  const morningStart = 6 * 60; // 06:00 AM
+  const morningEnd = 8 * 60 + 30; // 08:30 AM
+  const eveningStart = 17 * 60 + 30; // 05:30 PM
+  const eveningEnd = 21 * 60; // 09:00 PM
 
-  const { data: dbClasses = [], isLoading, refetch } = useQuery<WellnessClass[]>({
-    queryKey: ['wellness-classes', selectedDate],
-    queryFn: async () => {
-      return apiRequest<WellnessClass[]>(`/wellness/classes?date=${selectedDate}`);
-    },
-  });
-
-  const bookMutation = useMutation({
-    mutationFn: async (classId: string) => {
-      return apiRequest(`/wellness/classes/${classId}/book`, { method: 'POST' });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['wellness-classes'] });
-      toast.success('Spot Booked', 'Class spot booked successfully!');
-    },
-    onError: (err: any) => {
-      toast.error('Booking Failed', err.message || 'Failed to book class.');
-    },
-  });
-
-  const cancelMutation = useMutation({
-    mutationFn: async (classId: string) => {
-      return apiRequest(`/wellness/classes/${classId}/book`, { method: 'DELETE' });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['wellness-classes'] });
-      toast.info('Reservation Cancelled', 'Your reservation was cancelled.');
-    },
-    onError: (err: any) => {
-      toast.error('Cancellation Failed', err.message || 'Failed to cancel reservation.');
-    },
-  });
-
-  const createClassMutation = useMutation({
-    mutationFn: async () => {
-      return apiRequest('/wellness/classes', {
-        method: 'POST',
-        body: JSON.stringify({
-          title: newTitle,
-          instructorName: newInstructor,
-          scheduledDate: selectedDate,
-          startTime: newStartTime,
-          endTime: newEndTime,
-          capacity: Number(newCapacity),
-        }),
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['wellness-classes'] });
-      setIsAddModalOpen(false);
-      setNewTitle('');
-      toast.success('Session Scheduled', 'Class scheduled successfully.');
-    },
-    onError: (err: any) => {
-      toast.error('Scheduling Failed', err.message || 'Failed to create class.');
-    },
-  });
-
-  const isStaffOrAdmin = user?.role === 'ADMIN' || user?.role === 'HR_ADMIN' || user?.role === 'GYM_ATTENDANT';
-
-  const toggleAttendanceMutation = useMutation({
-    mutationFn: async ({
-      classId,
-      userId,
-      attended,
-    }: {
-      classId: string;
-      userId: string;
-      attended: boolean;
-    }) => {
-      return apiRequest(`/wellness/classes/${classId}/attendance/${userId}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ attended }),
-      });
-    },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['wellness-classes'] });
-      if (viewParticipantsClass) {
-        setViewParticipantsClass((prev) => {
-          if (!prev) return null;
-          return {
-            ...prev,
-            participants: prev.participants.map((p) =>
-              p.userId === variables.userId ? { ...p, attended: variables.attended } : p,
-            ),
-          };
-        });
-      }
-      toast.success(
-        'Attendance Updated',
-        `Participant marked as ${variables.attended ? 'Attended' : 'Registered'}.`,
-      );
-    },
-    onError: (err: any) => {
-      toast.error('Update Failed', err.message || 'Failed to update attendance.');
-    },
-  });
-
-  const isClassConcluded = (scheduledDate: string, startTime: string): boolean => {
-    const toLocalDateStr = (d: Date) => {
-      const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    };
-
-    const now = new Date();
-    const classDate = new Date(scheduledDate);
-    const classDateStr = toLocalDateStr(classDate);
-    const todayDateStr = toLocalDateStr(now);
-
-    if (classDateStr < todayDateStr) {
-      return true;
-    }
-    if (classDateStr === todayDateStr) {
-      const curHours = String(now.getHours()).padStart(2, '0');
-      const curMins = String(now.getMinutes()).padStart(2, '0');
-      const curTime = `${curHours}:${curMins}`;
-      return startTime <= curTime;
-    }
-    return false;
+  let facilityStatus: {
+    state: 'MORNING_ACTIVE' | 'EVENING_ACTIVE' | 'DAY_BREAK' | 'NIGHT_CLOSED' | 'SUNDAY_CLOSED';
+    headline: string;
+    subline: string;
+    colorTone: string;
   };
 
-  const getEthiopianTimeRange = (startTime: string, endTime: string): string => {
-    const formatTime = (t: string) => {
-      const [hStr, mStr] = t.split(':');
-      const h = parseInt(hStr, 10);
-      let etHour = (h - 6 + 24) % 12;
-      if (etHour === 0) etHour = 12;
-      return `${etHour}:${mStr}`;
+  if (currentDayIndex === 0) {
+    facilityStatus = {
+      state: 'SUNDAY_CLOSED',
+      headline: 'Closed for Weekly Maintenance & Sanitization',
+      subline: 'The gym room is closed on Sundays for deep cleaning. Opens Monday morning at 6:00 AM.',
+      colorTone: 'bg-slate-100 text-slate-700 border-slate-300',
     };
+  } else if (timeInMinutes >= morningStart && timeInMinutes <= morningEnd) {
+    facilityStatus = {
+      state: 'MORNING_ACTIVE',
+      headline: 'Morning Session is Active Now',
+      subline: 'Open for all registered MoA staff. Session concludes at 8:30 AM before workday start.',
+      colorTone: 'bg-emerald-50 text-emerald-900 border-emerald-300',
+    };
+  } else if (timeInMinutes >= eveningStart && timeInMinutes <= eveningEnd) {
+    facilityStatus = {
+      state: 'EVENING_ACTIVE',
+      headline: 'Evening Session is Active Now',
+      subline: 'Open for post-work workouts and strength training. Session concludes at 9:00 PM.',
+      colorTone: 'bg-emerald-50 text-emerald-900 border-emerald-300',
+    };
+  } else if (timeInMinutes > morningEnd && timeInMinutes < eveningStart) {
+    facilityStatus = {
+      state: 'DAY_BREAK',
+      headline: 'Midday Office Hours (Gym Room Closed)',
+      subline: 'Staff are on official duty. The room reopens for the Evening Session today at 5:30 PM.',
+      colorTone: 'bg-amber-50 text-amber-900 border-amber-200',
+    };
+  } else {
+    facilityStatus = {
+      state: 'NIGHT_CLOSED',
+      headline: 'Gym Facility Closed for the Night',
+      subline: 'The gym reopens tomorrow morning at 6:00 AM for the early morning session.',
+      colorTone: 'bg-slate-100 text-slate-700 border-slate-200',
+    };
+  }
 
-    const [hStart] = startTime.split(':').map((n) => parseInt(n, 10));
-    let period = 'ከጠዋቱ';
-    if (hStart >= 6 && hStart < 12) period = 'ከማለዳው';
-    else if (hStart >= 12 && hStart < 16) period = 'ከቀኑ';
-    else if (hStart >= 16 && hStart < 19) period = 'ከምሽቱ';
-    else period = 'ከሌሊቱ';
-
-    return `${period} ${formatTime(startTime)} – ${formatTime(endTime)}`;
-  };
-
-  const displayClasses = dbClasses;
-
-  const filteredClasses = displayClasses.filter((c) => {
-    const isMorning = c.startTime < '12:00';
-    if (shiftFilter === 'MORNING' && !isMorning) return false;
-    if (shiftFilter === 'EVENING' && isMorning) return false;
-    return true;
-  });
-
-  const selectedDayInfo = weekDays.find((d) => d.dateStr === selectedDate);
+  const isFacilityOpenNow =
+    facilityStatus.state === 'MORNING_ACTIVE' || facilityStatus.state === 'EVENING_ACTIVE';
 
   return (
     <div className="space-y-6">
-      {/* Clean Top Header */}
+      {/* Page Header */}
       <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <h1 className="text-lg font-bold text-slate-900 tracking-tight">
-              Gym Schedule
+              Facility Timetable & Operating Sessions
             </h1>
             <span className="text-xs font-mono font-semibold text-[#00843D] bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-              የሳምንቱ መርሃግብር
+              የአካል ብቃት እንቅስቃሴ ክፍለ-ጊዜያት
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Weekly class schedule, shift timings, and session reservations.
+            Official Ministry single-room gymnasium schedule, daily working sessions, and locker allocation.
           </p>
         </div>
 
-        {/* Clean Shift Summary & Action */}
-        <div className="flex items-center gap-3 shrink-0 flex-wrap">
-          <div className="text-[11px] text-slate-500 font-mono hidden md:block">
-            <span>Morning: 6:00 – 8:30 AM</span>
-            <span className="mx-1.5 text-slate-300">·</span>
-            <span>Evening: 5:30 – 9:00 PM</span>
+        {/* Live Status & Occupancy Meter */}
+        <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+          <div
+            className={`px-3 py-1.5 rounded-lg border text-xs font-bold flex items-center gap-2 shadow-2xs ${
+              isFacilityOpenNow
+                ? 'bg-emerald-50 text-emerald-900 border-emerald-300'
+                : 'bg-slate-50 text-slate-700 border-slate-200'
+            }`}
+          >
+            <span
+              className={`h-2.5 w-2.5 rounded-full ${
+                isFacilityOpenNow ? 'bg-[#00843D] animate-pulse' : 'bg-slate-400'
+              }`}
+            />
+            <span>{isFacilityOpenNow ? 'Gym Open Now' : 'Currently Closed'}</span>
           </div>
 
-          {isStaffOrAdmin && (
-            <button
-              type="button"
-              onClick={() => setIsAddModalOpen(true)}
-              className="px-3.5 h-8.5 text-xs font-semibold text-white bg-[#00843D] hover:bg-[#007033] rounded-[6px] shadow-2xs transition flex items-center gap-1.5 cursor-pointer"
-            >
-              <Plus className="h-4 w-4" />
-              <span>Schedule Class</span>
-            </button>
-          )}
-        </div>
-      </div>
+          <div className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg flex items-center gap-2 text-xs">
+            <Users className="w-3.5 h-3.5 text-[#00843D]" />
+            <span className="text-slate-600 font-medium">Inside:</span>
+            <span className="font-bold font-mono text-slate-900">
+              {currentCount} / {maxCapacity}
+            </span>
+          </div>
 
-      {/* Clean Horizontal Day Selector (Mon – Sat) matching MoA / ATS Standard */}
-      <div className="bg-white rounded-xl border border-slate-200 p-1.5 shadow-xs">
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
-          {weekDays.map((d) => {
-            const isSelected = d.dateStr === selectedDate;
-            return (
-              <button
-                key={d.key}
-                type="button"
-                onClick={() => setSelectedDate(d.dateStr)}
-                className={`flex flex-col items-center justify-center py-2.5 px-2 rounded-lg transition-all cursor-pointer text-center relative select-none ${
-                  isSelected
-                    ? 'bg-[#00843D] text-white font-bold shadow-xs'
-                    : 'bg-slate-50/70 text-slate-700 hover:bg-slate-100 hover:text-slate-900 border border-transparent hover:border-slate-200'
-                }`}
-              >
-                {d.isToday && (
-                  <span
-                    className={`absolute top-1 right-1 text-[8px] font-bold px-1 rounded-xs uppercase tracking-wider ${
-                      isSelected ? 'bg-white/25 text-white' : 'bg-emerald-100 text-emerald-800'
-                    }`}
-                  >
-                    Today
-                  </span>
-                )}
-                <span className={`text-[11px] font-medium ${isSelected ? 'text-emerald-100' : 'text-slate-500'}`}>
-                  {d.short} · {d.name}
-                </span>
-                <span className={`text-sm font-bold mt-0.5 ${isSelected ? 'text-white' : 'text-slate-900'}`}>
-                  {d.dayNumber} {d.monthName}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Minimal Filter Bar */}
-      <div className="bg-white rounded-xl border border-slate-200 p-3 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        {/* Shift Filter Tabs matching ATS / MoA standard */}
-        <div className="flex items-center gap-1 text-xs">
-          {[
-            { key: 'ALL', label: 'All Shifts' },
-            { key: 'MORNING', label: 'Morning Shift' },
-            { key: 'EVENING', label: 'Evening Shift' },
-          ].map((tab) => (
-            <button
-              key={tab.key}
-              type="button"
-              onClick={() => setShiftFilter(tab.key as any)}
-              className={`px-3 py-1.5 rounded-lg font-medium transition cursor-pointer select-none ${
-                shiftFilter === tab.key
-                  ? 'bg-[#00843D] text-white font-semibold shadow-xs'
-                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Selected Day Meta */}
-        <div className="text-xs text-slate-500 flex items-center gap-2">
-          <span>{selectedDayInfo?.name}, {selectedDayInfo?.dayNumber} {selectedDayInfo?.monthName}</span>
           <button
             type="button"
             onClick={() => refetch()}
-            title="Refresh schedule"
-            className="p-1 text-slate-400 hover:text-slate-700 transition cursor-pointer"
+            title="Refresh status"
+            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition cursor-pointer"
           >
-            <RefreshCw className="h-3.5 w-3.5" />
+            <RefreshCw className={`h-4 w-4 ${isOccupancyLoading ? 'animate-spin text-[#00843D]' : ''}`} />
           </button>
         </div>
       </div>
 
-      {/* Class Schedule Cards Grid */}
-      {isLoading ? (
-        <div className="bg-white rounded-xl border border-slate-200 p-12 text-center text-slate-500">
-          <RefreshCw className="h-5 w-5 animate-spin mx-auto text-[#00843D] mb-2" />
-          <p className="text-xs font-medium">Loading schedule...</p>
+      {/* Real-Time Live Status Banner */}
+      <div
+        className={`p-4 sm:p-5 rounded-2xl border shadow-xs transition-all ${facilityStatus.colorTone}`}
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <div className="p-2.5 rounded-xl bg-white shadow-2xs border border-inherit shrink-0">
+              {facilityStatus.state === 'MORNING_ACTIVE' ? (
+                <Sun className="h-6 w-6 text-amber-500" />
+              ) : facilityStatus.state === 'EVENING_ACTIVE' ? (
+                <Moon className="h-6 w-6 text-indigo-500" />
+              ) : facilityStatus.state === 'DAY_BREAK' ? (
+                <Clock className="h-6 w-6 text-amber-600" />
+              ) : (
+                <Calendar className="h-6 w-6 text-slate-500" />
+              )}
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-base font-bold text-slate-900 tracking-tight">
+                  {facilityStatus.headline}
+                </h2>
+                {isFacilityOpenNow && (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#00843D] text-white tracking-wider uppercase">
+                    Live
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-slate-600 mt-1 max-w-2xl leading-relaxed">
+                {facilityStatus.subline}
+              </p>
+            </div>
+          </div>
+
+          {/* Occupancy Indicator in Banner */}
+          <div className="bg-white/90 backdrop-blur-xs p-3 rounded-xl border border-slate-200/80 shadow-2xs shrink-0 sm:text-right min-w-[160px]">
+            <div className="text-[11px] text-slate-500 font-medium">Facility Occupancy</div>
+            <div className="text-base font-extrabold text-slate-900 font-mono mt-0.5">
+              {currentCount} <span className="text-xs font-normal text-slate-400">/ {maxCapacity} Max</span>
+            </div>
+            <div className="w-full bg-slate-100 rounded-full h-1.5 mt-1.5 overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all ${
+                  occupancyPct >= 90
+                    ? 'bg-rose-500'
+                    : occupancyPct >= 70
+                    ? 'bg-amber-500'
+                    : 'bg-[#00843D]'
+                }`}
+                style={{ width: `${occupancyPct}%` }}
+              />
+            </div>
+          </div>
         </div>
-      ) : filteredClasses.length === 0 ? (
-        <div className="bg-white rounded-xl border border-dashed border-slate-300 p-12 text-center text-slate-500">
-          <Calendar className="h-7 w-7 mx-auto text-slate-400 mb-2" />
-          <p className="text-sm font-semibold text-slate-700">No classes scheduled for this shift</p>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Switch shifts, pick another weekday, or click &ldquo;Schedule Class&rdquo; above.
+      </div>
+
+      {/* The Two Daily Working Sessions Cards */}
+      <div>
+        <div className="flex items-center justify-between mb-3.5">
+          <div>
+            <h2 className="text-sm font-bold text-slate-900 tracking-tight">
+              Daily Working Sessions (የቀኑ ክፍለ-ጊዜያት)
+            </h2>
+            <p className="text-xs text-slate-500">
+              The Ministry operates one main gymnasium room across two dedicated daily workout sessions.
+            </p>
+          </div>
+          <span className="text-xs font-semibold text-slate-500 hidden sm:block">
+            Monday through Saturday
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {/* Session 1: Morning Session */}
+          <div
+            className={`bg-white rounded-2xl border transition-all p-5 shadow-xs flex flex-col justify-between ${
+              facilityStatus.state === 'MORNING_ACTIVE'
+                ? 'border-emerald-500 ring-2 ring-emerald-500/20 shadow-md'
+                : 'border-slate-200 hover:border-slate-300'
+            }`}
+          >
+            <div>
+              {/* Top Tag & Status */}
+              <div className="flex items-center justify-between gap-2 mb-3">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-amber-50 text-amber-900 border border-amber-200">
+                  <Sun className="h-3.5 w-3.5 text-amber-600" />
+                  Morning Session · የጠዋት ክፍለ-ጊዜ
+                </span>
+
+                {facilityStatus.state === 'MORNING_ACTIVE' && (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 flex items-center gap-1 animate-pulse">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#00843D]" /> Open Now
+                  </span>
+                )}
+              </div>
+
+              {/* Time Block */}
+              <div className="bg-slate-50 rounded-xl p-3 border border-slate-100 flex items-center justify-between">
+                <div>
+                  <div className="text-lg font-extrabold text-slate-900 font-mono tracking-tight">
+                    06:00 AM – 08:30 AM
+                  </div>
+                  <div className="text-xs font-semibold text-[#00843D] mt-0.5">
+                    ከማለዳው 12:00 – 2:30 (Ethiopian Time)
+                  </div>
+                </div>
+                <Clock className="h-6 w-6 text-slate-400" />
+              </div>
+
+              {/* Description & Purpose */}
+              <p className="text-xs text-slate-600 mt-3 leading-relaxed">
+                Designed for civil servants who prefer early-morning cardio conditioning, treadmill running, and circuit training before the official Ministry workday starts.
+              </p>
+
+              {/* Key Amenities */}
+              <div className="mt-4 space-y-2 border-t border-slate-100 pt-3 text-xs text-slate-600">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-[#00843D] shrink-0" />
+                  <span><strong>Full Room Access:</strong> Free weights, treadmills, bikes & resistance machines</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Key className="h-4 w-4 text-amber-600 shrink-0" />
+                  <span><strong>Daily Lockers:</strong> Clean lockers (L-01 to L-30) issued at front desk</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="h-4 w-4 text-[#00843D] shrink-0" />
+                  <span><strong>Admittance:</strong> Scan digital QR pass or provide Employee ID at gate</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Note */}
+            <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+              <span>Duration: 2.5 Hours</span>
+              <span className="font-medium text-slate-700">Concludes strictly at 8:30 AM</span>
+            </div>
+          </div>
+
+          {/* Session 2: Evening Session */}
+          <div
+            className={`bg-white rounded-2xl border transition-all p-5 shadow-xs flex flex-col justify-between ${
+              facilityStatus.state === 'EVENING_ACTIVE'
+                ? 'border-emerald-500 ring-2 ring-emerald-500/20 shadow-md'
+                : 'border-slate-200 hover:border-slate-300'
+            }`}
+          >
+            <div>
+              {/* Top Tag & Status */}
+              <div className="flex items-center justify-between gap-2 mb-3">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-indigo-50 text-indigo-900 border border-indigo-200">
+                  <Moon className="h-3.5 w-3.5 text-indigo-600" />
+                  Evening Session · የማታ ክፍለ-ጊዜ
+                </span>
+
+                {facilityStatus.state === 'EVENING_ACTIVE' && (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 flex items-center gap-1 animate-pulse">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#00843D]" /> Open Now
+                  </span>
+                )}
+              </div>
+
+              {/* Time Block */}
+              <div className="bg-slate-50 rounded-xl p-3 border border-slate-100 flex items-center justify-between">
+                <div>
+                  <div className="text-lg font-extrabold text-slate-900 font-mono tracking-tight">
+                    05:30 PM – 09:00 PM
+                  </div>
+                  <div className="text-xs font-semibold text-[#00843D] mt-0.5">
+                    ከምሽቱ 11:30 – 3:00 (Ethiopian Time)
+                  </div>
+                </div>
+                <Clock className="h-6 w-6 text-slate-400" />
+              </div>
+
+              {/* Description & Purpose */}
+              <p className="text-xs text-slate-600 mt-3 leading-relaxed">
+                Post-work session focused on strength training, posture recovery from long office desk hours, dumbbell workouts, and general employee wellness.
+              </p>
+
+              {/* Key Amenities */}
+              <div className="mt-4 space-y-2 border-t border-slate-100 pt-3 text-xs text-slate-600">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-[#00843D] shrink-0" />
+                  <span><strong>Full Room Access:</strong> Strength benches, dumbbells, cables & stretching zone</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Key className="h-4 w-4 text-amber-600 shrink-0" />
+                  <span><strong>Evening Lockers:</strong> Daily key assignment with 23:59 automatic nightly reset</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="h-4 w-4 text-[#00843D] shrink-0" />
+                  <span><strong>Desk Attendant:</strong> Front desk personnel on duty for assistance & check-in</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Note */}
+            <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+              <span>Duration: 3.5 Hours</span>
+              <span className="font-medium text-slate-700">Concludes strictly at 9:00 PM</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Self-Guided Workout Spotlight (Since There Is No Trainer) */}
+      <div className="bg-gradient-to-r from-emerald-900 via-[#07572A] to-slate-900 text-white rounded-2xl p-5 sm:p-6 shadow-md relative overflow-hidden">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
+          <div className="max-w-xl">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-white/15 text-emerald-200 border border-white/20 mb-2">
+              <Sparkles className="h-3.5 w-3.5 text-moa-gold" />
+              <span>Self-Guided Training Support</span>
+            </div>
+            <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
+              Looking for exercise guidance without a floor trainer?
+            </h3>
+            <p className="text-xs text-emerald-100/90 mt-1.5 leading-relaxed">
+              Because the gym room operates without dedicated fitness instructors, the Ministry provides official video demonstrations in <strong>Amharic & English</strong> covering proper machine adjustments, dumbbell posture, and office-worker stretching.
+            </p>
+          </div>
+
+          <Link
+            to="/guides"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-emerald-50 text-[#07572A] font-bold text-xs rounded-xl shadow-xs transition hover:scale-102 shrink-0 cursor-pointer"
+          >
+            <Video className="h-4 w-4 text-[#00843D]" />
+            <span>Watch Exercise Video Guides</span>
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+      </div>
+
+      {/* Weekly Operating Hours Table (Mon - Sun) */}
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        <div className="p-4 sm:p-5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h3 className="text-sm font-bold text-slate-900 tracking-tight">
+              Weekly Timetable & Shift Schedule (የሳምንቱ የስራ ሰዓት ሰንጠረዥ)
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Standard Ministry operating timetable across the calendar week.
+            </p>
+          </div>
+          <span className="text-[11px] font-mono text-slate-500">
+            Current Day: {WEEKLY_SCHEDULE.find((d) => d.dayIndex === currentDayIndex)?.name}
+          </span>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs">
+            <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+              <tr>
+                <th className="py-3 px-4">Day of the Week</th>
+                <th className="py-3 px-4">Morning Session (ጠዋት)</th>
+                <th className="py-3 px-4">Evening Session (ማታ)</th>
+                <th className="py-3 px-4 text-center">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {WEEKLY_SCHEDULE.map((item) => {
+                const isCurrentDay = item.dayIndex === currentDayIndex;
+
+                return (
+                  <tr
+                    key={item.dayIndex}
+                    className={`transition ${
+                      isCurrentDay
+                        ? 'bg-emerald-50/60 font-semibold text-slate-900'
+                        : 'hover:bg-slate-50/50 text-slate-700'
+                    }`}
+                  >
+                    <td className="py-3 px-4">
+                      <div className="flex items-center gap-2">
+                        <span>{item.name} ({item.amharic})</span>
+                        {isCurrentDay && (
+                          <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-xs uppercase tracking-wider bg-[#00843D] text-white">
+                            Today
+                          </span>
+                        )}
+                      </div>
+                    </td>
+
+                    <td className="py-3 px-4 font-mono">
+                      <div>{item.morning}</div>
+                      <div className="text-[11px] text-slate-500 font-sans">{item.morningEt}</div>
+                    </td>
+
+                    <td className="py-3 px-4 font-mono">
+                      <div>{item.evening}</div>
+                      <div className="text-[11px] text-slate-500 font-sans">{item.eveningEt}</div>
+                    </td>
+
+                    <td className="py-3 px-4 text-center">
+                      {item.isOpen ? (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800">
+                          Active Working Day
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-500">
+                          Weekly Sanitization
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Facility Etiquette & Locker Rules */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs">
+          <div className="flex items-center gap-2 font-bold text-slate-900 mb-1.5">
+            <ShieldCheck className="h-4 w-4 text-[#00843D]" />
+            <span>Digital Gate Entry</span>
+          </div>
+          <p className="text-slate-600 leading-relaxed text-[11px]">
+            Always present your official Digital QR Pass or Employee ID to the desk attendant for instant verification and capacity counting.
           </p>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filteredClasses.map((item) => {
-            const isMorning = item.startTime < '12:00';
-            const capacityPercent = Math.min(100, Math.round((item.bookedCount / item.capacity) * 100));
-            const spotsRemaining = Math.max(0, item.capacity - item.bookedCount);
-            const isConcluded = isClassConcluded(item.scheduledDate, item.startTime);
-            const ethiopianDisplay = getEthiopianTimeRange(item.startTime, item.endTime);
 
-            return (
-              <div
-                key={item.id}
-                className={`bg-white rounded-xl border transition-all duration-150 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-md ${
-                  item.isBookedByMe
-                    ? 'border-emerald-500 ring-1 ring-emerald-500/20'
-                    : isConcluded
-                    ? 'border-slate-200 opacity-85'
-                    : 'border-slate-200'
-                }`}
-              >
-                <div className="p-5 flex-1">
-                  {/* Top Shift Tag & Booking Badge */}
-                  <div className="flex items-center justify-between gap-2 mb-2.5">
-                    <span className="text-[10px] font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded">
-                      {isMorning ? 'ጠዋት · Morning' : 'ማታ · Evening'}
-                    </span>
-
-                    {item.isBookedByMe ? (
-                      <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 flex items-center gap-1">
-                        <Check className="h-3 w-3" /> Reserved
-                      </span>
-                    ) : isConcluded ? (
-                      <span className="text-[10px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-                        Concluded
-                      </span>
-                    ) : item.isFull ? (
-                      <span className="text-[10px] font-semibold text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
-                        Full
-                      </span>
-                    ) : (
-                      <span className="text-[10px] font-medium text-emerald-700 bg-emerald-50/60 px-2 py-0.5 rounded border border-emerald-100">
-                        {spotsRemaining} {spotsRemaining === 1 ? 'spot' : 'spots'} left
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Title & Instructor */}
-                  <h3 className="text-sm font-bold text-slate-900 leading-snug">
-                    {item.title}
-                  </h3>
-                  <p className="text-xs text-slate-500 mt-1">
-                    Coach: <span className="font-semibold text-slate-700">{item.instructorName}</span>
-                  </p>
-
-                  {/* Clean Time Display */}
-                  <div className="mt-3.5 flex items-center gap-1.5 text-xs text-slate-600 font-mono">
-                    <Clock className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                    <span>{item.startTime} – {item.endTime}</span>
-                    {ethiopianDisplay && (
-                      <span className="text-slate-400 text-[11px]">({ethiopianDisplay})</span>
-                    )}
-                  </div>
-
-                  {/* Clean Capacity Meter */}
-                  <div className="mt-3 space-y-1">
-                    <div className="flex items-center justify-between text-[11px] text-slate-500 font-mono">
-                      <span>{item.bookedCount} / {item.capacity} spots booked</span>
-                      <span>{Math.round(capacityPercent)}%</span>
-                    </div>
-                    <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                      <div
-                        className={`h-full rounded-full transition-all ${
-                          capacityPercent >= 100
-                            ? 'bg-rose-500'
-                            : capacityPercent >= 75
-                            ? 'bg-amber-500'
-                            : 'bg-[#00843D]'
-                        }`}
-                        style={{ width: `${capacityPercent}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Card Actions */}
-                <div className="px-4 py-3 bg-slate-50/60 border-t border-slate-100 flex items-center justify-between gap-2">
-                  {isStaffOrAdmin ? (
-                    <button
-                      type="button"
-                      onClick={() => setViewParticipantsClass(item)}
-                      className="text-xs font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
-                    >
-                      <UserCheck className="h-3.5 w-3.5" />
-                      <span>Roster ({item.participants.length})</span>
-                    </button>
-                  ) : (
-                    <span className="text-[11px] text-slate-400 font-mono">
-                      Max {item.capacity} Staff
-                    </span>
-                  )}
-
-                  {item.isBookedByMe ? (
-                    isConcluded ? (
-                      <button
-                        type="button"
-                        disabled
-                        className="px-2.5 h-7.5 text-xs font-semibold text-slate-400 bg-slate-100 rounded-[6px] cursor-not-allowed"
-                      >
-                        Attended
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => cancelMutation.mutate(item.id)}
-                        disabled={cancelMutation.isPending}
-                        className="px-2.5 h-7.5 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-[6px] transition cursor-pointer disabled:opacity-50"
-                      >
-                        {cancelMutation.isPending ? 'Cancelling...' : 'Cancel Spot'}
-                      </button>
-                    )
-                  ) : isConcluded ? (
-                    <button
-                      type="button"
-                      disabled
-                      className="px-2.5 h-7.5 text-xs font-medium text-slate-400 bg-slate-100 rounded-[6px] cursor-not-allowed"
-                    >
-                      Booking Closed
-                    </button>
-                  ) : item.isFull ? (
-                    <button
-                      type="button"
-                      disabled
-                      className="px-2.5 h-7.5 text-xs font-semibold text-slate-400 bg-slate-100 rounded-[6px] cursor-not-allowed"
-                    >
-                      Full
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => bookMutation.mutate(item.id)}
-                      disabled={bookMutation.isPending}
-                      className="px-3 h-7.5 text-xs font-semibold text-white bg-[#00843D] hover:bg-[#007033] rounded-[6px] shadow-2xs transition cursor-pointer disabled:opacity-50"
-                    >
-                      {bookMutation.isPending ? 'Booking...' : 'Book Spot'}
-                    </button>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Admin / Attendant: Schedule New Class Modal */}
-      {isAddModalOpen && (
-        <div
-          onClick={(e) => e.target === e.currentTarget && setIsAddModalOpen(false)}
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto"
-        >
-          <div className="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-xl border border-slate-200 animate-in fade-in zoom-in-95 duration-150 max-h-[92vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <h2 className="text-base font-bold text-slate-900">Schedule Group Session</h2>
-              <button
-                type="button"
-                onClick={() => setIsAddModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600 cursor-pointer"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                createClassMutation.mutate();
-              }}
-              className="mt-4 space-y-3.5"
-            >
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Session Title *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
-                  placeholder="e.g. Core Conditioning & Aerobics"
-                  className="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:outline-hidden focus:ring-1 focus:ring-[#00843D]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Coach / Instructor *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={newInstructor}
-                  onChange={(e) => setNewInstructor(e.target.value)}
-                  className="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:outline-hidden focus:ring-1 focus:ring-[#00843D]"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Start Time *
-                  </label>
-                  <input
-                    type="time"
-                    required
-                    value={newStartTime}
-                    onChange={(e) => setNewStartTime(e.target.value)}
-                    className="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:outline-hidden focus:ring-1 focus:ring-[#00843D]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    End Time *
-                  </label>
-                  <input
-                    type="time"
-                    required
-                    value={newEndTime}
-                    onChange={(e) => setNewEndTime(e.target.value)}
-                    className="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:outline-hidden focus:ring-1 focus:ring-[#00843D]"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Max Capacity *
-                </label>
-                <input
-                  type="number"
-                  min="5"
-                  max="40"
-                  required
-                  value={newCapacity}
-                  onChange={(e) => setNewCapacity(Number(e.target.value))}
-                  className="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:outline-hidden focus:ring-1 focus:ring-[#00843D]"
-                />
-              </div>
-
-              <div className="pt-2 flex items-center justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setIsAddModalOpen(false)}
-                  className="px-3.5 h-8 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-[6px] transition cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={createClassMutation.isPending}
-                  className="px-3.5 h-8 text-xs font-semibold text-white bg-[#00843D] hover:bg-[#007033] rounded-[6px] transition shadow-2xs cursor-pointer disabled:opacity-50"
-                >
-                  {createClassMutation.isPending ? 'Saving...' : 'Save Session'}
-                </button>
-              </div>
-            </form>
+        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs">
+          <div className="flex items-center gap-2 font-bold text-slate-900 mb-1.5">
+            <Key className="h-4 w-4 text-amber-600" />
+            <span>Daily Locker Policy</span>
           </div>
+          <p className="text-slate-600 leading-relaxed text-[11px]">
+            Lockers (L-01 to L-30) are for daily session use only. Please clear your locker and return the key to the front desk before leaving.
+          </p>
         </div>
-      )}
 
-      {/* Participants Roster Modal */}
-      {viewParticipantsClass && (
-        <div
-          onClick={(e) => e.target === e.currentTarget && setViewParticipantsClass(null)}
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto"
-        >
-          <div className="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-xl border border-slate-200 max-h-[92vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div>
-                <h2 className="text-base font-bold text-slate-900">
-                  {viewParticipantsClass.title}
-                </h2>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Roster ({viewParticipantsClass.participants.length} / {viewParticipantsClass.capacity})
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setViewParticipantsClass(null)}
-                className="text-slate-400 hover:text-slate-600 cursor-pointer"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <div className="mt-3 max-h-72 overflow-y-auto divide-y divide-slate-100">
-              {viewParticipantsClass.participants.map((p, idx) => (
-                <div key={p.bookingId || idx} className="py-2.5 flex items-center justify-between gap-3 text-xs">
-                  <div>
-                    <div className="font-semibold text-slate-900">{p.fullName}</div>
-                    <div className="text-[11px] text-slate-500 font-mono">
-                      {p.employeeId} · {p.department}
-                    </div>
-                  </div>
-                  {isStaffOrAdmin ? (
-                    <button
-                      type="button"
-                      onClick={() =>
-                        toggleAttendanceMutation.mutate({
-                          classId: viewParticipantsClass.id,
-                          userId: p.userId,
-                          attended: !p.attended,
-                        })
-                      }
-                      disabled={toggleAttendanceMutation.isPending}
-                      className={`px-2.5 py-1 text-xs font-semibold rounded-md transition flex items-center gap-1.5 cursor-pointer ${
-                        p.attended
-                          ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border border-emerald-300'
-                          : 'bg-slate-100 text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 border border-slate-200'
-                      }`}
-                    >
-                      <CheckCircle2
-                        className={`h-3.5 w-3.5 ${
-                          p.attended ? 'text-emerald-700' : 'text-slate-400'
-                        }`}
-                      />
-                      <span>{p.attended ? 'Attended' : 'Mark Attended'}</span>
-                    </button>
-                  ) : (
-                    <span
-                      className={`text-[10px] font-semibold px-2 py-0.5 rounded ${
-                        p.attended
-                          ? 'bg-emerald-50 text-emerald-800'
-                          : 'bg-slate-100 text-slate-600'
-                      }`}
-                    >
-                      {p.attended ? 'Attended' : 'Registered'}
-                    </span>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-4 pt-3 border-t border-slate-100 flex justify-end">
-              <button
-                type="button"
-                onClick={() => setViewParticipantsClass(null)}
-                className="px-3.5 h-7.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-[6px] cursor-pointer"
-              >
-                Close
-              </button>
-            </div>
+        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs">
+          <div className="flex items-center gap-2 font-bold text-slate-900 mb-1.5">
+            <CheckCircle2 className="h-4 w-4 text-[#00843D]" />
+            <span>Attire & Sanitization</span>
           </div>
+          <p className="text-slate-600 leading-relaxed text-[11px]">
+            Wear appropriate athletic sportswear and clean indoor athletic shoes. Please wipe down benches and handles after each workout set.
+          </p>
         </div>
-      )}
+      </div>
     </div>
   );
 };

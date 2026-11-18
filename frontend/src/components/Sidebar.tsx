@@ -168,7 +168,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {!collapsed && <span className="truncate">My Entry Pass</span>}
               </NavLink>
 
-              {/* 2. Gym Schedule */}
+              {/* 2. Gym Timetable */}
               <NavLink
                 to="/schedule"
                 onClick={onCloseMobile}
@@ -177,11 +177,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     ? 'bg-white/20 text-white shadow-xs'
                     : 'text-white/80 hover:text-white hover:bg-white/10'
                 }`}
-                title={collapsed ? 'Gym Schedule' : undefined}
+                title={collapsed ? 'Gym Timetable' : undefined}
               >
                 {isActive('/schedule') && <ActiveBar />}
                 <Calendar className="h-5 w-5 text-emerald-300 shrink-0" />
-                {!collapsed && <span className="truncate">Gym Schedule</span>}
+                {!collapsed && <span className="truncate">Gym Timetable</span>}
               </NavLink>
 
               {/* 3. Exercise Video Guides */}
@@ -221,7 +221,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {!collapsed && <span className="truncate">Dashboard</span>}
               </NavLink>
 
-              {/* 2. Gym Schedule */}
+              {/* 2. Gym Timetable */}
               <NavLink
                 to="/schedule"
                 onClick={onCloseMobile}
@@ -230,11 +230,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     ? 'bg-white/20 text-white shadow-xs'
                     : 'text-white/80 hover:text-white hover:bg-white/10'
                 }`}
-                title={collapsed ? 'Gym Schedule' : undefined}
+                title={collapsed ? 'Gym Timetable' : undefined}
               >
                 {isActive('/schedule') && <ActiveBar />}
                 <Calendar className="h-5 w-5 text-emerald-300 shrink-0" />
-                {!collapsed && <span className="truncate">Gym Schedule</span>}
+                {!collapsed && <span className="truncate">Gym Timetable</span>}
               </NavLink>
 
               {/* 3. Reports */}

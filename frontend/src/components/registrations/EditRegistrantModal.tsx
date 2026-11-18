@@ -189,7 +189,7 @@ export const EditRegistrantModal: React.FC<EditRegistrantModalProps> = ({
               >
                 <Clock className="w-4 h-4 text-amber-600" />
                 <span>Morning</span>
-                <span className="text-[10px] font-normal text-slate-500">11:00–1:30</span>
+                <span className="text-[10px] font-normal text-slate-500">6:00–8:30 AM</span>
               </button>
 
               <button
@@ -203,7 +203,7 @@ export const EditRegistrantModal: React.FC<EditRegistrantModalProps> = ({
               >
                 <Clock className="w-4 h-4 text-indigo-600" />
                 <span>Evening</span>
-                <span className="text-[10px] font-normal text-slate-500">11:30–3:00</span>
+                <span className="text-[10px] font-normal text-slate-500">5:30–9:00 PM</span>
               </button>
 
               <button
@@ -217,7 +217,7 @@ export const EditRegistrantModal: React.FC<EditRegistrantModalProps> = ({
               >
                 <Clock className="w-4 h-4 text-emerald-600" />
                 <span>Flexible</span>
-                <span className="text-[10px] font-normal text-slate-500">Any Shift</span>
+                <span className="text-[10px] font-normal text-slate-500">Either Session</span>
               </button>
             </div>
           </div>

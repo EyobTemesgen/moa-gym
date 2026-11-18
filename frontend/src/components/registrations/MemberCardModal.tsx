@@ -34,14 +34,14 @@ export const MemberCardModal: React.FC<MemberCardModalProps> = ({
         return (
           <span className={`${pill} ${statusTone.morning}`}>
             <Clock className="w-3 h-3 text-amber-700" />
-            <span>Morning (11:00 – 1:30)</span>
+            <span>Morning (6:00 – 8:30 AM)</span>
           </span>
         );
       case 'EVENING':
         return (
           <span className={`${pill} ${statusTone.evening}`}>
             <Clock className="w-3 h-3 text-indigo-700" />
-            <span>Evening (11:30 – 3:00)</span>
+            <span>Evening (5:30 – 9:00 PM)</span>
           </span>
         );
       default:

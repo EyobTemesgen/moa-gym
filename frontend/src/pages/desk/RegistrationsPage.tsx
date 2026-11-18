@@ -53,8 +53,8 @@ type TabFilter = 'ALL' | 'ACTIVE' | 'MORNING' | 'EVENING' | 'SUSPENDED';
 const TABS: { key: TabFilter; label: string }[] = [
   { key: 'ALL', label: 'All Members' },
   { key: 'ACTIVE', label: 'Active' },
-  { key: 'MORNING', label: 'Morning (ጠዋት 11:00 - 1:30)' },
-  { key: 'EVENING', label: 'Evening (ማታ 11:30 - 3:00)' },
+  { key: 'MORNING', label: 'Morning (6:00 - 8:30 AM)' },
+  { key: 'EVENING', label: 'Evening (5:30 - 9:00 PM)' },
   { key: 'SUSPENDED', label: 'Suspended' },
 ];
 

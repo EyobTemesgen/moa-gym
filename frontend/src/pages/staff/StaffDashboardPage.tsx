@@ -92,14 +92,14 @@ export const StaffDashboardPage: React.FC = () => {
         return (
           <span className={`${pill} ${statusTone.morning}`}>
             <Clock className="w-3 h-3 text-amber-700" />
-            <span>Morning Shift (11:00 – 1:30)</span>
+            <span>Morning Shift (6:00 – 8:30 AM)</span>
           </span>
         );
       case 'EVENING':
         return (
           <span className={`${pill} ${statusTone.evening}`}>
             <Clock className="w-3 h-3 text-indigo-700" />
-            <span>Evening Shift (11:30 – 3:00)</span>
+            <span>Evening Shift (5:30 – 9:00 PM)</span>
           </span>
         );
       default:
@@ -291,14 +291,14 @@ export const StaffDashboardPage: React.FC = () => {
                   </span>
                 </div>
                 <h3 className="text-sm font-bold text-slate-900 group-hover:text-[#00843D] transition-colors">
-                  Gym Schedule & Classes
+                  Gym Timetable & Sessions
                 </h3>
                 <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                  View daily group training sessions and reserve your workout spots.
+                  Check morning (6:00 – 8:30 AM) and evening (5:30 – 9:00 PM) sessions and real-time facility occupancy.
                 </p>
               </div>
               <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center text-xs font-semibold text-[#00843D]">
-                <span>Browse Schedule</span>
+                <span>View Timetable</span>
                 <ArrowRight className="h-3.5 w-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
               </div>
             </Link>
@@ -342,10 +342,10 @@ export const StaffDashboardPage: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
               <div className="p-3 rounded-lg border border-slate-200 bg-slate-50/70">
                 <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                  Morning Shift
+                  Morning Session
                 </p>
                 <p className="text-sm font-mono font-bold text-slate-900 mt-0.5">
-                  11:00 – 1:30 (5:00 AM – 7:30 AM)
+                  6:00 AM – 8:30 AM (12:00 – 2:30)
                 </p>
                 <p className="text-[11px] text-slate-500 mt-0.5">
                   Pre-work morning workout session
@@ -354,10 +354,10 @@ export const StaffDashboardPage: React.FC = () => {
 
               <div className="p-3 rounded-lg border border-slate-200 bg-slate-50/70">
                 <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                  Evening Shift
+                  Evening Session
                 </p>
                 <p className="text-sm font-mono font-bold text-slate-900 mt-0.5">
-                  11:30 – 3:00 (5:30 PM – 9:00 PM)
+                  5:30 PM – 9:00 PM (11:30 – 3:00)
                 </p>
                 <p className="text-[11px] text-slate-500 mt-0.5">
                   Post-office evening workout session
@@ -379,19 +379,19 @@ export const StaffDashboardPage: React.FC = () => {
               <div className="flex items-start gap-2.5">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
                 <span>
-                  <strong>Gate Verification:</strong> Hold your QR code to the entrance scanner or show your MoA Employee ID card at the desk.
+                  <strong>Gate Verification:</strong> Hold your QR pass to the entrance scanner or show your MoA Employee ID card at the desk.
                 </span>
               </div>
               <div className="flex items-start gap-2.5">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
                 <span>
-                  <strong>Locker Keys:</strong> Keys are issued upon check-in. Please return keys at reception prior to leaving.
+                  <strong>Daily Lockers:</strong> 30 numbered lockers (L-01 to L-30) are assigned at check-in. Please return your locker key to reception upon departure.
                 </span>
               </div>
               <div className="flex items-start gap-2.5">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
                 <span>
-                  <strong>Departure:</strong> Scan your code upon departure or tap <strong>Check Out</strong> on this portal to keep live capacity accurate.
+                  <strong>Departure:</strong> Scan your code upon departure or tap <strong>Check Out</strong> on this portal to keep live facility capacity accurate.
                 </span>
               </div>
             </div>

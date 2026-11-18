@@ -1070,7 +1070,7 @@ export const DedicatedSignUpPage: React.FC = () => {
                   </div>
                   <div>
                     <div className="text-xs font-bold text-slate-900">Morning Shift</div>
-                    <div className="text-xs text-emerald-700 font-semibold mt-0.5">05:00 AM – 07:30 AM</div>
+                    <div className="text-xs text-emerald-700 font-semibold mt-0.5">06:00 AM – 08:30 AM</div>
                     <div className="text-[11px] text-slate-500 mt-0.5">Pre-work fitness & power training</div>
                   </div>
                 </button>
@@ -1427,7 +1427,7 @@ export const DedicatedSignUpPage: React.FC = () => {
                 <span className="text-slate-500">Selected Shift:</span>
                 <span className="font-semibold text-slate-800">
                   {registrationResult.registration?.shiftPreference === 'MORNING'
-                    ? 'Morning Shift (5:00 AM – 7:30 AM)'
+                    ? 'Morning Shift (6:00 AM – 8:30 AM)'
                     : 'Evening Shift (5:30 PM – 9:00 PM)'}
                 </span>
               </div>

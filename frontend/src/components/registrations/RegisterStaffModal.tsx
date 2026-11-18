@@ -524,9 +524,9 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
                 onChange={(e) => setShiftPreference(e.target.value)}
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-moa-green/30"
               >
-                <option value="MORNING">Morning (5:00 AM – 7:30 AM)</option>
+                <option value="MORNING">Morning (6:00 AM – 8:30 AM)</option>
                 <option value="EVENING">Evening (5:30 PM – 9:00 PM)</option>
-                <option value="ANY">Flexible Shift</option>
+                <option value="ANY">Flexible / Either Session</option>
               </select>
             </div>
 

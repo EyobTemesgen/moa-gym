@@ -232,10 +232,10 @@ export const AdminDashboardPage: React.FC = () => {
                       <span>🌅 ጠዋት</span>
                       <span className="text-[10px] text-emerald-700 font-semibold">(Morning)</span>
                     </div>
-                    <div className="text-[11px] text-slate-500 font-mono">5:00 AM – 7:30 AM</div>
+                    <div className="text-[11px] text-slate-500 font-mono">6:00 AM – 8:30 AM</div>
                   </div>
                   <div className="text-xs font-mono font-extrabold text-emerald-900 bg-emerald-100/80 px-2 py-1 rounded">
-                    ከማለዳው 11:00 – 1:30
+                    ከማለዳው 12:00 – 2:30
                   </div>
                 </div>
 
@@ -271,7 +271,7 @@ export const AdminDashboardPage: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
               <div className="p-3 rounded-lg bg-emerald-50/70 border border-emerald-100">
                 <span className="text-[11px] font-semibold text-emerald-800 block">ጠዋት (Morning)</span>
-                <span className="text-[10px] text-emerald-600 block">11:00 – 1:30 (5:00–7:30 AM)</span>
+                <span className="text-[10px] text-emerald-600 block">6:00–8:30 AM (12:00–2:30)</span>
                 <div className="text-xl font-bold text-emerald-950 mt-1.5 tabular-nums">
                   {stats?.shiftBreakdown?.MORNING ?? 0}
                 </div>
@@ -279,7 +279,7 @@ export const AdminDashboardPage: React.FC = () => {
 
               <div className="p-3 rounded-lg bg-indigo-50/70 border border-indigo-100">
                 <span className="text-[11px] font-semibold text-indigo-800 block">ማታ (Evening)</span>
-                <span className="text-[10px] text-indigo-600 block">11:30 – 3:00 (5:30–9:00 PM)</span>
+                <span className="text-[10px] text-indigo-600 block">5:30–9:00 PM (11:30–3:00)</span>
                 <div className="text-xl font-bold text-indigo-950 mt-1.5 tabular-nums">
                   {stats?.shiftBreakdown?.EVENING ?? 0}
                 </div>

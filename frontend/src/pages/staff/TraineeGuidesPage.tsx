@@ -40,8 +40,8 @@ const VIDEO_GUIDES: VideoGuide[] = [
     category: 'Beginner',
     isAmharicAudio: true,
     duration: '6:20 min',
-    instructor: 'Coach Henok (Gym Attendant)',
-    amharicInstructor: 'አሰልጣኝ ሄኖክ (የግብርና ሚኒስቴር ጂም)',
+    instructor: 'Henok (Facility Attendant)',
+    amharicInstructor: 'ሄኖክ (የግብርና ሚኒስቴር ጂም)',
     targetMuscles: 'Full Body, Machine Calibration & Core Stability',
     amharicTargetMuscles: 'ሙሉ አካል፣ የማሽን አጠቃቀም እና የወገብ ደህንነት',
     thumbnailUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=600&q=80',
@@ -150,8 +150,8 @@ const VIDEO_GUIDES: VideoGuide[] = [
     category: 'Strength',
     isAmharicAudio: true,
     duration: '7:15 min',
-    instructor: 'Trainer Tsegaye (Ethio Fitness / Surafel Gym Series)',
-    amharicInstructor: 'አሰልጣኝ ፀጋዬ (Tsegaye Workout / Ethiopian Trainers)',
+    instructor: 'Tsegaye (Ethio Fitness Guide)',
+    amharicInstructor: 'ፀጋዬ (የአካል ብቃት ቪዲዮ መመሪያ)',
     targetMuscles: 'Pectoralis Major, Anterior Deltoid, Triceps',
     amharicTargetMuscles: 'የደረት ጡንቻዎች፣ የትከሻ ፊት እና እጅ',
     thumbnailUrl: 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=600&q=80',
@@ -185,8 +185,8 @@ const VIDEO_GUIDES: VideoGuide[] = [
     category: 'Strength',
     isAmharicAudio: true,
     duration: '6:45 min',
-    instructor: 'Coach Henok (Gym Attendant)',
-    amharicInstructor: 'አሰልጣኝ ሄኖክ (የግብርና ሚኒስቴር ጂም)',
+    instructor: 'Henok (Facility Attendant)',
+    amharicInstructor: 'ሄኖክ (የግብርና ሚኒስቴር ጂም)',
     targetMuscles: 'Quadriceps, Hamstrings, Gluteus, Lumbar Core',
     amharicTargetMuscles: 'የታችኛው እግር፣ ጭን፣ ዳሌ እና የታችኛው ወገብ',
     thumbnailUrl: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=600&q=80',
@@ -220,8 +220,8 @@ const VIDEO_GUIDES: VideoGuide[] = [
     category: 'Mobility',
     isAmharicAudio: true,
     duration: '5:10 min',
-    instructor: 'Trainer Bethel (MoA Wellness Team)',
-    amharicInstructor: 'አሰልጣኝ ቤቴል (የግብርና ሚኒስቴር ጤና ቡድን)',
+    instructor: 'Bethel (MoA Staff Wellness)',
+    amharicInstructor: 'ቤቴል (የግብርና ሚኒስቴር ጤና ቡድን)',
     targetMuscles: 'Cervical Spine, Trapezius, Hip Flexors, Pectorals',
     amharicTargetMuscles: 'አንገት፣ ትከሻ፣ የላይኛው ጀርባ እና የዳሌ ጡንቻዎች',
     thumbnailUrl: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=600&q=80',
@@ -255,8 +255,8 @@ const VIDEO_GUIDES: VideoGuide[] = [
     category: 'Cardio',
     isAmharicAudio: true,
     duration: '4:20 min',
-    instructor: 'Coach Henok (Gym Attendant)',
-    amharicInstructor: 'አሰልጣኝ ሄኖክ (የግብርና ሚኒስቴር ጂም)',
+    instructor: 'Henok (Facility Attendant)',
+    amharicInstructor: 'ሄኖክ (የግብርና ሚኒስቴር ጂም)',
     targetMuscles: 'Cardiovascular, Quads, Calves',
     amharicTargetMuscles: 'የልብና የደም ዝውውር፣ ጭን እና ባት',
     thumbnailUrl: 'https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=600&q=80',
@@ -510,7 +510,7 @@ export const TraineeGuidesPage: React.FC = () => {
             {/* Language Tab Switcher */}
             <div className="mt-4 flex items-center justify-between border-b border-slate-100 pb-2">
               <span className="text-xs font-bold text-slate-700">
-                Coaching Checklist / የስልጠና ቅደም ተከተል
+                Workout Technique Checklist / የስልጠና ቅደም ተከተል
               </span>
               <div className="flex bg-slate-100 p-0.5 rounded text-xs">
                 <button

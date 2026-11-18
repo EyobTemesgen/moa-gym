@@ -221,23 +221,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {!collapsed && <span className="truncate">Dashboard</span>}
               </NavLink>
 
-              {/* 2. Gym Timetable */}
-              <NavLink
-                to="/schedule"
-                onClick={onCloseMobile}
-                className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition ${
-                  isActive('/schedule')
-                    ? 'bg-white/20 text-white shadow-xs'
-                    : 'text-white/80 hover:text-white hover:bg-white/10'
-                }`}
-                title={collapsed ? 'Gym Timetable' : undefined}
-              >
-                {isActive('/schedule') && <ActiveBar />}
-                <Calendar className="h-5 w-5 text-emerald-300 shrink-0" />
-                {!collapsed && <span className="truncate">Gym Timetable</span>}
-              </NavLink>
-
-              {/* 3. Reports */}
+              {/* 2. Reports */}
               <NavLink
                 to="/reports"
                 onClick={onCloseMobile}
@@ -348,22 +332,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {isActive('/active-floor') && <ActiveBar />}
                 <KeyRound className="h-5 w-5 text-moa-gold shrink-0" />
                 {!collapsed && <span className="truncate">Locker Control</span>}
-              </NavLink>
-
-              {/* 3. Gym Schedule */}
-              <NavLink
-                to="/schedule"
-                onClick={onCloseMobile}
-                className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition ${
-                  isActive('/schedule')
-                    ? 'bg-white/20 text-white shadow-xs'
-                    : 'text-white/80 hover:text-white hover:bg-white/10'
-                }`}
-                title={collapsed ? 'Gym Schedule' : undefined}
-              >
-                {isActive('/schedule') && <ActiveBar />}
-                <Calendar className="h-5 w-5 text-emerald-300 shrink-0" />
-                {!collapsed && <span className="truncate">Gym Schedule</span>}
               </NavLink>
             </div>
           )}

@@ -13,6 +13,7 @@ import {
   UserCog,
   Settings,
   Flame,
+  LogOut,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -22,13 +23,20 @@ interface SidebarProps {
   onCloseMobile: () => void;
 }
 
+const getInitials = (name?: string): string => {
+  if (!name) return 'MOA';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  return name.slice(0, 2).toUpperCase();
+};
+
 export const Sidebar: React.FC<SidebarProps> = ({
   collapsed,
   onToggleCollapse,
   mobileOpen,
   onCloseMobile,
 }) => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -267,6 +275,80 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <Flame className="h-5 w-5 text-amber-300 shrink-0" />
                 {!collapsed && <span className="truncate">Floor & Lockers</span>}
               </NavLink>
+            </div>
+          )}
+        </div>
+
+        {/* Bottom Section: Compact User Avatar & Quick Logout */}
+        <div className="p-2.5 border-t border-white/10 bg-black/15 shrink-0">
+          {collapsed ? (
+            <div className="flex flex-col items-center gap-2">
+              <div
+                title={`${user.fullName} (${user.role === 'HR_ADMIN' ? 'ADMIN' : user.role})`}
+                className="relative cursor-default"
+              >
+                {user.photoUrl ? (
+                  <img
+                    src={user.photoUrl}
+                    alt={user.fullName}
+                    className="h-8 w-8 rounded-lg object-cover ring-1 ring-moa-gold"
+                  />
+                ) : (
+                  <div className="h-8 w-8 rounded-lg bg-white/20 text-white flex items-center justify-center font-bold text-xs ring-1 ring-white/20">
+                    {getInitials(user.fullName)}
+                  </div>
+                )}
+                <span className="absolute -bottom-0.5 -right-0.5 size-2 rounded-full bg-emerald-400 ring-2 ring-[#07572A]" />
+              </div>
+
+              <button
+                type="button"
+                onClick={logout}
+                title="Sign out"
+                aria-label="Sign out"
+                className="p-2 text-white/70 hover:text-rose-300 hover:bg-rose-500/20 rounded-lg transition cursor-pointer"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2.5">
+              <div className="relative shrink-0">
+                {user.photoUrl ? (
+                  <img
+                    src={user.photoUrl}
+                    alt={user.fullName}
+                    className="h-8 w-8 rounded-lg object-cover ring-1 ring-moa-gold"
+                  />
+                ) : (
+                  <div className="h-8 w-8 rounded-lg bg-white/20 text-white flex items-center justify-center font-bold text-xs ring-1 ring-white/20">
+                    {getInitials(user.fullName)}
+                  </div>
+                )}
+                <span className="absolute -bottom-0.5 -right-0.5 size-2 rounded-full bg-emerald-400 ring-2 ring-[#07572A]" />
+              </div>
+
+              <div className="flex-1 min-w-0 leading-tight">
+                <div className="text-xs font-bold text-white truncate">
+                  {user.fullName}
+                </div>
+                <div className="text-[10px] font-mono text-emerald-200/90 truncate mt-0.5">
+                  <span className="text-moa-gold font-semibold">
+                    {user.role === 'HR_ADMIN' ? 'ADMIN' : user.role}
+                  </span>
+                  {' · '}{user.employeeId}
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={logout}
+                title="Sign out"
+                aria-label="Sign out"
+                className="p-1.5 text-white/70 hover:text-rose-300 hover:bg-rose-500/20 rounded-lg transition cursor-pointer shrink-0"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
             </div>
           )}
         </div>

@@ -191,7 +191,7 @@ export const GymRegistrantsPrintModal: React.FC<GymRegistrantsPrintModalProps> =
 
           {/* Document Footer Notice */}
           <div className="text-center pt-4 border-t border-slate-200 text-[10px] text-slate-400">
-            © 2026 Federal Democratic Republic of Ethiopia Ministry of Agriculture · Internal Civil Service Wellness Center
+            © 2026 Federal Democratic Republic of Ethiopia Ministry of Agriculture · Staff Wellness & Fitness Center
           </div>
         </div>
       </div>

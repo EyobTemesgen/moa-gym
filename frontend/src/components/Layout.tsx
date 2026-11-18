@@ -34,9 +34,8 @@ export const Layout: React.FC = () => {
         </main>
 
         <footer className="no-print bg-white border-t border-slate-200 mt-auto py-3">
-          <div className="w-full px-4 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
+          <div className="w-full px-4 flex items-center justify-between text-xs text-slate-500">
             <p>© 2026 Ministry of Agriculture · Staff Wellness & Fitness Gymnasium</p>
-            <p className="text-[11px] text-slate-400">Official Civil Service Portal</p>
           </div>
         </footer>
       </div>

@@ -15,7 +15,6 @@ import { ActiveFloorPage } from './pages/desk/ActiveFloorPage';
 import { RegistrationsPage } from './pages/desk/RegistrationsPage';
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
 import { UserManagementPage } from './pages/admin/UserManagementPage';
-import { HrRosterPage } from './pages/admin/HrRosterPage';
 import { AnalyticsPage } from './pages/admin/AnalyticsPage';
 import { SettingsPage } from './pages/admin/SettingsPage';
 
@@ -121,15 +120,8 @@ export const App: React.FC = () => {
                 }
               />
 
-              {/* Admin Management */}
-              <Route
-                path="/admin/roster"
-                element={
-                  <RoleGuard allowedRoles={['ADMIN', 'HR_ADMIN']}>
-                    <HrRosterPage />
-                  </RoleGuard>
-                }
-              />
+              {/* Legacy HR Whitelist Route Redirected to Unified Registrations */}
+              <Route path="/admin/roster" element={<Navigate to="/registrations" replace />} />
 
               {/* Reports & Analytics */}
               <Route

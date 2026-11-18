@@ -15,7 +15,6 @@ import {
   UserCog,
   Settings,
   Sliders,
-  UserCheck,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -37,8 +36,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const isSettingsActive =
     location.pathname === '/admin/users' ||
-    location.pathname === '/admin/settings' ||
-    location.pathname === '/admin/roster';
+    location.pathname === '/admin/settings';
 
   const [settingsOpen, setSettingsOpen] = useState<boolean>(() => {
     if (isSettingsActive) return true;
@@ -246,20 +244,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     >
                       <Sliders className="h-4 w-4 text-sky-300 shrink-0" />
                       <span className="truncate">Facility Settings</span>
-                    </NavLink>
-
-                    {/* HR Staff Whitelist */}
-                    <NavLink
-                      to="/admin/roster"
-                      onClick={onCloseMobile}
-                      className={`relative flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-medium transition ${
-                        isActive('/admin/roster')
-                          ? 'bg-white/20 text-white shadow-2xs font-semibold'
-                          : 'text-white/70 hover:text-white hover:bg-white/10'
-                      }`}
-                    >
-                      <UserCheck className="h-4 w-4 text-emerald-300 shrink-0" />
-                      <span className="truncate">HR Whitelist</span>
                     </NavLink>
                   </div>
                 )}

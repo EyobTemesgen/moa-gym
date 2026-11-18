@@ -94,8 +94,8 @@ export const AdminDashboardPage: React.FC = () => {
           </Link>
 
           <Link to="/registrations" className={btn.primary}>
-            <UserPlus className="h-4 w-4" />
-            <span>Staff Registrations</span>
+            <Users className="h-4 w-4" />
+            <span>Member Directory</span>
           </Link>
         </div>
       </div>
@@ -327,8 +327,8 @@ export const AdminDashboardPage: React.FC = () => {
                     <Users className="h-4 w-4" />
                   </div>
                   <div>
-                    <div className="font-bold text-slate-900">Staff Registrations Directory</div>
-                    <div className="text-[11px] text-slate-500 font-normal">Manage member intake & roster</div>
+                    <div className="font-bold text-slate-900">Member Directory & Roster</div>
+                    <div className="text-[11px] text-slate-500 font-normal">View enrolled members, shifts & lockers</div>
                   </div>
                 </div>
                 <ChevronRightIcon className="h-4 w-4 text-slate-400" />

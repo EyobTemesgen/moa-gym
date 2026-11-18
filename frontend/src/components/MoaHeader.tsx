@@ -77,8 +77,8 @@ export const MoaHeader: React.FC<MoaHeaderProps> = ({ onOpenMobileSidebar }) => 
         };
       case '/registrations':
         return {
-          title: 'Staff Registrations',
-          subtitle: 'Staff gym membership records and directory',
+          title: 'Member Directory',
+          subtitle: 'Gym membership records, shift roster, and locker allocation',
         };
       case '/admin/users':
         return {
@@ -336,7 +336,7 @@ export const MoaHeader: React.FC<MoaHeaderProps> = ({ onOpenMobileSidebar }) => 
                               className="w-full flex items-center gap-2.5 px-3 py-2 text-left font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-900 rounded-lg transition cursor-pointer"
                             >
                               <Users className="w-4 h-4 text-emerald-700 shrink-0" />
-                              <span>Staff Registrations</span>
+                              <span>Member Directory</span>
                             </button>
 
                             <button

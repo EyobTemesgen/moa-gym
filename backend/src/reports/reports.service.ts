@@ -74,6 +74,121 @@ export class ReportsService {
     };
   }
 
+  async getAttendanceLogs(params: {
+    query?: string;
+    department?: string;
+    status?: string;
+    days?: number;
+    startDate?: string;
+    endDate?: string;
+    page?: number;
+    limit?: number;
+  }) {
+    const page = Math.max(1, params.page || 1);
+    const limit = Math.min(100, Math.max(1, params.limit || 20));
+    const skip = (page - 1) * limit;
+
+    let dateFilter: any = {};
+    if (params.startDate && params.endDate) {
+      dateFilter = {
+        checkInTime: {
+          gte: new Date(params.startDate),
+          lte: new Date(new Date(params.endDate).setHours(23, 59, 59, 999)),
+        },
+      };
+    } else if (params.days !== undefined && params.days > 0) {
+      const since = new Date();
+      since.setDate(since.getDate() - params.days);
+      since.setHours(0, 0, 0, 0);
+      dateFilter = {
+        checkInTime: { gte: since },
+      };
+    }
+
+    const where: any = {
+      ...dateFilter,
+      ...(params.department && params.department !== 'ALL'
+        ? { user: { hrRecord: { department: params.department } } }
+        : {}),
+      ...(params.status === 'ACTIVE'
+        ? { checkOutTime: null }
+        : params.status === 'COMPLETED'
+        ? { checkOutTime: { not: null }, autoClosed: false }
+        : params.status === 'AUTO_CLOSED'
+        ? { autoClosed: true }
+        : {}),
+    };
+
+    if (params.query?.trim()) {
+      const q = params.query.trim();
+      where.OR = [
+        { user: { hrRecord: { fullName: { contains: q, mode: 'insensitive' } } } },
+        { user: { hrRecord: { employeeId: { contains: q, mode: 'insensitive' } } } },
+        { lockerNumber: { contains: q, mode: 'insensitive' } },
+      ];
+    }
+
+    const [total, logs, distinctDepts] = await Promise.all([
+      this.prisma.attendance.count({ where }),
+      this.prisma.attendance.findMany({
+        where,
+        include: {
+          user: {
+            include: { hrRecord: true },
+          },
+        },
+        orderBy: { checkInTime: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.hrEmployeeRoster.findMany({
+        select: { department: true },
+        distinct: ['department'],
+        orderBy: { department: 'asc' },
+      }),
+    ]);
+
+    const items = logs.map((log) => {
+      const checkIn = new Date(log.checkInTime);
+      const checkOut = log.checkOutTime ? new Date(log.checkOutTime) : null;
+      let durationMinutes: number | null = null;
+      if (checkOut) {
+        durationMinutes = Math.max(1, Math.round((checkOut.getTime() - checkIn.getTime()) / 60000));
+      }
+
+      let status = 'COMPLETED';
+      if (!checkOut) {
+        status = 'ACTIVE';
+      } else if (log.autoClosed) {
+        status = 'AUTO_CLOSED';
+      }
+
+      return {
+        id: log.id,
+        userId: log.userId,
+        employeeId: log.user.employeeId,
+        fullName: log.user.hrRecord.fullName,
+        department: log.user.hrRecord.department,
+        photoUrl: log.user.hrRecord.photoUrl,
+        checkInTime: log.checkInTime,
+        checkOutTime: log.checkOutTime,
+        durationMinutes,
+        lockerNumber: log.lockerNumber,
+        autoClosed: log.autoClosed,
+        status,
+      };
+    });
+
+    return {
+      items,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit) || 1,
+      departments: distinctDepts.map((d) => d.department).filter(Boolean),
+    };
+  }
+
   async generateAttendanceCsv(days = 30): Promise<string> {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);

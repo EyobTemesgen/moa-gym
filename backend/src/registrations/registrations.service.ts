@@ -165,6 +165,31 @@ export class RegistrationsService {
     return record;
   }
 
+  async update(
+    id: string,
+    data: {
+      phone?: string;
+      shiftPreference?: string;
+      department?: string;
+      remarks?: string;
+    },
+  ) {
+    const record = await this.prisma.gymRegistration.findUnique({ where: { id } });
+    if (!record) {
+      throw new NotFoundException('Registration record not found');
+    }
+
+    return this.prisma.gymRegistration.update({
+      where: { id },
+      data: {
+        ...(data.phone !== undefined ? { phone: data.phone?.trim() } : {}),
+        ...(data.shiftPreference !== undefined ? { shiftPreference: data.shiftPreference } : {}),
+        ...(data.department !== undefined ? { department: data.department?.trim() } : {}),
+        ...(data.remarks !== undefined ? { remarks: data.remarks?.trim() } : {}),
+      },
+    });
+  }
+
   async updateStatus(id: string, status: string) {
     const record = await this.prisma.gymRegistration.findUnique({ where: { id } });
     if (!record) {

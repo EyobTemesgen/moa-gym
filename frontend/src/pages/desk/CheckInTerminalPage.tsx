@@ -67,6 +67,7 @@ export const CheckInTerminalPage: React.FC = () => {
   const [isVerifying, setIsVerifying] = useState(false);
   const [isCheckingIn, setIsCheckingIn] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [isEnrolling, setIsEnrolling] = useState(false);
   const [cameraActive, setCameraActive] = useState(false);
   const [lastNotification, setLastNotification] = useState<{
     type: 'success' | 'info';
@@ -176,6 +177,54 @@ export const CheckInTerminalPage: React.FC = () => {
       alert(err.message || 'Check-in failed');
     } finally {
       setIsCheckingIn(false);
+    }
+  };
+
+  // Instant Walk-in Registration & Check-in
+  const handleQuickEnrollAndAdmit = async () => {
+    if (!verification?.employee?.employeeId) return;
+    setIsEnrolling(true);
+    try {
+      // 1. Create registration record
+      await apiRequest('/registrations', {
+        method: 'POST',
+        body: JSON.stringify({
+          employeeId: verification.employee.employeeId,
+          fullName: verification.employee.fullName,
+          department: verification.employee.department,
+          shiftPreference: 'FLEXIBLE',
+          phone: verification.employee.emergencyContactPhone || '+251 91 000 0000',
+        }),
+      });
+
+      // 2. Perform check-in immediately
+      const res = await apiRequest<any>('/attendance/check-in', {
+        method: 'POST',
+        body: JSON.stringify({
+          employeeId: verification.employee.employeeId,
+          lockerNumber: selectedLocker || undefined,
+        }),
+      });
+
+      const empName = verification.employee.fullName;
+      const empId = verification.employee.employeeId;
+      const lockerText = res.lockerNumber ? ` · Locker #${res.lockerNumber}` : '';
+
+      setLastNotification({
+        type: 'success',
+        message: `Walk-in staff member ${empName} (${empId}) enrolled & admitted!${lockerText}`,
+      });
+
+      queryClient.invalidateQueries({ queryKey: ['liveOccupancy'] });
+      queryClient.invalidateQueries({ queryKey: ['gymRegistrations'] });
+      setVerification(null);
+      setManualId('');
+      setSelectedLocker('');
+      setTimeout(() => inputRef.current?.focus(), 50);
+    } catch (err: any) {
+      alert(err.message || 'Quick enrollment failed');
+    } finally {
+      setIsEnrolling(false);
     }
   };
 
@@ -574,10 +623,63 @@ export const CheckInTerminalPage: React.FC = () => {
                 </div>
               )}
 
-              {/* ACTION 3: Unregistered Alert */}
+              {/* ACTION 3: Instant Walk-in Registration & Check-in */}
               {verification.status === 'UNREGISTERED' && (
-                <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800">
-                  This employee is active on the MoA HR Roster, but has not yet enrolled in the Gym service. Please direct them to the Admin to complete registration.
+                <div className="space-y-3">
+                  <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 flex items-start gap-2.5">
+                    <UserX className="h-4 w-4 text-amber-700 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold">Active Employee Not Yet Enrolled in Gym</p>
+                      <p className="text-[11px] text-amber-800 mt-0.5">
+                        {verification.employee?.fullName} is verified on the MoA HR Roster. You can enroll and admit them to the floor immediately below.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Optional Locker Assignment */}
+                  <div className="bg-slate-50 border border-slate-200 p-3 rounded-xl space-y-1.5">
+                    <div className="flex items-center justify-between text-xs">
+                      <label className="font-bold text-slate-800 flex items-center gap-1.5">
+                        <Key className="w-3.5 h-3.5 text-amber-600" />
+                        <span>Assign Daily Locker (Optional)</span>
+                      </label>
+                      <span className="text-[11px] font-mono text-slate-500">
+                        {verification.availableLockers?.length ?? 0} available
+                      </span>
+                    </div>
+
+                    <select
+                      value={selectedLocker}
+                      onChange={(e) => setSelectedLocker(e.target.value)}
+                      className="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-[6px] bg-white font-mono text-slate-800 focus:outline-none focus:border-emerald-700 cursor-pointer"
+                    >
+                      <option value="">No Locker / Personal Bag</option>
+                      {(verification.availableLockers || []).map((lock) => (
+                        <option key={lock} value={lock}>
+                          Locker #{lock}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleQuickEnrollAndAdmit}
+                    disabled={isEnrolling}
+                    className="w-full h-11 bg-[#00843D] hover:bg-[#0B6B3A] text-white font-bold text-sm rounded-lg shadow-sm transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  >
+                    {isEnrolling ? (
+                      <>
+                        <RefreshCw className="h-5 w-5 animate-spin" />
+                        <span>Enrolling & Authorizing Entrance...</span>
+                      </>
+                    ) : (
+                      <>
+                        <UserCheck className="h-5 w-5" />
+                        <span>⚡ Instant Enroll & Admit to Gym</span>
+                      </>
+                    )}
+                  </button>
                 </div>
               )}
             </div>

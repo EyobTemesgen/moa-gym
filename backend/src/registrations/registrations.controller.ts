@@ -83,6 +83,19 @@ export class RegistrationsController {
     return this.registrationsService.findOne(id);
   }
 
+  @Patch(':id')
+  @Roles(Role.GYM_ATTENDANT, Role.ADMIN)
+  @ApiOperation({ summary: 'Update gym registration member particulars (phone, shift, remarks)' })
+  async update(
+    @Param('id') id: string,
+    @Body('phone') phone?: string,
+    @Body('shiftPreference') shiftPreference?: string,
+    @Body('department') department?: string,
+    @Body('remarks') remarks?: string,
+  ) {
+    return this.registrationsService.update(id, { phone, shiftPreference, department, remarks });
+  }
+
   @Patch(':id/status')
   @Roles(Role.GYM_ATTENDANT, Role.ADMIN)
   @ApiOperation({ summary: 'Update gym registration membership status' })

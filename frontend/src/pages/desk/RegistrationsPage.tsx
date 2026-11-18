@@ -11,10 +11,14 @@ import {
   Download,
   RotateCcw,
   X,
+  QrCode,
+  Edit3,
 } from 'lucide-react';
 import { RegisterStaffModal } from '../../components/registrations/RegisterStaffModal';
 import { BatchRegisterModal } from '../../components/registrations/BatchRegisterModal';
 import { GymRegistrantsPrintModal } from '../../components/registrations/GymRegistrantsPrintModal';
+import { MemberCardModal } from '../../components/registrations/MemberCardModal';
+import { EditRegistrantModal } from '../../components/registrations/EditRegistrantModal';
 import { SortableHeader, SortDirection } from '../../components/ui/SortableHeader';
 import { usePagination, Pagination } from '../../components/ui/Pagination';
 import { btn, table, statusTone, pill } from '../../components/ui/theme';
@@ -64,6 +68,8 @@ export const RegistrationsPage: React.FC = () => {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [isBatchModalOpen, setIsBatchModalOpen] = useState(false);
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+  const [cardModalRegistrant, setCardModalRegistrant] = useState<Registrant | null>(null);
+  const [editModalRegistrant, setEditModalRegistrant] = useState<Registrant | null>(null);
   const [notification, setNotification] = useState<string | null>(null);
 
   // Fetch Registrations
@@ -443,7 +449,7 @@ export const RegistrationsPage: React.FC = () => {
                   align="center"
                   thClassName="py-2.5 px-3 w-28 text-center"
                 />
-                <th className={table.actionsHead}>Action</th>
+                <th className="sticky right-0 z-[1] bg-slate-100/95 w-44 text-right px-3 py-2.5">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 bg-white">
@@ -534,22 +540,46 @@ export const RegistrationsPage: React.FC = () => {
                       </td>
 
                       {/* Action Cell (Pinned) */}
-                      <td className={table.actionsCell}>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            toggleStatusMutation.mutate({
-                              id: row.id,
-                              status: isActive ? 'SUSPENDED' : 'ACTIVE',
-                            })
-                          }
-                          className={btn.row}
-                          title={isActive ? 'Suspend membership' : 'Activate membership'}
-                        >
-                          <span className={isActive ? 'text-rose-700' : 'text-emerald-700'}>
-                            {isActive ? 'Suspend' : 'Activate'}
-                          </span>
-                        </button>
+                      <td className="sticky right-0 z-[1] bg-white w-44 text-right whitespace-nowrap shadow-[-10px_0_10px_-10px_rgba(15,23,42,0.12)] px-3 py-2.5">
+                        <div className="flex items-center justify-end gap-1.5">
+                          {/* Print Member Pass Card */}
+                          <button
+                            type="button"
+                            onClick={() => setCardModalRegistrant(row)}
+                            className={btn.row}
+                            title="View & Print Member Entry Pass"
+                          >
+                            <QrCode className="w-3.5 h-3.5 text-emerald-700" />
+                            <span className="hidden sm:inline">Pass</span>
+                          </button>
+
+                          {/* Edit Particulars */}
+                          <button
+                            type="button"
+                            onClick={() => setEditModalRegistrant(row)}
+                            className={btn.row}
+                            title="Edit member particulars"
+                          >
+                            <Edit3 className="w-3.5 h-3.5 text-slate-600" />
+                          </button>
+
+                          {/* Suspend / Activate Toggle */}
+                          <button
+                            type="button"
+                            onClick={() =>
+                              toggleStatusMutation.mutate({
+                                id: row.id,
+                                status: isActive ? 'SUSPENDED' : 'ACTIVE',
+                              })
+                            }
+                            className={btn.row}
+                            title={isActive ? 'Suspend membership' : 'Activate membership'}
+                          >
+                            <span className={isActive ? 'text-rose-700' : 'text-emerald-700'}>
+                              {isActive ? 'Suspend' : 'Activate'}
+                            </span>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -592,6 +622,22 @@ export const RegistrationsPage: React.FC = () => {
         items={filteredAndSortedItems}
         totalCount={filteredAndSortedItems.length}
         selectedDepartment={selectedDept}
+      />
+
+      <MemberCardModal
+        isOpen={!!cardModalRegistrant}
+        onClose={() => setCardModalRegistrant(null)}
+        registrant={cardModalRegistrant}
+      />
+
+      <EditRegistrantModal
+        isOpen={!!editModalRegistrant}
+        onClose={() => setEditModalRegistrant(null)}
+        registrant={editModalRegistrant}
+        onSuccess={() => {
+          queryClient.invalidateQueries({ queryKey: ['gymRegistrations'] });
+          setNotification('Member registration details updated successfully.');
+        }}
       />
     </div>
   );

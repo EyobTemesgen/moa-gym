@@ -370,4 +370,45 @@ export class UsersService {
       },
     };
   }
+
+  async changePassword(userId: string, currentPassword?: string, newPassword?: string) {
+    if (!currentPassword || !newPassword) {
+      throw new BadRequestException('Both current and new password are required');
+    }
+
+    const trimmedNew = newPassword.trim();
+    if (trimmedNew.length < 8) {
+      throw new BadRequestException('New password must be at least 8 characters long');
+    }
+    if (!/[A-Za-z]/.test(trimmedNew) || !/[0-9]/.test(trimmedNew)) {
+      throw new BadRequestException('New password must contain both letters and numbers');
+    }
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new NotFoundException('User account not found');
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.passwordHash);
+    if (!isMatch) {
+      throw new BadRequestException('Current password does not match our records');
+    }
+
+    if (currentPassword === trimmedNew) {
+      throw new BadRequestException('New password must be different from your current password');
+    }
+
+    const passwordHash = await bcrypt.hash(trimmedNew, 10);
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash },
+    });
+
+    return {
+      success: true,
+      message: 'Password has been successfully changed.',
+    };
+  }
 }

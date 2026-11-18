@@ -14,7 +14,10 @@ import {
   LayoutDashboard,
   UserCog,
   Settings,
+  KeyRound,
+  Flame,
 } from 'lucide-react';
+import { ChangePasswordModal } from './auth/ChangePasswordModal';
 
 interface SidebarProps {
   collapsed: boolean;
@@ -32,6 +35,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
 
   const isSettingsActive =
     location.pathname === '/registrations' ||
@@ -252,6 +256,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <ShieldCheck className="h-5 w-5 text-moa-gold shrink-0" />
                 {!collapsed && <span className="truncate">Gate Terminal</span>}
               </NavLink>
+
+              {/* 2. Live Floor & Lockers */}
+              <NavLink
+                to="/active-floor"
+                onClick={onCloseMobile}
+                className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition ${
+                  isActive('/active-floor')
+                    ? 'bg-white/20 text-white shadow-xs'
+                    : 'text-white/80 hover:text-white hover:bg-white/10'
+                }`}
+                title={collapsed ? 'Floor & Lockers' : undefined}
+              >
+                {isActive('/active-floor') && <ActiveBar />}
+                <Flame className="h-5 w-5 text-amber-300 shrink-0" />
+                {!collapsed && <span className="truncate">Floor & Lockers</span>}
+              </NavLink>
             </div>
           )}
         </div>
@@ -281,17 +301,34 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </div>
             )}
 
-            <button
-              type="button"
-              onClick={logout}
-              title="Sign out"
-              className="p-1.5 text-white/70 hover:text-red-300 hover:bg-white/10 rounded-lg transition shrink-0 ml-auto cursor-pointer"
-            >
-              <LogOut className="h-4 w-4" />
-            </button>
+            <div className="flex items-center gap-1 shrink-0 ml-auto">
+              <button
+                type="button"
+                onClick={() => setIsChangePasswordOpen(true)}
+                title="Change Password"
+                className="p-1.5 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition cursor-pointer"
+              >
+                <KeyRound className="h-4 w-4" />
+              </button>
+
+              <button
+                type="button"
+                onClick={logout}
+                title="Sign out"
+                className="p-1.5 text-white/70 hover:text-red-300 hover:bg-white/10 rounded-lg transition cursor-pointer"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         </div>
       </aside>
+
+      {/* Change Password Modal */}
+      <ChangePasswordModal
+        isOpen={isChangePasswordOpen}
+        onClose={() => setIsChangePasswordOpen(false)}
+      />
     </>
   );
 };

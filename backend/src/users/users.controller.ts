@@ -12,6 +12,7 @@ import {
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { SubmitWaiverDto } from './dto/waiver.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -40,6 +41,12 @@ export class UsersController {
   @ApiOperation({ summary: 'Generate short-lived rotating JWT entry pass for browser display' })
   async getRotatingQrPass(@Req() req: any) {
     return this.usersService.generateQrPassToken(req.user.id);
+  }
+
+  @Post('me/change-password')
+  @ApiOperation({ summary: 'Change password for currently logged-in user' })
+  async changePassword(@Req() req: any, @Body() dto: ChangePasswordDto) {
+    return this.usersService.changePassword(req.user.id, dto.currentPassword, dto.newPassword);
   }
 
   // --- Admin User Management Endpoints ---

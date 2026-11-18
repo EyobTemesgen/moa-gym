@@ -15,7 +15,7 @@ import {
   Info,
   CheckCircle2,
   Calendar,
-  BookOpen,
+  Video,
   ArrowRight,
   Sparkles,
 } from 'lucide-react';
@@ -335,21 +335,21 @@ export const StaffDashboardPage: React.FC = () => {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <div className="w-8 h-8 rounded-lg bg-sky-700 text-white flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
-                    <BookOpen className="h-4 w-4" />
+                    <Video className="h-4 w-4" />
                   </div>
                   <span className="text-[10px] font-bold text-sky-800 bg-sky-100/80 px-2 py-0.5 rounded-full">
-                    SOP & Videos
+                    🇪🇹 በአማርኛ
                   </span>
                 </div>
                 <h3 className="text-sm font-bold text-slate-900 group-hover:text-sky-800 transition-colors">
-                  Trainee Manuals & Videos
+                  Exercise Video Guides
                 </h3>
                 <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
-                  Official gym handbook, locker rules, equipment safety, and video workouts.
+                  Workout tutorials, equipment form, and desk mobility in Amharic & English.
                 </p>
               </div>
               <div className="mt-3 pt-2 border-t border-sky-100 flex items-center text-xs font-semibold text-sky-800">
-                <span>Open Guide Hub</span>
+                <span>Watch Videos</span>
                 <ArrowRight className="h-3.5 w-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
               </div>
             </Link>

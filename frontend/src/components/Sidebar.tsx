@@ -15,7 +15,7 @@ import {
   Flame,
   LogOut,
   Calendar,
-  BookOpen,
+  Video,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -161,7 +161,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {!collapsed && <span className="truncate">Gym Schedule</span>}
               </NavLink>
 
-              {/* 3. Trainee Guides & Videos */}
+              {/* 3. Exercise Video Guides */}
               <NavLink
                 to="/guides"
                 onClick={onCloseMobile}
@@ -170,11 +170,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     ? 'bg-white/20 text-white shadow-xs'
                     : 'text-white/80 hover:text-white hover:bg-white/10'
                 }`}
-                title={collapsed ? 'Trainee Guides' : undefined}
+                title={collapsed ? 'Exercise Videos' : undefined}
               >
                 {isActive('/guides') && <ActiveBar />}
-                <BookOpen className="h-5 w-5 text-sky-300 shrink-0" />
-                {!collapsed && <span className="truncate">Trainee Guides</span>}
+                <Video className="h-5 w-5 text-sky-300 shrink-0" />
+                {!collapsed && <span className="truncate">Exercise Videos</span>}
               </NavLink>
             </div>
           )}
@@ -214,7 +214,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {!collapsed && <span className="truncate">Gym Schedule</span>}
               </NavLink>
 
-              {/* 3. Trainee Guides */}
+              {/* 3. Exercise Videos */}
               <NavLink
                 to="/guides"
                 onClick={onCloseMobile}
@@ -223,11 +223,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     ? 'bg-white/20 text-white shadow-xs'
                     : 'text-white/80 hover:text-white hover:bg-white/10'
                 }`}
-                title={collapsed ? 'Trainee Guides' : undefined}
+                title={collapsed ? 'Exercise Videos' : undefined}
               >
                 {isActive('/guides') && <ActiveBar />}
-                <BookOpen className="h-5 w-5 text-sky-300 shrink-0" />
-                {!collapsed && <span className="truncate">Trainee Guides</span>}
+                <Video className="h-5 w-5 text-sky-300 shrink-0" />
+                {!collapsed && <span className="truncate">Exercise Videos</span>}
               </NavLink>
 
               {/* 4. Reports */}
@@ -359,7 +359,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {!collapsed && <span className="truncate">Gym Schedule</span>}
               </NavLink>
 
-              {/* 4. Trainee Guides */}
+              {/* 4. Exercise Videos */}
               <NavLink
                 to="/guides"
                 onClick={onCloseMobile}
@@ -368,11 +368,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     ? 'bg-white/20 text-white shadow-xs'
                     : 'text-white/80 hover:text-white hover:bg-white/10'
                 }`}
-                title={collapsed ? 'Trainee Guides' : undefined}
+                title={collapsed ? 'Exercise Videos' : undefined}
               >
                 {isActive('/guides') && <ActiveBar />}
-                <BookOpen className="h-5 w-5 text-sky-300 shrink-0" />
-                {!collapsed && <span className="truncate">Trainee Guides</span>}
+                <Video className="h-5 w-5 text-sky-300 shrink-0" />
+                {!collapsed && <span className="truncate">Exercise Videos</span>}
               </NavLink>
             </div>
           )}

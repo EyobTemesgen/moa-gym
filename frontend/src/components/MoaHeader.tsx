@@ -113,8 +113,8 @@ export const MoaHeader: React.FC<MoaHeaderProps> = ({ onOpenMobileSidebar }) => 
         };
       case '/guides':
         return {
-          title: 'Trainee Guides & Videos',
-          subtitle: 'Official gym handbook, equipment safety SOP, and video tutorials',
+          title: 'Exercise Video Guides',
+          subtitle: 'Guided workout and exercise tutorials in Amharic and English',
         };
       default:
         return {

@@ -17,7 +17,7 @@ import {
   UserCog,
 } from 'lucide-react';
 import { StatCard } from '../../components/ui/StatCard';
-import { btn, pill, statusTone } from '../../components/ui/theme';
+import { btn } from '../../components/ui/theme';
 
 interface DashboardStats {
   totalRegistered: number;
@@ -367,101 +367,6 @@ export const AdminDashboardPage: React.FC = () => {
               </Link>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Bottom Section: Recent Registrations Table */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-        <div className="p-5 border-b border-slate-200 flex items-center justify-between">
-          <div>
-            <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-              <Users className="h-4 w-4 text-[#00843D]" />
-              Recent Staff Registrations
-            </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Latest ministry staff members enrolled into the gym program
-            </p>
-          </div>
-
-          <Link
-            to="/registrations"
-            className="text-xs font-semibold text-emerald-700 hover:text-emerald-900 inline-flex items-center gap-1"
-          >
-            <span>View All Registrations</span>
-            <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-[13px]">
-            <thead className="bg-slate-50/80 border-b border-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider">
-              <tr>
-                <th className="py-2.5 px-4">Full Name</th>
-                <th className="py-2.5 px-4">Directorate</th>
-                <th className="py-2.5 px-3.5">Employee ID</th>
-                <th className="py-2.5 px-3.5">Shift Preference</th>
-                <th className="py-2.5 px-3.5">Registration Date</th>
-                <th className="py-2.5 px-3 text-center">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 bg-white">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={6} className="py-12 text-center text-slate-400 text-xs">
-                    Loading recent registrations...
-                  </td>
-                </tr>
-              ) : !stats?.recentRegistrations || stats.recentRegistrations.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="py-12 text-center text-slate-400 text-xs">
-                    No registrations recorded yet.
-                  </td>
-                </tr>
-              ) : (
-                stats.recentRegistrations.map((row) => (
-                  <tr key={row.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="py-2.5 px-4">
-                      <div className="flex items-center gap-2.5">
-                        {row.hrRecord?.photoUrl ? (
-                          <img
-                            src={row.hrRecord.photoUrl}
-                            alt={row.fullName}
-                            className="h-7 w-7 rounded-full object-cover ring-1 ring-slate-200 shrink-0"
-                          />
-                        ) : (
-                          <div className="h-7 w-7 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs shrink-0">
-                            {row.fullName.charAt(0)}
-                          </div>
-                        )}
-                        <span className="font-bold text-slate-900 truncate">{row.fullName}</span>
-                      </div>
-                    </td>
-                    <td className="py-2.5 px-4 font-semibold text-slate-700">{row.department}</td>
-                    <td className="py-2.5 px-3.5">
-                      <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
-                        {row.employeeId}
-                      </span>
-                    </td>
-                    <td className="py-2.5 px-3.5 text-xs text-slate-600">
-                      {row.shiftPreference || 'Flexible'}
-                    </td>
-                    <td className="py-2.5 px-3.5 text-slate-500 font-mono text-[11px]">
-                      {new Date(row.registeredAt).toLocaleDateString('en-GB')}
-                    </td>
-                    <td className="py-2.5 px-3 text-center">
-                      <span
-                        className={`${pill} ${
-                          row.status === 'ACTIVE' ? statusTone.active : statusTone.suspended
-                        }`}
-                      >
-                        {row.status === 'ACTIVE' ? 'Active' : 'Suspended'}
-                      </span>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
         </div>
       </div>
     </div>

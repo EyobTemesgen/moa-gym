@@ -385,7 +385,7 @@ export const CheckInTerminalPage: React.FC = () => {
                     Fast Lane Gate Check
                   </span>
                   <h2 className="text-base sm:text-lg font-bold text-slate-900">
-                    Ask Arriving Staff for Employee ID
+                    Verify Member Entrance
                   </h2>
                 </div>
                 <span className="text-[11px] font-mono text-slate-400 bg-slate-100 px-2.5 py-1 rounded-md">
@@ -404,7 +404,7 @@ export const CheckInTerminalPage: React.FC = () => {
                     type="text"
                     value={manualId}
                     onChange={(e) => setManualId(e.target.value)}
-                    placeholder="Type Employee ID (e.g. EMP-MOA-001) or Full Name..."
+                    placeholder="Scan QR, or enter Pass Code, Employee ID, Name, or Phone..."
                     className="w-full pl-11 pr-24 py-3 bg-slate-50 border-2 border-slate-300 hover:border-emerald-600 focus:border-[#00843D] focus:bg-white rounded-lg text-sm sm:text-base font-mono text-slate-900 placeholder-slate-400 focus:outline-none transition-all shadow-inner"
                   />
                   {manualId && (

@@ -102,25 +102,52 @@ export class AttendanceService {
       };
     }
 
-    // Step 1.5: Match against Gym Registration (Supports Reg # ተ.ቁ, Employee ID, or Staff Name)
-    const asNum = parseInt(employeeId, 10);
-    const gymReg = await this.prisma.gymRegistration.findFirst({
+    // Step 1.5: Match against Gym Registration & User Accounts
+    // Supports: QR Token, Employee ID, Pass Code, Reg # (e.g. REG-0012 or 12), Staff Name, Username, Phone
+    const cleanSearch = employeeId.trim();
+    const asNum = parseInt(cleanSearch, 10);
+    const regMatch = cleanSearch.match(/^REG-?(\d+)$/i);
+    const parsedRegNum = regMatch ? parseInt(regMatch[1], 10) : (!isNaN(asNum) ? asNum : null);
+    const digitsOnly = cleanSearch.replace(/[\s-]/g, '');
+
+    let gymReg = await this.prisma.gymRegistration.findFirst({
       where: {
         OR: [
-          { employeeId: { equals: employeeId, mode: 'insensitive' } },
-          ...(isNaN(asNum) ? [] : [{ regNumber: asNum }]),
-          { fullName: { contains: employeeId, mode: 'insensitive' } },
+          { employeeId: { equals: cleanSearch, mode: 'insensitive' } },
+          ...(parsedRegNum !== null ? [{ regNumber: parsedRegNum }] : []),
+          { fullName: { contains: cleanSearch, mode: 'insensitive' } },
+          ...(digitsOnly.length >= 7 ? [{ phone: { contains: digitsOnly } }] : []),
+          { email: { equals: cleanSearch, mode: 'insensitive' } },
         ],
       },
     });
 
     if (gymReg) {
       employeeId = gymReg.employeeId;
+    } else {
+      // Check if identifier matches a registered user's username
+      const matchedUser = await this.prisma.user.findFirst({
+        where: {
+          OR: [
+            { username: { equals: cleanSearch, mode: 'insensitive' } },
+            { employeeId: { equals: cleanSearch, mode: 'insensitive' } },
+          ],
+        },
+      });
+      if (matchedUser) {
+        employeeId = matchedUser.employeeId;
+      }
     }
 
-    // Step 2: HR Whitelist Check
-    let hrRecord = await this.prisma.hrEmployeeRoster.findUnique({
-      where: { employeeId },
+    // Step 2: HR Whitelist Check (by exact employeeId or matching name/phone)
+    let hrRecord = await this.prisma.hrEmployeeRoster.findFirst({
+      where: {
+        OR: [
+          { employeeId: { equals: employeeId, mode: 'insensitive' } },
+          { fullName: { contains: cleanSearch, mode: 'insensitive' } },
+          ...(digitsOnly.length >= 7 ? [{ phone: { contains: digitsOnly } }] : []),
+        ],
+      },
       include: {
         userAccount: {
           include: {
@@ -160,7 +187,7 @@ export class AttendanceService {
       return {
         status: 'DENIED' as GateVerificationStatus,
         reason: 'NOT_FOUND_IN_ROSTER',
-        message: `Employee "${dto.employeeId}" was not found in the gym registration roster or HR staff records.`,
+        message: `Member "${dto.employeeId || dto.qrToken || 'entered'}" was not found in the gym registration roster or HR staff records.`,
       };
     }
 

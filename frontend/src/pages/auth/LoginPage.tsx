@@ -120,6 +120,18 @@ export const LoginPage: React.FC = () => {
     setPassword('Password123!');
   };
 
+  // Only expose quick demo credentials on local development / localhost testing
+  // Strictly hidden in all production, staging, or intranet server deployments (e.g. gym.moa.gov.et / 10.10.20.x)
+  const isLocalHost =
+    typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1' ||
+      window.location.hostname.endsWith('.local'));
+
+  const showDemoCredentials =
+    (import.meta.env.DEV || (isLocalHost && import.meta.env.VITE_SHOW_DEMO_LOGINS !== 'false')) &&
+    import.meta.env.VITE_HIDE_DEMO_LOGINS !== 'true';
+
   return (
     <div className="min-h-[80vh] flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full bg-white rounded-2xl border border-slate-200 shadow-md p-8">
@@ -227,35 +239,42 @@ export const LoginPage: React.FC = () => {
           </Link>
         </div>
 
-        {/* Demo Fast Login Helpers */}
-        <div className="mt-6 bg-slate-50 rounded-xl p-3 border border-slate-200/80">
-          <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2">
-            Demo Credentials (1-Click Fill)
-          </p>
-          <div className="grid grid-cols-3 gap-1.5 text-[10px]">
-            <button
-              type="button"
-              onClick={() => handleQuickLogin('EMP-ADM-01')}
-              className="px-2 py-1.5 bg-white border border-slate-200 rounded text-slate-700 hover:border-moa-green font-medium cursor-pointer"
-            >
-              Admin
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickLogin('EMP-DSK-01')}
-              className="px-2 py-1.5 bg-white border border-slate-200 rounded text-slate-700 hover:border-moa-green font-medium cursor-pointer"
-            >
-              Attendant
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickLogin('EMP-MOA-001')}
-              className="px-2 py-1.5 bg-white border border-slate-200 rounded text-slate-700 hover:border-moa-green font-medium cursor-pointer"
-            >
-              Staff Member
-            </button>
+        {/* Demo Fast Login Helpers - ONLY displayed in local development/localhost environments */}
+        {showDemoCredentials && (
+          <div className="mt-6 bg-slate-50 rounded-xl p-3 border border-slate-200/80">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                Demo Credentials (1-Click Fill)
+              </p>
+              <span className="text-[9px] font-mono font-bold text-amber-700 bg-amber-100/80 px-1.5 py-0.5 rounded">
+                Local Only
+              </span>
+            </div>
+            <div className="grid grid-cols-3 gap-1.5 text-[10px]">
+              <button
+                type="button"
+                onClick={() => handleQuickLogin('EMP-ADM-01')}
+                className="px-2 py-1.5 bg-white border border-slate-200 rounded text-slate-700 hover:border-moa-green font-medium cursor-pointer"
+              >
+                Admin
+              </button>
+              <button
+                type="button"
+                onClick={() => handleQuickLogin('EMP-DSK-01')}
+                className="px-2 py-1.5 bg-white border border-slate-200 rounded text-slate-700 hover:border-moa-green font-medium cursor-pointer"
+              >
+                Attendant
+              </button>
+              <button
+                type="button"
+                onClick={() => handleQuickLogin('EMP-MOA-001')}
+                className="px-2 py-1.5 bg-white border border-slate-200 rounded text-slate-700 hover:border-moa-green font-medium cursor-pointer"
+              >
+                Staff Member
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* ─── Change / Reset Password Modal (ATS standard) ─── */}

@@ -34,6 +34,7 @@ export interface RegisterStaffPayload {
   paymentMethod?: string;
   emergencyContactName?: string;
   emergencyContactPhone?: string;
+  photoUrl?: string;
 }
 
 export interface RegistrationResult {

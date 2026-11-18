@@ -24,6 +24,10 @@ import {
   CreditCard,
   Check,
   Video,
+  Camera,
+  Upload,
+  X,
+  RefreshCw,
 } from 'lucide-react';
 
 interface LockerItem {
@@ -62,6 +66,12 @@ export const DedicatedSignUpPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+
+  // Profile Photo (Camera or File Upload)
+  const [photoUrl, setPhotoUrl] = useState<string>('');
+  const [webcamActive, setWebcamActive] = useState<boolean>(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const videoRef = React.useRef<HTMLVideoElement>(null);
 
   // Step 2: Schedule & Fee
   const [shiftPreference, setShiftPreference] = useState<'MORNING' | 'EVENING'>('MORNING');
@@ -120,6 +130,85 @@ export const DedicatedSignUpPage: React.FC = () => {
       setPaymentMethod('TELEBIRR');
     }
   }, [memberType]);
+
+  // Clean up webcam stream on unmount
+  useEffect(() => {
+    return () => {
+      stopWebcam();
+    };
+  }, []);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload an image file (PNG, JPG, JPEG, WEBP).');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const minDim = Math.min(img.width, img.height);
+        const startX = (img.width - minDim) / 2;
+        const startY = (img.height - minDim) / 2;
+
+        canvas.width = 250;
+        canvas.height = 250;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, startX, startY, minDim, minDim, 0, 0, 250, 250);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+          setPhotoUrl(dataUrl);
+        }
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const startWebcam = async () => {
+    setWebcamActive(true);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: 350, height: 350, facingMode: 'user' },
+      });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+      }
+    } catch (err) {
+      console.warn('Webcam failed to start:', err);
+      setWebcamActive(false);
+      alert('Unable to access camera. Please check camera permissions or upload a photo from your device.');
+    }
+  };
+
+  const stopWebcam = () => {
+    if (videoRef.current?.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      stream.getTracks().forEach((track) => track.stop());
+      videoRef.current.srcObject = null;
+    }
+    setWebcamActive(false);
+  };
+
+  const captureWebcamPhoto = () => {
+    if (!videoRef.current) return;
+    const canvas = document.createElement('canvas');
+    canvas.width = 250;
+    canvas.height = 250;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.drawImage(videoRef.current, 0, 0, 250, 250);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      setPhotoUrl(dataUrl);
+    }
+    stopWebcam();
+  };
 
   // Day toggle
   const toggleDay = (dayKey: string) => {
@@ -221,6 +310,7 @@ export const DedicatedSignUpPage: React.FC = () => {
         lockerNumber: wantsLocker && selectedLocker ? selectedLocker : undefined,
         monthlyFee,
         paymentMethod,
+        photoUrl: photoUrl.trim() || undefined,
       };
 
       const result = await registerStaff(payload);
@@ -311,6 +401,118 @@ export const DedicatedSignUpPage: React.FC = () => {
                   <span>External Member</span>
                 </button>
               </div>
+            </div>
+
+            {/* Member Profile Photo Section (Take with Camera or Attach Photo) */}
+            <div className="bg-slate-50 border border-slate-200/90 rounded-xl p-3 sm:p-3.5 space-y-2.5">
+              <div className="flex items-center gap-3.5">
+                <div className="relative shrink-0">
+                  {photoUrl ? (
+                    <img
+                      src={photoUrl}
+                      alt="Profile Preview"
+                      className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl object-cover ring-2 ring-[#00843D] shadow-xs"
+                    />
+                  ) : (
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-emerald-100/80 text-[#00843D] flex items-center justify-center font-bold text-xl border border-emerald-200 shadow-2xs">
+                      <User className="w-7 h-7 sm:w-8 sm:h-8 text-[#00843D]" />
+                    </div>
+                  )}
+                  {photoUrl && (
+                    <span className="absolute -bottom-1 -right-1 p-0.5 bg-[#00843D] text-white rounded-full shadow-2xs">
+                      <Check className="w-3 h-3" />
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-slate-900 text-xs">
+                      Profile Photo
+                    </span>
+                    <span className="text-[10px] font-semibold text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded-full">
+                      Pass & Gate Verification
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-0.5">
+                    Take a live photo with your camera or attach an image from your device.
+                  </p>
+
+                  <div className="flex items-center gap-2 mt-2 flex-wrap">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={webcamActive ? stopWebcam : startWebcam}
+                      className="px-2.5 py-1 text-xs font-semibold text-white bg-[#00843D] hover:bg-[#0B6B3A] rounded-[6px] shadow-xs transition cursor-pointer flex items-center gap-1.5"
+                    >
+                      <Camera className="w-3.5 h-3.5" />
+                      <span>{webcamActive ? 'Cancel Camera' : 'Take with Camera'}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="px-2.5 py-1 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 rounded-[6px] shadow-2xs transition cursor-pointer flex items-center gap-1.5"
+                    >
+                      <Upload className="w-3.5 h-3.5 text-slate-500" />
+                      <span>Attach Photo</span>
+                    </button>
+
+                    {photoUrl && (
+                      <button
+                        type="button"
+                        onClick={() => setPhotoUrl('')}
+                        className="text-xs text-rose-600 hover:text-rose-800 hover:underline cursor-pointer ml-1"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Webcam Live Capture Viewfinder */}
+              {webcamActive && (
+                <div className="p-3 bg-slate-900 rounded-xl flex flex-col items-center gap-2.5 text-white animate-fadeIn">
+                  <div className="text-xs font-semibold flex items-center gap-1.5 text-emerald-400">
+                    <Camera className="w-3.5 h-3.5" />
+                    <span>Live Camera Viewfinder</span>
+                  </div>
+                  <div className="relative w-44 h-44 rounded-xl overflow-hidden border-2 border-emerald-500/50 shadow-inner bg-black">
+                    <video
+                      ref={videoRef}
+                      autoPlay
+                      playsInline
+                      muted
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <button
+                      type="button"
+                      onClick={captureWebcamPhoto}
+                      className="px-4 py-1.5 bg-[#00843D] hover:bg-[#0B6B3A] text-white text-xs font-bold rounded-[6px] shadow-xs cursor-pointer flex items-center gap-1.5"
+                    >
+                      <Camera className="w-3.5 h-3.5" />
+                      <span>Capture Photo</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={stopWebcam}
+                      className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold rounded-[6px] cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* First Name & Last Name (2 Cols) */}
@@ -806,6 +1008,19 @@ export const DedicatedSignUpPage: React.FC = () => {
 
             {/* Summary Credentials Card */}
             <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200 text-left space-y-2.5 text-xs">
+              {(photoUrl || registrationResult.user?.photoUrl) && (
+                <div className="flex items-center gap-3 pb-2.5 border-b border-slate-200/80">
+                  <img
+                    src={photoUrl || registrationResult.user?.photoUrl}
+                    alt="Member"
+                    className="w-12 h-12 rounded-xl object-cover ring-2 ring-[#00843D] shadow-xs shrink-0"
+                  />
+                  <div>
+                    <div className="font-bold text-slate-900 text-xs">{registrationResult.user?.fullName}</div>
+                    <div className="text-[11px] text-emerald-800 font-medium">Digital Gate Pass Photo Attached</div>
+                  </div>
+                </div>
+              )}
               <div className="flex items-center justify-between pb-2 border-b border-slate-200/80">
                 <span className="text-slate-500">Official Reg Number:</span>
                 <span className="font-mono font-bold text-emerald-800 text-sm">

@@ -504,6 +504,7 @@ export class AuthService {
             department: departmentName,
             phone: phone || '+251 90 000 0000',
             email,
+            photoUrl: dto.photoUrl?.trim() || null,
             employmentStatus: EmploymentStatus.ACTIVE,
           },
         });
@@ -513,6 +514,7 @@ export class AuthService {
           data: {
             email,
             ...(phone ? { phone } : {}),
+            ...(dto.photoUrl?.trim() ? { photoUrl: dto.photoUrl.trim() } : {}),
           },
         });
       }

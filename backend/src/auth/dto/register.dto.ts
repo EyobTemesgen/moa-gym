@@ -103,4 +103,9 @@ export class RegisterStaffDto {
   @IsOptional()
   @IsString()
   emergencyContactPhone?: string;
+
+  @ApiProperty({ description: 'Member profile photo (base64 data URL or image link)', required: false })
+  @IsOptional()
+  @IsString()
+  photoUrl?: string;
 }

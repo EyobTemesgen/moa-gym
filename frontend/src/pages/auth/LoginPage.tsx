@@ -221,9 +221,9 @@ export const LoginPage: React.FC = () => {
           </p>
           <Link
             to="/claim"
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-moa-green hover:text-moa-green-dark transition bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-moa-green hover:text-moa-green-dark transition bg-emerald-50 px-3.5 py-1.5 rounded-lg border border-emerald-200"
           >
-            Self-Register & Activate Gym Pass →
+            Sign Up →
           </Link>
         </div>
 

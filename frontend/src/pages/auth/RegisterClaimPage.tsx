@@ -158,7 +158,7 @@ export const RegisterClaimPage: React.FC = () => {
         <div className="text-center mb-6">
           <MoaLogo className="mx-auto h-14 w-14 mb-2.5" size={56} />
           <h2 className="text-xl font-bold text-slate-900 tracking-tight">
-            MoA Gym Self-Registration
+            Sign Up for MoA Gym
           </h2>
           <p className="text-xs text-slate-500 mt-1">
             Staff Wellness & Fitness Access
@@ -321,7 +321,7 @@ export const RegisterClaimPage: React.FC = () => {
 
             <div className="text-center pt-4 mt-2">
               <Link to="/login" className="text-xs text-slate-600 hover:text-moa-green">
-                Already registered? Sign in instead →
+                Already registered? Sign in →
               </Link>
             </div>
           </div>
@@ -410,7 +410,7 @@ export const RegisterClaimPage: React.FC = () => {
               disabled={isSubmitting}
               className="w-full py-2.5 px-4 bg-moa-green hover:bg-moa-green-dark text-white text-xs font-semibold rounded-lg shadow-sm transition flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
             >
-              {isSubmitting ? 'Activating Account...' : 'Activate & Generate Gym Pass'}
+              {isSubmitting ? 'Signing Up...' : 'Sign Up & Activate Gym Pass'}
               <ArrowRight className="h-4 w-4" />
             </button>
           </form>

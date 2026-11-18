@@ -237,13 +237,13 @@ export const LoginPage: React.FC = () => {
 
         <div className="mt-6 pt-5 border-t border-slate-100 text-center">
           <p className="text-xs text-slate-600 mb-2">
-            First time using the Gym? (አዲስ ተመዝጋቢ?)
+            Don't have an account?
           </p>
           <Link
             to="/register"
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-moa-green hover:text-moa-green-dark transition bg-emerald-50 px-3.5 py-1.5 rounded-lg border border-emerald-200"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-moa-green hover:text-[#0B6B3A] transition bg-emerald-50 hover:bg-emerald-100/70 px-4 py-2 rounded-lg border border-emerald-200 shadow-2xs"
           >
-            Create Account & Self-Register →
+            Sign Up →
           </Link>
         </div>
 

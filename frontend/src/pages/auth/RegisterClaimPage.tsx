@@ -227,14 +227,14 @@ export const RegisterClaimPage: React.FC = () => {
               <form onSubmit={handleNameLookup} className="space-y-4">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Your Full Name (ሙሉ ስም)
+                    Your Full Name
                   </label>
                   <input
                     type="text"
                     required
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    placeholder="e.g. Aster Mengistu or አበበ ከበደ"
+                    placeholder="e.g. Aster Mengistu"
                     className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-moa-green/30 focus:border-moa-green"
                   />
                   <p className="text-[11px] text-slate-400 mt-1">
@@ -244,7 +244,7 @@ export const RegisterClaimPage: React.FC = () => {
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Directorate / የስራ አስፈፃሚ ክፍል
+                    Directorate / Department
                   </label>
                   <div className="relative">
                     <select
@@ -252,7 +252,7 @@ export const RegisterClaimPage: React.FC = () => {
                       onChange={(e) => setSelectedDept(e.target.value)}
                       className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-moa-green/30 focus:border-moa-green bg-white"
                     >
-                      <option value="ALL">All Directorates / ሁሉም ክፍሎች</option>
+                      <option value="ALL">All Directorates</option>
                       {departments.map((dept) => (
                         <option key={dept} value={dept}>
                           {dept}
@@ -366,16 +366,16 @@ export const RegisterClaimPage: React.FC = () => {
 
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Preferred Workout Shift / የሰዓት ምርጫ
+                Preferred Workout Shift
               </label>
               <select
                 value={shiftPreference}
                 onChange={(e) => setShiftPreference(e.target.value)}
                 className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-moa-green/30 focus:border-moa-green bg-white font-medium"
               >
-                <option value="MORNING">ጠዋት / Morning (ከማለዳው 11:00 – 1:30 / 5:00 – 7:30 AM)</option>
-                <option value="EVENING">ማታ / Evening (ከ11:30 – ምሽት 3:00 / 5:30 – 9:00 PM)</option>
-                <option value="ANY">Flexible / ማንኛውም ሰዓት</option>
+                <option value="MORNING">Morning Shift (5:00 AM – 7:30 AM)</option>
+                <option value="EVENING">Evening Shift (5:30 PM – 9:00 PM)</option>
+                <option value="ANY">Flexible Shift</option>
               </select>
             </div>
 

@@ -32,12 +32,12 @@ interface LockerItem {
 }
 
 const WEEK_DAYS = [
-  { key: 'MON', name: 'Monday', amharic: 'ሰኞ' },
-  { key: 'TUE', name: 'Tuesday', amharic: 'ማክሰኞ' },
-  { key: 'WED', name: 'Wednesday', amharic: 'ረቡዕ' },
-  { key: 'THU', name: 'Thursday', amharic: 'ሐሙስ' },
-  { key: 'FRI', name: 'Friday', amharic: 'ዓርብ' },
-  { key: 'SAT', name: 'Saturday', amharic: 'ቅዳሜ' },
+  { key: 'MON', name: 'Mon', fullName: 'Monday' },
+  { key: 'TUE', name: 'Tue', fullName: 'Tuesday' },
+  { key: 'WED', name: 'Wed', fullName: 'Wednesday' },
+  { key: 'THU', name: 'Thu', fullName: 'Thursday' },
+  { key: 'FRI', name: 'Fri', fullName: 'Friday' },
+  { key: 'SAT', name: 'Sat', fullName: 'Saturday' },
 ];
 
 export const DedicatedSignUpPage: React.FC = () => {
@@ -247,7 +247,7 @@ export const DedicatedSignUpPage: React.FC = () => {
           MoA Wellness & Fitness Center
         </h1>
         <span className="text-[11px] text-emerald-200/80 font-medium hidden sm:inline">
-          · የግብርና ሚኒስቴር
+          · Ministry of Agriculture
         </span>
       </div>
 
@@ -256,10 +256,10 @@ export const DedicatedSignUpPage: React.FC = () => {
         {/* Step Progress Indicators */}
         <div className="mb-3">
           <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500 mb-1">
-            <span className={step >= 1 ? 'text-emerald-700 font-bold' : ''}>1. መለያ / Profile</span>
-            <span className={step >= 2 ? 'text-emerald-700 font-bold' : ''}>2. ሰዓትና ክፍያ / Schedule & Fee</span>
-            <span className={step >= 3 ? 'text-emerald-700 font-bold' : ''}>3. ሎከር / Locker</span>
-            <span className={step >= 4 ? 'text-emerald-700 font-bold' : ''}>4. ማጠቃለያ / Done</span>
+            <span className={step >= 1 ? 'text-emerald-700 font-bold' : ''}>1. Profile</span>
+            <span className={step >= 2 ? 'text-emerald-700 font-bold' : ''}>2. Schedule & Fee</span>
+            <span className={step >= 3 ? 'text-emerald-700 font-bold' : ''}>3. Locker</span>
+            <span className={step >= 4 ? 'text-emerald-700 font-bold' : ''}>4. Complete</span>
           </div>
           <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden flex">
             <div
@@ -277,7 +277,7 @@ export const DedicatedSignUpPage: React.FC = () => {
           </div>
         )}
 
-        {/* STEP 1: ACCOUNT CREATION (Matching User's Reference Screenshot) */}
+        {/* STEP 1: ACCOUNT CREATION */}
         {step === 1 && (
           <form onSubmit={handleProceedToStep2} className="space-y-3">
             <div className="flex items-center justify-between border-b border-slate-100 pb-2 mb-1">
@@ -288,7 +288,7 @@ export const DedicatedSignUpPage: React.FC = () => {
             {/* Member Category Segmented Toggle */}
             <div className="space-y-1">
               <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider">
-                Membership Category / የአባልነት ዓይነት <span className="text-red-500">*</span>
+                Membership Category <span className="text-red-500">*</span>
               </label>
               <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-xl">
                 <button
@@ -301,7 +301,7 @@ export const DedicatedSignUpPage: React.FC = () => {
                   }`}
                 >
                   <Building2 className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>MoA Staff (የሚኒስቴር ሰራተኛ)</span>
+                  <span>MoA Staff Member</span>
                 </button>
                 <button
                   type="button"
@@ -313,7 +313,7 @@ export const DedicatedSignUpPage: React.FC = () => {
                   }`}
                 >
                   <Globe className="w-3.5 h-3.5 text-teal-600" />
-                  <span>External Member (ውጫዊ ተጠቃሚ)</span>
+                  <span>External Member</span>
                 </button>
               </div>
             </div>
@@ -351,7 +351,7 @@ export const DedicatedSignUpPage: React.FC = () => {
             {/* Username */}
             <div>
               <label className="block text-xs font-medium text-slate-700 mb-1">
-                Username / መለያ ስም <span className="text-red-500">*</span>
+                Username <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -366,7 +366,7 @@ export const DedicatedSignUpPage: React.FC = () => {
             {/* Email */}
             <div>
               <label className="block text-xs font-medium text-slate-700 mb-1">
-                Email / ኢሜይል <span className="text-red-500">*</span>
+                Email Address <span className="text-red-500">*</span>
               </label>
               <input
                 type="email"
@@ -382,7 +382,7 @@ export const DedicatedSignUpPage: React.FC = () => {
             {memberType === 'INTERNAL' ? (
               <div>
                 <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Department / የስራ ክፍል <span className="text-red-500">*</span>
+                  Directorate / Department <span className="text-red-500">*</span>
                 </label>
                 <select
                   required
@@ -390,7 +390,7 @@ export const DedicatedSignUpPage: React.FC = () => {
                   onChange={(e) => setDepartment(e.target.value)}
                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all"
                 >
-                  <option value="">Select your department...</option>
+                  <option value="">Select your directorate / department...</option>
                   {departments.map((dept) => (
                     <option key={dept} value={dept}>
                       {dept}
@@ -404,7 +404,7 @@ export const DedicatedSignUpPage: React.FC = () => {
             ) : (
               <div>
                 <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Organization / ተቋም ወይም ድርጅት <span className="text-red-500">*</span>
+                  Organization / Institution <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -421,7 +421,7 @@ export const DedicatedSignUpPage: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-medium text-slate-700 mb-1">
-                  {memberType === 'INTERNAL' ? 'Employee ID (የሰራተኛ መለያ)' : 'National / Kebele ID'}
+                  {memberType === 'INTERNAL' ? 'Employee ID' : 'National / Kebele ID'}
                 </label>
                 <input
                   type="text"
@@ -433,7 +433,7 @@ export const DedicatedSignUpPage: React.FC = () => {
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Phone / ስልክ ቁጥር
+                  Phone Number
                 </label>
                 <input
                   type="tel"
@@ -520,7 +520,7 @@ export const DedicatedSignUpPage: React.FC = () => {
             {/* Shift Preference Selector */}
             <div className="space-y-2">
               <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
-                Workout Shift / የጂም ፈረቃ <span className="text-red-500">*</span>
+                Workout Shift <span className="text-red-500">*</span>
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button
@@ -536,9 +536,9 @@ export const DedicatedSignUpPage: React.FC = () => {
                     <Clock className="w-5 h-5" />
                   </div>
                   <div>
-                    <div className="text-xs font-bold text-slate-900">ጠዋት / Morning Shift</div>
-                    <div className="text-xs text-emerald-700 font-semibold mt-0.5">06:00 AM – 08:30 AM</div>
-                    <div className="text-[11px] text-slate-500 mt-0.5">ከቢሮ ሰዓት በፊት / Pre-work cardio & power</div>
+                    <div className="text-xs font-bold text-slate-900">Morning Shift</div>
+                    <div className="text-xs text-emerald-700 font-semibold mt-0.5">05:00 AM – 07:30 AM</div>
+                    <div className="text-[11px] text-slate-500 mt-0.5">Pre-work fitness & power training</div>
                   </div>
                 </button>
 
@@ -555,9 +555,9 @@ export const DedicatedSignUpPage: React.FC = () => {
                     <Calendar className="w-5 h-5" />
                   </div>
                   <div>
-                    <div className="text-xs font-bold text-slate-900">ማታ / Evening Shift</div>
-                    <div className="text-xs text-teal-700 font-semibold mt-0.5">05:00 PM – 08:00 PM</div>
-                    <div className="text-[11px] text-slate-500 mt-0.5">ከስራ ሰዓት በኋላ / Post-work conditioning</div>
+                    <div className="text-xs font-bold text-slate-900">Evening Shift</div>
+                    <div className="text-xs text-teal-700 font-semibold mt-0.5">05:30 PM – 09:00 PM</div>
+                    <div className="text-[11px] text-slate-500 mt-0.5">Post-work fitness & conditioning</div>
                   </div>
                 </button>
               </div>
@@ -567,10 +567,10 @@ export const DedicatedSignUpPage: React.FC = () => {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider">
-                  Target Workout Days / በሳምንት የሚሰሩባቸው ቀናት
+                  Target Workout Days
                 </label>
                 <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-100">
-                  {daysPerWeek} ቀናት / {daysPerWeek} days/week
+                  {daysPerWeek} days / week
                 </span>
               </div>
               <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
@@ -587,7 +587,7 @@ export const DedicatedSignUpPage: React.FC = () => {
                           : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-slate-300'
                       }`}
                     >
-                      <div>{d.amharic}</div>
+                      <div className="font-bold text-xs">{d.name}</div>
                       <div className="text-[10px] opacity-75">{d.key}</div>
                     </button>
                   );
@@ -600,7 +600,7 @@ export const DedicatedSignUpPage: React.FC = () => {
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
                   <DollarSign className="w-4 h-4 text-emerald-700" />
-                  Calculated Monthly Fee / ወርሃዊ ክፍያ
+                  Calculated Monthly Fee
                 </span>
                 <span
                   className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${
@@ -620,7 +620,7 @@ export const DedicatedSignUpPage: React.FC = () => {
                     <span className="text-sm font-bold text-emerald-700">ETB / Month</span>
                   </div>
                   <div className="text-[11px] text-slate-500 mt-0.5">
-                    በሳምንት {daysPerWeek} ቀናት (~{perSessionEst} ብር per workout session)
+                    {daysPerWeek} days per week (~{perSessionEst} ETB per workout session)
                   </div>
                 </div>
                 <div className="text-right">
@@ -632,7 +632,7 @@ export const DedicatedSignUpPage: React.FC = () => {
               {/* Payment Method Selector */}
               <div>
                 <label className="block text-[11px] font-semibold text-slate-600 mb-1.5">
-                  Preferred Payment Channel / የክፍያ አማራጭ
+                  Preferred Payment Method
                 </label>
                 <select
                   value={paymentMethod}
@@ -641,15 +641,15 @@ export const DedicatedSignUpPage: React.FC = () => {
                 >
                   {memberType === 'INTERNAL' ? (
                     <>
-                      <option value="PAYROLL_DEDUCTION">MoA Monthly Payroll Deduction (በወርሃዊ ደመወዝ ቅነሳ)</option>
-                      <option value="TELEBIRR">Telebirr Direct (በቴሌብር)</option>
-                      <option value="CASH_DESK">Gym Front Desk Receipt (በካሽ ሪሲት)</option>
+                      <option value="PAYROLL_DEDUCTION">MoA Monthly Payroll Deduction</option>
+                      <option value="TELEBIRR">Telebirr Direct</option>
+                      <option value="CASH_DESK">Gym Front Desk Receipt</option>
                     </>
                   ) : (
                     <>
-                      <option value="TELEBIRR">Telebirr Direct (በቴሌብር)</option>
+                      <option value="TELEBIRR">Telebirr Direct</option>
                       <option value="CBE_BIRR">Commercial Bank of Ethiopia (CBE Birr)</option>
-                      <option value="CASH_DESK">Gym Front Desk Cash (በካሽ ሪሲት)</option>
+                      <option value="CASH_DESK">Gym Front Desk Cash / Receipt</option>
                     </>
                   )}
                 </select>
@@ -699,7 +699,7 @@ export const DedicatedSignUpPage: React.FC = () => {
                 }`}
               >
                 <div className="text-xs font-bold text-slate-900">🗄️ Reserve a Locker</div>
-                <div className="text-[11px] text-slate-500 mt-0.5">የግል ሎከር መመደብ እፈልጋለሁ</div>
+                <div className="text-[11px] text-slate-500 mt-0.5">Assign an individual secure locker</div>
               </button>
 
               <button
@@ -715,7 +715,7 @@ export const DedicatedSignUpPage: React.FC = () => {
                 }`}
               >
                 <div className="text-xs font-bold text-slate-900">🚫 Skip Locker for Now</div>
-                <div className="text-[11px] text-slate-500 mt-0.5">ሎከር አያስፈልገኝም</div>
+                <div className="text-[11px] text-slate-500 mt-0.5">No locker required at this time</div>
               </button>
             </div>
 
@@ -833,8 +833,8 @@ export const DedicatedSignUpPage: React.FC = () => {
                 <span className="text-slate-500">Selected Shift:</span>
                 <span className="font-semibold text-slate-800">
                   {registrationResult.registration?.shiftPreference === 'MORNING'
-                    ? 'ጠዋት / Morning (06:00 - 08:30)'
-                    : 'ማታ / Evening (17:00 - 20:00)'}
+                    ? 'Morning Shift (5:00 AM – 7:30 AM)'
+                    : 'Evening Shift (5:30 PM – 9:00 PM)'}
                 </span>
               </div>
               <div className="flex items-center justify-between">

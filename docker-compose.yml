@@ -1,50 +1,85 @@
+# MoA Staff Wellness & Gym Management System: PostgreSQL database, NestJS API, and Nginx (PWA + HTTPS).
+#
+# Production run:
+#   cp .env.example .env              # set secure passwords & JWT secret
+#   # Place SSL certs in ./ssl/fullchain.pem and ./ssl/privkey.pem
+#   docker compose up -d --build
+#
+# See docs/DEPLOYMENT.md.
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
 services:
+
+  # ── PostgreSQL Database ───────────────────────────────────────────────────
   db:
     image: postgres:16-alpine
     container_name: moa-gym-db
     restart: unless-stopped
-    environment:
-      POSTGRES_USER: moa_gym_user
-      POSTGRES_PASSWORD: moa_gym_password
-      POSTGRES_DB: moa_gym_db
-    ports:
-      - "5436:5432"
+    logging: *default-logging
     volumes:
-      - moa_gym_pgdata:/var/lib/postgresql/data
+      - moa_gym_db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-moa_gym_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-moa_gym_db}
+      TZ: ${TZ:-Africa/Addis_Ababa}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U moa_gym_user -d moa_gym_db"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-moa_gym_user} -d ${POSTGRES_DB:-moa_gym_db}"]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 12
 
+  # ── NestJS API ────────────────────────────────────────────────────────────
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      args:
+        APP_VERSION: ${APP_VERSION:-1.0.0}
+        APP_COMMIT: ${APP_COMMIT:-dev}
+    image: moa-gym-backend:latest
     container_name: moa-gym-backend
     restart: unless-stopped
-    environment:
-      PORT: 5005
-      DATABASE_URL: postgresql://moa_gym_user:moa_gym_password@db:5432/moa_gym_db?schema=public
-      JWT_SECRET: moa-gym-super-secret-jwt-key-2026-wellness
-      JWT_EXPIRATION: 8h
-      FRONTEND_URL: http://localhost:3005
-    ports:
-      - "5005:5005"
+    logging: *default-logging
     depends_on:
       db:
         condition: service_healthy
+    environment:
+      PORT: 5005
+      DATABASE_URL: postgresql://${POSTGRES_USER:-moa_gym_user}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-moa_gym_db}?schema=public
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-8h}
+      TRUST_PROXY: ${TRUST_PROXY:-1}
+      TZ: ${TZ:-Africa/Addis_Ababa}
+      APP_ENV: ${APP_ENV:-prod}
+    expose:
+      - "5005"
 
-  frontend:
+  # ── Nginx: Web App (PWA) & API Gateway ────────────────────────────────────
+  nginx:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: moa-gym-frontend
+      context: .
+      dockerfile: nginx/Dockerfile
+      args:
+        APP_VERSION: ${APP_VERSION:-1.0.0}
+        APP_COMMIT: ${APP_COMMIT:-dev}
+    image: moa-gym-nginx:latest
+    container_name: moa-gym-nginx
     restart: unless-stopped
-    ports:
-      - "3005:80"
+    logging: *default-logging
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./ssl:/etc/nginx/ssl:ro
 
 volumes:
-  moa_gym_pgdata:
+  moa_gym_db_data:

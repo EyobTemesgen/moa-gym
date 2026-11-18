@@ -10,12 +10,14 @@ import { LockersModule } from './lockers/lockers.module';
 import { WellnessModule } from './wellness/wellness.module';
 import { ReportsModule } from './reports/reports.module';
 import { RegistrationsModule } from './registrations/registrations.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     ScheduleModule.forRoot(),
     PrismaModule,
+    HealthModule,
     AuthModule,
     HrRosterModule,
     UsersModule,

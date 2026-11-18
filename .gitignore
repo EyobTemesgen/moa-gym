@@ -14,3 +14,14 @@ backend/dist/
 frontend/dist/
 backend/node_modules/
 frontend/node_modules/
+
+# SSL Certificates (private keys & certs must not be committed)
+ssl/*.pem
+ssl/*.key
+ssl/*.crt
+ssl/*.p12
+
+# Database Backups
+backups/
+*.dump
+*.sql.gz

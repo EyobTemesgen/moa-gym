@@ -6,7 +6,13 @@
   "scripts": {
     "build": "npm run build:backend && npm run build:frontend",
     "build:backend": "npm --prefix backend run build",
-    "build:frontend": "npm --prefix frontend run build"
+    "build:frontend": "npm --prefix frontend run build",
+    "docker:local": "docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --build",
+    "docker:local:down": "docker compose -f docker-compose.yml -f docker-compose.local.yml down",
+    "docker:local:logs": "docker compose -f docker-compose.yml -f docker-compose.local.yml logs -f",
+    "docker:prod": "docker compose up -d --build",
+    "docker:prod:down": "docker compose down",
+    "docker:prod:logs": "docker compose logs -f"
   },
   "keywords": [
     "ethiopia",

@@ -33,16 +33,10 @@ export const Layout: React.FC = () => {
           <Outlet />
         </main>
 
-        <footer className="bg-white border-t border-slate-200 mt-auto py-3">
-          <div className="w-full px-4 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-500 gap-2">
-            <p>© 2026 Ministry of Agriculture (MoA) · Staff Gym</p>
-            <div className="flex items-center gap-3">
-              <span className="text-emerald-700 font-semibold">Strict HR Whitelist</span>
-              <span>·</span>
-              <span className="text-slate-600">No Commercial Access</span>
-              <span>·</span>
-              <span className="text-slate-600">On-Premises Intranet Stack</span>
-            </div>
+        <footer className="no-print bg-white border-t border-slate-200 mt-auto py-3">
+          <div className="w-full px-4 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
+            <p>© 2026 Ministry of Agriculture · Staff Wellness & Fitness Gymnasium</p>
+            <p className="text-[11px] text-slate-400">Official Civil Service Portal</p>
           </div>
         </footer>
       </div>

@@ -15,7 +15,10 @@ Built strictly aligned with the MoA Design System (`#00843D` green, `#FCDD09` go
 1. **Administration (`ADMIN`)**:
    * **Executive Dashboard (`/admin/dashboard`)**: High-level KPI cards (Total Registrants, Active Members, Registered Today, Live On Floor), directorate wellness engagement progress bars, and workout shift breakdowns.
    * **Staff Registrations (`/registrations`)**: Single staff intake from HR whitelist or paper forms, photo sync, bulk Excel/CSV import, and official printable A4 rosters.
-   * **User Management (`/admin/users`)**: Institutional access control, live role assignment (ADMIN, GYM_ATTENDANT, STAFF_MEMBER), account status toggling (ACTIVE / SUSPENDED), and 1-click password reset.
+   * **Settings Menu (`Settings`)**: Collapsible navigation drawer matching Asset Tracking System (ATS), containing:
+     - **Users (`/admin/users`)**: Access control, live role switching (ADMIN, GYM_ATTENDANT, STAFF_MEMBER), account suspension, and password resets.
+     - **Facility Settings (`/admin/settings`)**: Capacity limits, gate thresholds, and legal waiver terms.
+     - **HR Whitelist (`/admin/roster`)**: Master civil service employee directory and bulk CSV sync.
    * **Reports (`/reports`)**: Attendance volume curves, peak hours, and filtered CSV exports for civil service leadership.
 
 2. **Gate Checking Fast Lane (`GYM_ATTENDANT`)**:

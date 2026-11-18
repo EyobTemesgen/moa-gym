@@ -1,5 +1,5 @@
-import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/auth-context';
 import { MoaLogo } from './MoaLogo';
 import {
@@ -13,6 +13,9 @@ import {
   User,
   LayoutDashboard,
   UserCog,
+  Settings,
+  Sliders,
+  UserCheck,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -30,6 +33,37 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const isSettingsActive =
+    location.pathname === '/admin/users' ||
+    location.pathname === '/admin/settings' ||
+    location.pathname === '/admin/roster';
+
+  const [settingsOpen, setSettingsOpen] = useState<boolean>(() => {
+    if (isSettingsActive) return true;
+    try {
+      return localStorage.getItem('moa_gym_settings_open') !== '0';
+    } catch {
+      return true;
+    }
+  });
+
+  useEffect(() => {
+    if (isSettingsActive) {
+      setSettingsOpen(true);
+    }
+  }, [isSettingsActive]);
+
+  const toggleSettingsOpen = () => {
+    setSettingsOpen((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('moa_gym_settings_open', next ? '1' : '0');
+      } catch {}
+      return next;
+    });
+  };
 
   if (!user) return null;
 
@@ -141,23 +175,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {!collapsed && <span className="truncate">Staff Registrations</span>}
               </NavLink>
 
-              {/* 3. User Management */}
-              <NavLink
-                to="/admin/users"
-                onClick={onCloseMobile}
-                className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition ${
-                  isActive('/admin/users')
-                    ? 'bg-white/20 text-white shadow-xs'
-                    : 'text-white/80 hover:text-white hover:bg-white/10'
-                }`}
-                title={collapsed ? 'User Management' : undefined}
-              >
-                {isActive('/admin/users') && <ActiveBar />}
-                <UserCog className="h-5 w-5 text-amber-300 shrink-0" />
-                {!collapsed && <span className="truncate">User Management</span>}
-              </NavLink>
-
-              {/* 4. Reports */}
+              {/* 3. Reports */}
               <NavLink
                 to="/reports"
                 onClick={onCloseMobile}
@@ -172,6 +190,80 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <BarChart3 className="h-5 w-5 text-sky-300 shrink-0" />
                 {!collapsed && <span className="truncate">Reports</span>}
               </NavLink>
+
+              {/* 4. Settings Menu (Collapsible, matching Asset Tracking System) */}
+              <div className="pt-1">
+                <button
+                  type="button"
+                  onClick={() => (collapsed ? navigate('/admin/users') : toggleSettingsOpen())}
+                  className={`w-full relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition cursor-pointer ${
+                    isSettingsActive && (collapsed || !settingsOpen)
+                      ? 'bg-white/20 text-white shadow-xs'
+                      : 'text-white/80 hover:text-white hover:bg-white/10'
+                  }`}
+                  title={collapsed ? 'Settings' : undefined}
+                >
+                  {isSettingsActive && (collapsed || !settingsOpen) && <ActiveBar />}
+                  <Settings className="h-5 w-5 text-amber-300 shrink-0" />
+                  {!collapsed && (
+                    <>
+                      <span className="flex-1 text-left truncate">Settings</span>
+                      <ChevronRight
+                        className={`h-4 w-4 text-emerald-200/70 transition-transform ${
+                          settingsOpen ? 'rotate-90 text-white' : ''
+                        }`}
+                      />
+                    </>
+                  )}
+                </button>
+
+                {/* Submenu items */}
+                {!collapsed && settingsOpen && (
+                  <div className="mt-1 ml-4 pl-3 border-l border-white/15 space-y-1">
+                    {/* Users */}
+                    <NavLink
+                      to="/admin/users"
+                      onClick={onCloseMobile}
+                      className={`relative flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-medium transition ${
+                        isActive('/admin/users')
+                          ? 'bg-white/20 text-white shadow-2xs font-semibold'
+                          : 'text-white/70 hover:text-white hover:bg-white/10'
+                      }`}
+                    >
+                      <UserCog className="h-4 w-4 text-amber-300 shrink-0" />
+                      <span className="truncate">Users</span>
+                    </NavLink>
+
+                    {/* Facility Settings */}
+                    <NavLink
+                      to="/admin/settings"
+                      onClick={onCloseMobile}
+                      className={`relative flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-medium transition ${
+                        isActive('/admin/settings')
+                          ? 'bg-white/20 text-white shadow-2xs font-semibold'
+                          : 'text-white/70 hover:text-white hover:bg-white/10'
+                      }`}
+                    >
+                      <Sliders className="h-4 w-4 text-sky-300 shrink-0" />
+                      <span className="truncate">Facility Settings</span>
+                    </NavLink>
+
+                    {/* HR Staff Whitelist */}
+                    <NavLink
+                      to="/admin/roster"
+                      onClick={onCloseMobile}
+                      className={`relative flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-medium transition ${
+                        isActive('/admin/roster')
+                          ? 'bg-white/20 text-white shadow-2xs font-semibold'
+                          : 'text-white/70 hover:text-white hover:bg-white/10'
+                      }`}
+                    >
+                      <UserCheck className="h-4 w-4 text-emerald-300 shrink-0" />
+                      <span className="truncate">HR Whitelist</span>
+                    </NavLink>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 

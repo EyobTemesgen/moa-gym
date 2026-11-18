@@ -16,6 +16,8 @@ import { RegistrationsPage } from './pages/desk/RegistrationsPage';
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
 import { UserManagementPage } from './pages/admin/UserManagementPage';
 import { AnalyticsPage } from './pages/admin/AnalyticsPage';
+import { GymSchedulePage } from './pages/staff/GymSchedulePage';
+import { TraineeGuidesPage } from './pages/staff/TraineeGuidesPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -69,8 +71,31 @@ export const App: React.FC = () => {
                 }
               />
 
+              {/* Gym Schedule & Timetable */}
+              <Route
+                path="/schedule"
+                element={
+                  <RoleGuard allowedRoles={['STAFF_MEMBER', 'GYM_ATTENDANT', 'ADMIN', 'HR_ADMIN']}>
+                    <GymSchedulePage />
+                  </RoleGuard>
+                }
+              />
+
+              {/* Trainee Manuals & Video Training Guides */}
+              <Route
+                path="/guides"
+                element={
+                  <RoleGuard allowedRoles={['STAFF_MEMBER', 'GYM_ATTENDANT', 'ADMIN', 'HR_ADMIN']}>
+                    <TraineeGuidesPage />
+                  </RoleGuard>
+                }
+              />
+
+              {/* Aliases */}
               <Route path="/waiver" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/classes" element={<Navigate to="/" replace />} />
+              <Route path="/classes" element={<Navigate to="/schedule" replace />} />
+              <Route path="/manuals" element={<Navigate to="/guides" replace />} />
+              <Route path="/training" element={<Navigate to="/guides" replace />} />
 
               {/* Admin: Overview Dashboard */}
               <Route

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../lib/auth-context';
 import { apiRequest } from '../../lib/api';
 import { QRCodeSVG } from 'qrcode.react';
@@ -14,6 +15,9 @@ import {
   Info,
   CheckCircle2,
   Calendar,
+  BookOpen,
+  ArrowRight,
+  Sparkles,
 } from 'lucide-react';
 import { MoaLogo } from '../../components/MoaLogo';
 import { btn, pill, statusTone } from '../../components/ui/theme';
@@ -296,6 +300,61 @@ export const StaffDashboardPage: React.FC = () => {
 
         {/* Right Column: Operating Hours & Gym Guidelines */}
         <div className="lg:col-span-7 space-y-5 no-print">
+          {/* Quick Hub Cards: Schedule & Trainee Guides */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <Link
+              to="/schedule"
+              className="group p-4 bg-gradient-to-br from-emerald-50/80 to-white rounded-xl border border-emerald-200/90 shadow-2xs hover:shadow-md hover:border-emerald-400 transition-all duration-200 flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="w-8 h-8 rounded-lg bg-[#00843D] text-white flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                    <Calendar className="h-4 w-4" />
+                  </div>
+                  <span className="text-[10px] font-bold text-[#00843D] bg-emerald-100/80 px-2 py-0.5 rounded-full">
+                    Timetable
+                  </span>
+                </div>
+                <h3 className="text-sm font-bold text-slate-900 group-hover:text-[#00843D] transition-colors">
+                  Gym Schedule & Classes
+                </h3>
+                <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
+                  View daily group fitness sessions, shift hours, and book your spot.
+                </p>
+              </div>
+              <div className="mt-3 pt-2 border-t border-emerald-100 flex items-center text-xs font-semibold text-[#00843D]">
+                <span>Browse Schedule</span>
+                <ArrowRight className="h-3.5 w-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+
+            <Link
+              to="/guides"
+              className="group p-4 bg-gradient-to-br from-sky-50/80 to-white rounded-xl border border-sky-200/90 shadow-2xs hover:shadow-md hover:border-sky-400 transition-all duration-200 flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="w-8 h-8 rounded-lg bg-sky-700 text-white flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                    <BookOpen className="h-4 w-4" />
+                  </div>
+                  <span className="text-[10px] font-bold text-sky-800 bg-sky-100/80 px-2 py-0.5 rounded-full">
+                    SOP & Videos
+                  </span>
+                </div>
+                <h3 className="text-sm font-bold text-slate-900 group-hover:text-sky-800 transition-colors">
+                  Trainee Manuals & Videos
+                </h3>
+                <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
+                  Official gym handbook, locker rules, equipment safety, and video workouts.
+                </p>
+              </div>
+              <div className="mt-3 pt-2 border-t border-sky-100 flex items-center text-xs font-semibold text-sky-800">
+                <span>Open Guide Hub</span>
+                <ArrowRight className="h-3.5 w-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+          </div>
+
           {/* Operating Hours & Shifts Schedule */}
           <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs">
             <div className="flex items-center gap-2 mb-3">

@@ -14,6 +14,8 @@ import {
   Settings,
   Flame,
   LogOut,
+  Calendar,
+  BookOpen,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -127,6 +129,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* Staff Member Navigation */}
           {user.role === 'STAFF_MEMBER' && (
             <div className="space-y-1.5">
+              {/* 1. My Entry Pass */}
               <NavLink
                 to="/dashboard"
                 onClick={onCloseMobile}
@@ -140,6 +143,38 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {isActive('/dashboard') && <ActiveBar />}
                 <QrCode className="h-5 w-5 text-moa-gold shrink-0" />
                 {!collapsed && <span className="truncate">My Entry Pass</span>}
+              </NavLink>
+
+              {/* 2. Gym Schedule */}
+              <NavLink
+                to="/schedule"
+                onClick={onCloseMobile}
+                className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition ${
+                  isActive('/schedule')
+                    ? 'bg-white/20 text-white shadow-xs'
+                    : 'text-white/80 hover:text-white hover:bg-white/10'
+                }`}
+                title={collapsed ? 'Gym Schedule' : undefined}
+              >
+                {isActive('/schedule') && <ActiveBar />}
+                <Calendar className="h-5 w-5 text-emerald-300 shrink-0" />
+                {!collapsed && <span className="truncate">Gym Schedule</span>}
+              </NavLink>
+
+              {/* 3. Trainee Guides & Videos */}
+              <NavLink
+                to="/guides"
+                onClick={onCloseMobile}
+                className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition ${
+                  isActive('/guides')
+                    ? 'bg-white/20 text-white shadow-xs'
+                    : 'text-white/80 hover:text-white hover:bg-white/10'
+                }`}
+                title={collapsed ? 'Trainee Guides' : undefined}
+              >
+                {isActive('/guides') && <ActiveBar />}
+                <BookOpen className="h-5 w-5 text-sky-300 shrink-0" />
+                {!collapsed && <span className="truncate">Trainee Guides</span>}
               </NavLink>
             </div>
           )}
@@ -163,7 +198,39 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {!collapsed && <span className="truncate">Dashboard</span>}
               </NavLink>
 
-              {/* 2. Reports */}
+              {/* 2. Gym Schedule */}
+              <NavLink
+                to="/schedule"
+                onClick={onCloseMobile}
+                className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition ${
+                  isActive('/schedule')
+                    ? 'bg-white/20 text-white shadow-xs'
+                    : 'text-white/80 hover:text-white hover:bg-white/10'
+                }`}
+                title={collapsed ? 'Gym Schedule' : undefined}
+              >
+                {isActive('/schedule') && <ActiveBar />}
+                <Calendar className="h-5 w-5 text-emerald-300 shrink-0" />
+                {!collapsed && <span className="truncate">Gym Schedule</span>}
+              </NavLink>
+
+              {/* 3. Trainee Guides */}
+              <NavLink
+                to="/guides"
+                onClick={onCloseMobile}
+                className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition ${
+                  isActive('/guides')
+                    ? 'bg-white/20 text-white shadow-xs'
+                    : 'text-white/80 hover:text-white hover:bg-white/10'
+                }`}
+                title={collapsed ? 'Trainee Guides' : undefined}
+              >
+                {isActive('/guides') && <ActiveBar />}
+                <BookOpen className="h-5 w-5 text-sky-300 shrink-0" />
+                {!collapsed && <span className="truncate">Trainee Guides</span>}
+              </NavLink>
+
+              {/* 4. Reports */}
               <NavLink
                 to="/reports"
                 onClick={onCloseMobile}
@@ -179,7 +246,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {!collapsed && <span className="truncate">Reports</span>}
               </NavLink>
 
-              {/* 3. Settings Menu (Collapsible, matching Asset Tracking System) */}
+              {/* 5. Settings Menu (Collapsible, matching Asset Tracking System) */}
               <div className="pt-1">
                 <button
                   type="button"
@@ -274,6 +341,38 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {isActive('/active-floor') && <ActiveBar />}
                 <Flame className="h-5 w-5 text-amber-300 shrink-0" />
                 {!collapsed && <span className="truncate">Floor & Lockers</span>}
+              </NavLink>
+
+              {/* 3. Gym Schedule */}
+              <NavLink
+                to="/schedule"
+                onClick={onCloseMobile}
+                className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition ${
+                  isActive('/schedule')
+                    ? 'bg-white/20 text-white shadow-xs'
+                    : 'text-white/80 hover:text-white hover:bg-white/10'
+                }`}
+                title={collapsed ? 'Gym Schedule' : undefined}
+              >
+                {isActive('/schedule') && <ActiveBar />}
+                <Calendar className="h-5 w-5 text-emerald-300 shrink-0" />
+                {!collapsed && <span className="truncate">Gym Schedule</span>}
+              </NavLink>
+
+              {/* 4. Trainee Guides */}
+              <NavLink
+                to="/guides"
+                onClick={onCloseMobile}
+                className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition ${
+                  isActive('/guides')
+                    ? 'bg-white/20 text-white shadow-xs'
+                    : 'text-white/80 hover:text-white hover:bg-white/10'
+                }`}
+                title={collapsed ? 'Trainee Guides' : undefined}
+              >
+                {isActive('/guides') && <ActiveBar />}
+                <BookOpen className="h-5 w-5 text-sky-300 shrink-0" />
+                {!collapsed && <span className="truncate">Trainee Guides</span>}
               </NavLink>
             </div>
           )}

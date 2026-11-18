@@ -106,6 +106,16 @@ export const MoaHeader: React.FC<MoaHeaderProps> = ({ onOpenMobileSidebar }) => 
           title: 'My Entry Pass',
           subtitle: 'Personal gym access pass and membership status',
         };
+      case '/schedule':
+        return {
+          title: 'Gym Schedule',
+          subtitle: 'Weekly class timetable, shift rotations, and session booking',
+        };
+      case '/guides':
+        return {
+          title: 'Trainee Guides & Videos',
+          subtitle: 'Official gym handbook, equipment safety SOP, and video tutorials',
+        };
       default:
         return {
           title: 'MoA Gym',

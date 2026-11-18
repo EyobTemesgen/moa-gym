@@ -168,7 +168,7 @@ export const LoginPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center py-10 px-4 sm:px-6 lg:px-8 relative">
-      <div className="max-w-[420px] w-full bg-white rounded-2xl border border-slate-200/90 shadow-xl p-6 sm:p-8 relative overflow-hidden">
+      <div className="max-w-[480px] w-full bg-white rounded-2xl border border-slate-200/90 shadow-xl p-7 sm:p-9 relative overflow-hidden">
         {/* Top Gold & Green Brand Stripe */}
         <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-[#00843D] via-[#FCDD09] to-[#00843D]" />
 

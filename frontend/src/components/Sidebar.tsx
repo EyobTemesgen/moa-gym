@@ -92,27 +92,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
           {/* Staff Member Navigation */}
           {user.role === 'STAFF_MEMBER' && (
-            <div>
-              {!collapsed && (
-                <div className="px-3 text-[10px] font-bold text-emerald-200/70 uppercase tracking-wider mb-2">
-                  Staff Portal
-                </div>
-              )}
-              <div className="space-y-1.5">
-                <NavLink
-                  to="/dashboard"
-                  onClick={onCloseMobile}
-                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${isActive('/dashboard')
-                      ? 'bg-white/20 text-white shadow-xs'
-                      : 'text-white/80 hover:text-white hover:bg-white/10'
-                    }`}
-                  title={collapsed ? 'My Entry Pass' : undefined}
-                >
-                  {isActive('/dashboard') && <ActiveBar />}
-                  <QrCode className="h-5 w-5 text-moa-gold shrink-0" />
-                  {!collapsed && <span className="font-semibold text-xs">My Entry Pass</span>}
-                </NavLink>
-              </div>
+            <div className="space-y-1.5">
+              <NavLink
+                to="/dashboard"
+                onClick={onCloseMobile}
+                className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition ${
+                  isActive('/dashboard')
+                    ? 'bg-white/20 text-white shadow-xs'
+                    : 'text-white/80 hover:text-white hover:bg-white/10'
+                }`}
+                title={collapsed ? 'My Entry Pass' : undefined}
+              >
+                {isActive('/dashboard') && <ActiveBar />}
+                <QrCode className="h-5 w-5 text-moa-gold shrink-0" />
+                {!collapsed && <span className="truncate">My Entry Pass</span>}
+              </NavLink>
             </div>
           )}
 
@@ -169,30 +163,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           )}
 
-          {/* Front Desk Attendant Navigation: Gate Checking Terminal only */}
+          {/* Front Desk Attendant Navigation */}
           {user.role === 'GYM_ATTENDANT' && (
-            <div>
-              {!collapsed && (
-                <div className="px-3 text-[10px] font-bold text-emerald-200/70 uppercase tracking-wider mb-2">
-                  Gate Operations
-                </div>
-              )}
-              <div className="space-y-1.5">
-                {/* 1. Gate Checking Terminal */}
-                <NavLink
-                  to="/terminal"
-                  onClick={onCloseMobile}
-                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${isActive('/terminal')
-                      ? 'bg-white/20 text-white shadow-xs'
-                      : 'text-white/80 hover:text-white hover:bg-white/10'
-                    }`}
-                  title={collapsed ? 'Gate Terminal' : undefined}
-                >
-                  {isActive('/terminal') && <ActiveBar />}
-                  <ShieldCheck className="h-5 w-5 text-moa-gold shrink-0" />
-                  {!collapsed && <span className="font-semibold text-xs">Gate Terminal</span>}
-                </NavLink>
-              </div>
+            <div className="space-y-1.5">
+              {/* 1. Gate Checking Terminal */}
+              <NavLink
+                to="/terminal"
+                onClick={onCloseMobile}
+                className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition ${
+                  isActive('/terminal')
+                    ? 'bg-white/20 text-white shadow-xs'
+                    : 'text-white/80 hover:text-white hover:bg-white/10'
+                }`}
+                title={collapsed ? 'Gate Terminal' : undefined}
+              >
+                {isActive('/terminal') && <ActiveBar />}
+                <ShieldCheck className="h-5 w-5 text-moa-gold shrink-0" />
+                {!collapsed && <span className="truncate">Gate Terminal</span>}
+              </NavLink>
             </div>
           )}
         </div>

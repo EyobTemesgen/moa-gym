@@ -347,7 +347,7 @@ export const DedicatedSignUpPage: React.FC = () => {
   const getInputClass = (fieldName: string) => {
     const hasError = touched[fieldName] && fieldErrors[fieldName];
     const isValid = touched[fieldName] && !fieldErrors[fieldName];
-    return `w-full px-3.5 py-2.5 bg-white border text-sm text-slate-900 rounded-lg transition-all duration-150 shadow-2xs focus:outline-none ${
+    return `w-full px-3.5 py-2.5 bg-white border text-sm text-slate-900 rounded-[4px] transition-all duration-150 shadow-2xs focus:outline-none ${
       hasError
         ? 'border-rose-500 bg-rose-50/10 focus:border-rose-600 focus:ring-2 focus:ring-rose-500/20'
         : isValid
@@ -1065,7 +1065,7 @@ export const DedicatedSignUpPage: React.FC = () => {
             <div className="pt-2">
               <button
                 type="submit"
-                className="w-full py-3 px-6 bg-[#00843D] hover:bg-[#07572A] text-white font-bold text-xs uppercase tracking-wider rounded-lg shadow-sm hover:shadow-md active:shadow-xs transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 group"
+                className="w-full py-3 px-6 bg-[#00843D] hover:bg-[#07572A] text-white font-bold text-xs uppercase tracking-wider rounded-[4px] shadow-sm hover:shadow-md active:shadow-xs transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 group"
               >
                 <span>Continue to Gym Schedule & Fee</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
@@ -1232,7 +1232,7 @@ export const DedicatedSignUpPage: React.FC = () => {
                   <select
                     value={paymentMethod}
                     onChange={(e) => setPaymentMethod(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-[4px] text-xs text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-[#00843D]/20 focus:border-[#00843D]"
                   >
                     <option value="TELEBIRR">Telebirr Direct</option>
                     <option value="CBE_BIRR">Commercial Bank of Ethiopia (CBE Birr)</option>
@@ -1247,14 +1247,14 @@ export const DedicatedSignUpPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setStep(1)}
-                className="py-3 px-5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 hover:border-slate-400 font-bold text-xs uppercase tracking-wider rounded-lg shadow-2xs transition-all duration-200 cursor-pointer flex items-center gap-1.5"
+                className="py-3 px-5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 hover:border-slate-400 font-bold text-xs uppercase tracking-wider rounded-[4px] shadow-2xs transition-all duration-200 cursor-pointer flex items-center gap-1.5"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Back</span>
               </button>
               <button
                 type="submit"
-                className="flex-1 py-3 px-6 bg-[#00843D] hover:bg-[#07572A] text-white font-bold text-xs uppercase tracking-wider rounded-lg shadow-sm hover:shadow-md active:shadow-xs transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 group"
+                className="flex-1 py-3 px-6 bg-[#00843D] hover:bg-[#07572A] text-white font-bold text-xs uppercase tracking-wider rounded-[4px] shadow-sm hover:shadow-md active:shadow-xs transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 group"
               >
                 <span>Continue to Locker Assignment</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
@@ -1393,7 +1393,7 @@ export const DedicatedSignUpPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setStep(2)}
-                className="py-3 px-5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 hover:border-slate-400 font-bold text-xs uppercase tracking-wider rounded-lg shadow-2xs transition-all duration-200 cursor-pointer flex items-center gap-1.5"
+                className="py-3 px-5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 hover:border-slate-400 font-bold text-xs uppercase tracking-wider rounded-[4px] shadow-2xs transition-all duration-200 cursor-pointer flex items-center gap-1.5"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Back</span>
@@ -1401,7 +1401,7 @@ export const DedicatedSignUpPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex-1 py-3 px-6 bg-[#00843D] hover:bg-[#07572A] disabled:opacity-60 text-white font-bold text-xs uppercase tracking-wider rounded-lg shadow-sm hover:shadow-md active:shadow-xs transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 group"
+                className="flex-1 py-3 px-6 bg-[#00843D] hover:bg-[#07572A] disabled:opacity-60 text-white font-bold text-xs uppercase tracking-wider rounded-[4px] shadow-sm hover:shadow-md active:shadow-xs transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 group"
               >
                 <Check className="w-4 h-4" />
                 <span>{isSubmitting ? 'Registering...' : 'Complete Registration & Sign Up'}</span>

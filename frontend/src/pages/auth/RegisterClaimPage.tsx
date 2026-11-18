@@ -153,16 +153,18 @@ export const RegisterClaimPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-[85vh] flex flex-col justify-start items-center pt-3 sm:pt-5 pb-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full bg-white rounded-2xl border border-slate-200 shadow-md p-5 sm:p-6">
-        <div className="text-center mb-3">
-          <MoaLogo className="mx-auto h-11 w-11 mb-1.5" size={44} />
-          <h2 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
-            Sign Up for MoA Gym
-          </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Staff Wellness & Fitness Access
-          </p>
+    <div className="min-h-[85vh] flex flex-col justify-start items-center pt-2 sm:pt-3 pb-6 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full bg-white rounded-2xl border border-slate-200 shadow-md p-4 sm:p-5">
+        <div className="flex items-center justify-center gap-2 mb-2 text-center">
+          <MoaLogo className="h-8 w-8" size={32} />
+          <div>
+            <h2 className="text-base font-bold text-slate-900 tracking-tight leading-tight">
+              Sign Up for MoA Gym
+            </h2>
+            <p className="text-[11px] text-slate-500">
+              Staff Wellness & Fitness Access
+            </p>
+          </div>
         </div>
 
         {error && (

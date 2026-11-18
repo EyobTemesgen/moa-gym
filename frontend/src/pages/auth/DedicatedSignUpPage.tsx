@@ -233,35 +233,35 @@ export const DedicatedSignUpPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0c3924] via-[#115033] to-[#0a2f1c] flex flex-col justify-start items-center pt-3 sm:pt-5 pb-8 px-4 sm:px-6 lg:px-8 selection:bg-emerald-500 selection:text-white relative">
+    <div className="min-h-screen bg-gradient-to-br from-[#0c3924] via-[#115033] to-[#0a2f1c] flex flex-col justify-start items-center pt-2 sm:pt-3 pb-6 px-4 sm:px-6 lg:px-8 selection:bg-emerald-500 selection:text-white relative">
       {/* Background Decorative Rings */}
       <div className="absolute top-0 left-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
 
-      {/* MoA Header Badge & Branding */}
-      <div className="flex flex-col items-center mb-2.5 text-center z-10">
-        <div className="w-10 h-10 bg-white rounded-xl shadow-md flex items-center justify-center border border-emerald-100/50 mb-1.5 transition-transform hover:scale-105">
-          <ShieldCheck className="w-5 h-5 text-emerald-700" />
+      {/* MoA Header Badge & Branding - Compact Bar */}
+      <div className="flex items-center justify-center gap-2 mb-2 z-10 text-center">
+        <div className="w-7 h-7 bg-white rounded-lg shadow-sm flex items-center justify-center border border-emerald-100/50">
+          <ShieldCheck className="w-4 h-4 text-emerald-700" />
         </div>
-        <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white drop-shadow-sm">
+        <h1 className="text-sm sm:text-base font-bold tracking-tight text-white drop-shadow-sm">
           MoA Wellness & Fitness Center
         </h1>
-        <p className="text-xs font-medium text-emerald-200/90 tracking-wide">
-          Ministry of Agriculture | የግብርና ሚኒስቴር
-        </p>
+        <span className="text-[11px] text-emerald-200/80 font-medium hidden sm:inline">
+          · የግብርና ሚኒስቴር
+        </span>
       </div>
 
       {/* Main Container Card */}
-      <div className="bg-white rounded-2xl shadow-2xl p-5 sm:p-6 max-w-xl w-full border border-slate-100 z-10 transition-all">
+      <div className="bg-white rounded-2xl shadow-2xl p-4 sm:p-5 max-w-xl w-full border border-slate-100 z-10 transition-all">
         {/* Step Progress Indicators */}
-        <div className="mb-4">
-          <div className="flex items-center justify-between text-xs font-semibold text-slate-500 mb-1.5">
+        <div className="mb-3">
+          <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500 mb-1">
             <span className={step >= 1 ? 'text-emerald-700 font-bold' : ''}>1. መለያ / Profile</span>
             <span className={step >= 2 ? 'text-emerald-700 font-bold' : ''}>2. ሰዓትና ክፍያ / Schedule & Fee</span>
             <span className={step >= 3 ? 'text-emerald-700 font-bold' : ''}>3. ሎከር / Locker</span>
             <span className={step >= 4 ? 'text-emerald-700 font-bold' : ''}>4. ማጠቃለያ / Done</span>
           </div>
-          <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden flex">
+          <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden flex">
             <div
               className="bg-emerald-600 h-full transition-all duration-300"
               style={{ width: `${(step / 4) * 100}%` }}
@@ -271,7 +271,7 @@ export const DedicatedSignUpPage: React.FC = () => {
 
         {/* Error Alert */}
         {error && (
-          <div className="mb-5 p-3.5 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl flex items-start gap-2.5">
+          <div className="mb-3 p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-start gap-2">
             <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
             <span>{error}</span>
           </div>
@@ -279,17 +279,15 @@ export const DedicatedSignUpPage: React.FC = () => {
 
         {/* STEP 1: ACCOUNT CREATION (Matching User's Reference Screenshot) */}
         {step === 1 && (
-          <form onSubmit={handleProceedToStep2} className="space-y-4">
-            <div className="border-b border-slate-100 pb-3 mb-2">
-              <h2 className="text-xl font-bold text-slate-900 tracking-tight">Create an Account</h2>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Self-service gym membership registration for MoA staff & authorized community trainees.
-              </p>
+          <form onSubmit={handleProceedToStep2} className="space-y-3">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-2 mb-1">
+              <h2 className="text-base font-bold text-slate-900 tracking-tight">Create an Account</h2>
+              <span className="text-[11px] text-slate-400">MoA Staff & Community Registration</span>
             </div>
 
             {/* Member Category Segmented Toggle */}
-            <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+            <div className="space-y-1">
+              <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider">
                 Membership Category / የአባልነት ዓይነት <span className="text-red-500">*</span>
               </label>
               <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-xl">

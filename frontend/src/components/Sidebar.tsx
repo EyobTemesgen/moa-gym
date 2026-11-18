@@ -422,11 +422,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <div className="text-xs font-bold text-white truncate">
                   {user.fullName}
                 </div>
-                <div className="text-[10px] font-mono text-emerald-200/90 truncate mt-0.5">
-                  <span className="text-moa-gold font-semibold">
-                    {user.role === 'HR_ADMIN' ? 'ADMIN' : user.role}
-                  </span>
-                  {' · '}{user.employeeId}
+                <div className="text-[10px] font-semibold text-moa-gold truncate mt-0.5">
+                  {user.role === 'HR_ADMIN' ? 'ADMIN' : user.role}
                 </div>
               </div>
 

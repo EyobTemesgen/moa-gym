@@ -243,10 +243,7 @@ export const MoaHeader: React.FC<MoaHeaderProps> = ({ onOpenMobileSidebar }) => 
                           <span className="block font-bold text-xs text-slate-900 truncate">
                             {user.fullName}
                           </span>
-                          <span className="block text-[11px] text-slate-500 font-mono truncate mt-0.5">
-                            ID: {user.employeeId}
-                          </span>
-                          <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
+                          <div className="mt-1 flex items-center gap-1.5 flex-wrap">
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
                               <Shield className="w-2.5 h-2.5 text-emerald-700" />
                               {roleDisplay}

@@ -435,6 +435,53 @@ export class AuthService {
     return lockers;
   }
 
+  async checkAvailability(query: { username?: string; employeeId?: string; email?: string }) {
+    const rawUsername = query.username?.trim();
+    const normalizedUsername = rawUsername ? rawUsername.toLowerCase() : null;
+    const employeeId = query.employeeId?.trim();
+    const email = query.email?.trim().toLowerCase();
+
+    const orConditions: any[] = [];
+    if (normalizedUsername) {
+      orConditions.push({ username: normalizedUsername });
+    }
+    if (employeeId) {
+      orConditions.push({ employeeId });
+    }
+    if (email) {
+      orConditions.push({ hrRecord: { email } });
+    }
+
+    if (orConditions.length === 0) {
+      return { available: true };
+    }
+
+    const existingUser = await this.prisma.user.findFirst({
+      where: { OR: orConditions },
+      include: { hrRecord: true },
+    });
+
+    if (existingUser) {
+      if (normalizedUsername && existingUser.username?.toLowerCase() === normalizedUsername) {
+        return {
+          available: false,
+          conflictField: 'username',
+          message: `The username "${rawUsername}" is already taken. Please choose another username.`,
+        };
+      }
+      return {
+        available: false,
+        conflictField: existingUser.employeeId === employeeId ? 'employeeId' : 'email',
+        message: `An account already exists for ${existingUser.hrRecord.fullName} (${existingUser.employeeId}). Please sign in instead.`,
+        employeeId: existingUser.employeeId,
+        username: existingUser.username,
+        fullName: existingUser.hrRecord.fullName,
+      };
+    }
+
+    return { available: true };
+  }
+
   calculateGymFee(memberType: 'INTERNAL' | 'EXTERNAL', daysPerWeek: number): number {
     if (memberType === 'INTERNAL') {
       return 0; // 100% Free institutional wellness benefit for MoA civil servants

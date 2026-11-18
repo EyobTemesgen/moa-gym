@@ -31,6 +31,16 @@ export class AuthController {
     return this.authService.getAvailableLockers();
   }
 
+  @Get('check-availability')
+  @ApiOperation({ summary: 'Pre-check whether username, employee ID, or email is already registered' })
+  async checkAvailability(
+    @Query('username') username?: string,
+    @Query('employeeId') employeeId?: string,
+    @Query('email') email?: string,
+  ) {
+    return this.authService.checkAvailability({ username, employeeId, email });
+  }
+
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Self-service registration for internal staff and external members' })

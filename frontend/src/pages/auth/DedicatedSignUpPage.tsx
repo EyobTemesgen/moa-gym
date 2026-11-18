@@ -356,8 +356,8 @@ export const DedicatedSignUpPage: React.FC = () => {
     }`;
   };
 
-  // Step 1 Validation
-  const handleProceedToStep2 = (e: React.FormEvent) => {
+  // Step 1 Validation & Pre-Check
+  const handleProceedToStep2 = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
@@ -392,6 +392,28 @@ export const DedicatedSignUpPage: React.FC = () => {
       setError(firstErrorMsg);
       toast.warning('Check Required Fields', firstErrorMsg);
       return;
+    }
+
+    // Pre-check if Employee ID, Username, or Email is already registered in the system
+    try {
+      const params = new URLSearchParams();
+      if (employeeId.trim()) params.append('employeeId', employeeId.trim());
+      if (username.trim()) params.append('username', username.trim());
+      if (email.trim()) params.append('email', email.trim());
+
+      const checkRes = await apiRequest<{
+        available: boolean;
+        message?: string;
+        conflictField?: string;
+      }>(`/auth/check-availability?${params.toString()}`);
+
+      if (checkRes && checkRes.available === false) {
+        setError(checkRes.message || 'An account already exists for this ID or email. Please sign in instead.');
+        toast.error('Account Already Exists', checkRes.message || 'Please sign in instead.');
+        return;
+      }
+    } catch (err: any) {
+      console.warn('Pre-check availability error:', err);
     }
 
     setStep(2);
@@ -512,11 +534,31 @@ export const DedicatedSignUpPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Error Alert */}
+        {/* Error Alert with Sign In CTA */}
         {error && (
-          <div className="mb-3 p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-start gap-2">
-            <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
-            <span>{error}</span>
+          <div className="mb-4 p-3.5 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-xl shadow-2xs">
+            <div className="flex items-start gap-2.5">
+              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="font-semibold">{error}</p>
+                {(error.toLowerCase().includes('already exists') ||
+                  error.toLowerCase().includes('sign in instead') ||
+                  error.toLowerCase().includes('already taken')) && (
+                  <div className="mt-2.5 flex items-center gap-2 flex-wrap">
+                    <Link
+                      to="/login"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#00843D] hover:bg-[#007033] text-white text-xs font-bold rounded-lg shadow-xs transition cursor-pointer"
+                    >
+                      <span>Sign In Instead</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                    <span className="text-[11px] text-slate-500">
+                      Already registered? Log in with your Employee ID, username, or email.
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
 
@@ -995,16 +1037,6 @@ export const DedicatedSignUpPage: React.FC = () => {
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
               </button>
             </div>
-
-            {/* Sign in footer */}
-            <div className="text-center pt-2">
-              <p className="text-xs text-slate-600">
-                Already have an account?{' '}
-                <Link to="/login" className="font-semibold text-emerald-700 hover:underline">
-                  Sign in
-                </Link>
-              </p>
-            </div>
           </form>
         )}
 
@@ -1453,6 +1485,18 @@ export const DedicatedSignUpPage: React.FC = () => {
                 </button>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Persistent "Already have an account? Sign in" Footer across Steps 1, 2, and 3 */}
+        {step < 4 && (
+          <div className="mt-5 pt-3.5 border-t border-slate-100 text-center">
+            <p className="text-xs text-slate-600">
+              Already have an account?{' '}
+              <Link to="/login" className="font-bold text-[#00843D] hover:text-[#007033] hover:underline">
+                Sign in &rarr;
+              </Link>
+            </p>
           </div>
         )}
       </div>

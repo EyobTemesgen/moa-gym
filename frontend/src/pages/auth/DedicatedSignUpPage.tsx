@@ -487,7 +487,7 @@ export const DedicatedSignUpPage: React.FC = () => {
       <div className="text-center mb-3">
         <MoaLogo className="mx-auto h-12 w-12 mb-1.5" size={48} />
         <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-          MoA Gym Registration
+          MoA Gym Service Registration
         </h1>
         <p className="text-xs text-slate-500 mt-0.5">
           Staff Wellness & Fitness Center · Ministry of Agriculture

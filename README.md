@@ -28,6 +28,7 @@ Built strictly aligned with the MoA Design System (`#00843D` green, `#FCDD09` go
 3. **Staff Member Digital Access (`STAFF_MEMBER`)**:
    * **Zero-Friction Self-Registration (`/claim`)**: Staff finds their Name & Directorate on the HR whitelist, sets their password, and picks their preferred workout shift.
    * **Permanent Digital Entry Pass (`/dashboard`)**: Scannable QR code and barcode with photo, employee ID, registration number, and live facility occupancy meter.
+   * **Self-Service Password Reset (`/login`)**: Direct password change or recovery via temporary password or registered ministry email.
 
 ---
 

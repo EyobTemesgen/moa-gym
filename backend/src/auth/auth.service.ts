@@ -11,6 +11,7 @@ import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../prisma/prisma.service';
 import { LoginDto } from './dto/login.dto';
 import { ClaimAccountDto } from './dto/claim-account.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { EmploymentStatus, Role } from '@prisma/client';
 
 function cleanTokens(str: string): string[] {
@@ -347,6 +348,72 @@ export class AuthService {
         role: newUser.role,
         waiverSigned: newUser.waiverSigned,
       },
+    };
+  }
+
+  async resetOrChangePassword(dto: ResetPasswordDto) {
+    const trimmedId = dto.identifier.trim();
+    const newPwd = dto.newPassword.trim();
+
+    if (!trimmedId) {
+      throw new BadRequestException('Enter your Employee ID or registered email.');
+    }
+    if (!newPwd || newPwd.length < 6) {
+      throw new BadRequestException('New password must be at least 6 characters.');
+    }
+
+    // Find user by employeeId or email
+    const user = await this.prisma.user.findFirst({
+      where: {
+        OR: [
+          { employeeId: trimmedId },
+          { hrRecord: { email: { equals: trimmedId, mode: 'insensitive' } } },
+        ],
+      },
+      include: { hrRecord: true },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`No account found matching "${trimmedId}". Please verify your Employee ID or register first.`);
+    }
+
+    if (user.hrRecord.employmentStatus !== EmploymentStatus.ACTIVE) {
+      throw new ForbiddenException('Access denied: Employee status is not active in HR records');
+    }
+
+    // Two verification paths matching ATS standard:
+    // 1. Current / temporary password verification
+    // 2. Email verification (if user forgot current password completely)
+    if (dto.currentPassword && dto.currentPassword.trim()) {
+      const isMatch = await bcrypt.compare(dto.currentPassword.trim(), user.passwordHash);
+      if (!isMatch) {
+        throw new BadRequestException('Current / temporary password is incorrect.');
+      }
+    } else if (dto.email && dto.email.trim()) {
+      const emailInput = dto.email.trim().toLowerCase();
+      const officialEmail = (user.hrRecord.email || '').trim().toLowerCase();
+      if (!officialEmail || emailInput !== officialEmail) {
+        throw new BadRequestException(
+          'The provided email does not match the official registered email for this employee in HR records.',
+        );
+      }
+    } else {
+      throw new BadRequestException(
+        'Please provide either your current/temporary password or your registered work email for verification.',
+      );
+    }
+
+    const newHash = await bcrypt.hash(newPwd, 10);
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { passwordHash: newHash },
+    });
+
+    return {
+      success: true,
+      message: `Password updated successfully for ${user.hrRecord.fullName}. You can now sign in with your new password.`,
+      employeeId: user.employeeId,
+      fullName: user.hrRecord.fullName,
     };
   }
 }

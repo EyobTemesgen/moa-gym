@@ -3,6 +3,7 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { ClaimAccountDto } from './dto/claim-account.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @ApiTags('Auth')
 @Controller('api/auth')
@@ -47,5 +48,13 @@ export class AuthController {
   @ApiResponse({ status: 201, description: 'Account claimed successfully, session started' })
   async claim(@Body() claimDto: ClaimAccountDto) {
     return this.authService.claimAccount(claimDto);
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Public self-service password change or reset from login portal' })
+  @ApiResponse({ status: 200, description: 'Password changed successfully' })
+  async resetOrChangePassword(@Body() resetDto: ResetPasswordDto) {
+    return this.authService.resetOrChangePassword(resetDto);
   }
 }

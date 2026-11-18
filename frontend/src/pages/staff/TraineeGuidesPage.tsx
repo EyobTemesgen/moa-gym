@@ -13,11 +13,9 @@ import {
   Building2,
   Key,
   ExternalLink,
+  User,
+  ArrowRight,
   Sparkles,
-  Youtube,
-  Globe,
-  Dumbbell,
-  HeartPulse,
 } from 'lucide-react';
 import { MoaLogo } from '../../components/MoaLogo';
 
@@ -46,7 +44,7 @@ const VIDEO_GUIDES: VideoGuide[] = [
   {
     id: 'vid-amharic-beginner',
     title: 'Gym Beginner Starter Guide: Machine Settings, Posture & Safe Lifting',
-    amharicTitle: 'የጂም አጀማመር፣ የመሳሪያዎች አጠቃቀም እና የአደጋ መከላከያ መመሪያ',
+    amharicTitle: 'የጂም አጀማመር እና የመሳሪያዎች አጠቃቀም መመሪያ',
     category: 'Beginner',
     isAmharicAudio: true,
     duration: '6:20 min',
@@ -56,8 +54,8 @@ const VIDEO_GUIDES: VideoGuide[] = [
     amharicTargetMuscles: 'ሙሉ አካል፣ የማሽን አጠቃቀም እና የወገብ ደህንነት',
     thumbnailUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=600&q=80',
     youtubeSearchTerm: 'የጅምናዚየም ስፖርት አሰራር ለጀማሪዎች በአማርኛ gym workout amharic',
-    description: 'A comprehensive beginner walkthrough in Amharic covering how to adjust pin-selected machines, calibrate seat height, breathe during lifts, and maintain safe spinal posture.',
-    amharicDescription: 'ለአዲስ ሰልጣኞች የተዘጋጀ የአማርኛ መመሪያ፡ ማሽኖችን እንዴት ከቁመት ጋር ማስተካከል እንደሚቻል፣ የደህንነት ፒኖች አጠቃቀም፣ የመተንፈስ ስርዓት እና ትክክለኛ አቋቋም።',
+    description: 'A comprehensive beginner walkthrough in Amharic covering how to adjust pin-selected machines, calibrate seat height, and breathe properly during lifts.',
+    amharicDescription: 'ለአዲስ ሰልጣኞች የተዘጋጀ የአማርኛ መመሪያ፡ ማሽኖችን እንዴት ከቁመት ጋር ማስተካከል እንደሚቻል፣ የደህንነት ፒኖች አጠቃቀም እና የመተንፈስ ስርዓት።',
     amharicCues: [
       'ማንኛውንም ማሽን ከመጠቀምዎ በፊት መቀመጫውን ከቁመትዎ ጋር አስተካክለው ይቆልፉ።',
       'የክብደት መምረጫ ፒኑ (weight stack pin) ሙሉ በሙሉ ወደ ውስጥ መግባቱን ያረጋግጡ።',
@@ -70,6 +68,7 @@ const VIDEO_GUIDES: VideoGuide[] = [
       'Ensure the selector pin is fully inserted into the stack plate.',
       'Exhale on concentric exertion, inhale on controlled eccentric return.',
       'Always warm up with 5-10 minutes of light cardio before lifting.',
+      'Re-rack weights and dumbbells to numbered holders after each set.',
     ],
     amharicMistakes: [
       'ያለ ማሟሟቂያ በከባድ ክብደት አይጀምሩ።',
@@ -85,7 +84,7 @@ const VIDEO_GUIDES: VideoGuide[] = [
   {
     id: 'vid-amharic-abs',
     title: 'Belly Fat Reduction & Core Toning Exercises (Meski Fitness Amharic)',
-    amharicTitle: 'ቦርጭን ለማጥፋት እና የሆድ ጡንቻን ለማጠንከር የሚረዱ እንቅስቃሴዎች',
+    amharicTitle: 'ቦርጭን ለማጥፋት እና የሆድ ጡንቻን ለማጠንከር',
     category: 'Cardio',
     isAmharicAudio: true,
     duration: '8:30 min',
@@ -95,8 +94,8 @@ const VIDEO_GUIDES: VideoGuide[] = [
     amharicTargetMuscles: 'የሆድ ጡንቻዎች፣ ጎንና ወገብ',
     thumbnailUrl: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=600&q=80',
     youtubeSearchTerm: 'ቦርጭን ለማጥፋት የሚረዱ ቀላል ስፖርታዊ እንቅስቃሴዎች meski fitness',
-    description: 'Proven core toning and abdominal exercises taught in Amharic, focusing on plank alignment, knee drives, and pelvic tilts without placing strain on your lower back.',
-    amharicDescription: 'በቀላል የሆድ እና የወገብ ስፖርቶች አማካኝነት የሆድ ስብን ለማቅለጥ እና ወገብን ለማጠንከር የሚረዳ ታዋቂ የአማርኛ ስልጠና።',
+    description: 'Proven core toning and abdominal exercises taught in Amharic, focusing on plank alignment, knee drives, and pelvic tilts without back strain.',
+    amharicDescription: 'በቀላል የሆድ እና የወገብ ስፖርቶች አማካኝነት የሆድ ስብን ለማቅለጥ እና ወገብን ለማጠንከር የሚረዳ የአማርኛ ስልጠና።',
     amharicCues: [
       'የፕላንክ (Plank) እንቅስቃሴ ላይ ወገብ ሳይወላገድ ሰውነትን እንደ ሳንቃ ቀጥ ማድረግ።',
       'እግሮችን ወደ ላይ በማንሳት (Leg Raises) የታችኛውን የሆድ ጡንቻ ማነቃቃት።',
@@ -120,7 +119,7 @@ const VIDEO_GUIDES: VideoGuide[] = [
   {
     id: 'vid-amharic-aerobics',
     title: 'Aerobic Dance & High-Energy Cardio for Weight Loss & Heart Health',
-    amharicTitle: 'የኤሮቢክስ እንቅስቃሴ ለጤና፣ ቅልጥፍና እና ክብደት መቀነስ',
+    amharicTitle: 'የኤሮቢክስ እንቅስቃሴ ለጤና እና ክብደት መቀነስ',
     category: 'Cardio',
     isAmharicAudio: true,
     duration: '12:45 min',
@@ -144,7 +143,7 @@ const VIDEO_GUIDES: VideoGuide[] = [
       'Sip small amounts of water during designated hydration breaks.',
     ],
     amharicMistakes: [
-      'በደረቅ ወይም ተንሸራታች ወለል ላይ ያለ ተገቢ የስፖርት ጫማ አለመስራት።',
+      'በተንሸራታች ወለል ላይ ያለ ተገቢ የስፖርት ጫማ አለመስራት።',
       'እንቅስቃሴውን በድንገት አቁሞ አለመቀመጥ (Always cool down gradually)።',
     ],
     englishMistakes: [
@@ -154,8 +153,8 @@ const VIDEO_GUIDES: VideoGuide[] = [
   },
   {
     id: 'vid-amharic-chest',
-    title: 'Proper Chest Workout Form: Barbell Bench Press & Dumbbell Press (Amharic)',
-    amharicTitle: 'ትክክለኛ የደረት ስፖርት አሰራር - ቤንች ፕሬስ እና ዳምቤል',
+    title: 'Proper Chest Workout Form: Barbell Bench Press & Dumbbell Press',
+    amharicTitle: 'ትክክለኛ የደረት ስፖርት አሰራር (ቤንች ፕሬስ እና ዳምቤል)',
     category: 'Strength',
     isAmharicAudio: true,
     duration: '7:15 min',
@@ -171,7 +170,7 @@ const VIDEO_GUIDES: VideoGuide[] = [
       'ጀርባዎን በቤንቹ ላይ በማሳረፍ ደረትዎን ወደ ፊት አውጥተው ይተኙ።',
       'ክርንዎን ከሰውነትዎ በ45 ዲግሪ ማዕዘን ይያዙ (ትከሻ እንዳይጎዳ)።',
       'ባርቤሉን እስከ ደረትዎ ድረስ በቁጥጥር ዝቅ ያድርጉት።',
-      'ወደ ላይ ሲገፉ እጆችን ሙሉ በሙሉ ሳያስረሱ (Without locking out elbows) ግፊቱን ደረት ላይ ማቆየት።',
+      'ወደ ላይ ሲገፉ እጆችን ሙሉ በሙሉ ሳያስረሱ ግፊቱን ደረት ላይ ማቆየት።',
     ],
     englishCues: [
       'Retract scapulae and plant feet firmly flat on the floor.',
@@ -189,8 +188,8 @@ const VIDEO_GUIDES: VideoGuide[] = [
   },
   {
     id: 'vid-amharic-squat',
-    title: 'Safe Squats & Deadlifts: Neutral Spine & Knee Protection (Amharic)',
-    amharicTitle: 'ትክክለኛ የስኳት እና የዳድሊፍት አሰራር - ወገብ እና ጉልበት ሳይጎዳ',
+    title: 'Safe Squats & Deadlifts: Neutral Spine & Knee Protection',
+    amharicTitle: 'ትክክለኛ የስኳት አሰራር (ወገብ እና ጉልበት ሳይጎዳ)',
     category: 'Strength',
     isAmharicAudio: true,
     duration: '6:45 min',
@@ -225,7 +224,7 @@ const VIDEO_GUIDES: VideoGuide[] = [
   {
     id: 'vid-amharic-desk',
     title: 'Office Worker Desk Decompression: Relieving Neck, Shoulder & Hip Stiffness',
-    amharicTitle: 'ቀኑን ሙሉ ለተቀመጠ ሰራተኛ የአንገት፣ ትከሻ እና የወገብ ማፍታቻ',
+    amharicTitle: 'ለቢሮ ሰራተኞች የአንገት፣ ትከሻ እና የወገብ ማፍታቻ',
     category: 'Mobility',
     isAmharicAudio: true,
     duration: '5:10 min',
@@ -260,7 +259,7 @@ const VIDEO_GUIDES: VideoGuide[] = [
   {
     id: 'vid-amharic-treadmill',
     title: 'Treadmill & Cardio Calibration: Speed, Incline & Emergency Stop',
-    amharicTitle: 'የትሬድሚል አጠቃቀም፣ የፍጥነት መቆጣጠሪያ እና የቀይ ደህንነት ክሊፕ አስፈላጊነት',
+    amharicTitle: 'የትሬድሚል አጠቃቀም እና የቀይ ደህንነት ክሊፕ አስፈላጊነት',
     category: 'Cardio',
     isAmharicAudio: true,
     duration: '4:20 min',
@@ -295,8 +294,8 @@ const VIDEO_GUIDES: VideoGuide[] = [
 ];
 
 export const TraineeGuidesPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'MANUAL' | 'VIDEOS'>('VIDEOS');
-  const [selectedCategory, setSelectedCategory] = useState<string>('AMHARIC');
+  const [activeTab, setActiveTab] = useState<'VIDEOS' | 'MANUAL'>('VIDEOS');
+  const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeVideo, setActiveVideo] = useState<VideoGuide | null>(null);
   const [modalLanguage, setModalLanguage] = useState<'AMHARIC' | 'ENGLISH'>('AMHARIC');
@@ -322,48 +321,48 @@ export const TraineeGuidesPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Top Banner (Hidden on print) */}
+      {/* Clean Header Bar */}
       <div className="no-print bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-lg font-bold text-slate-900 tracking-tight">
-              Trainee Manuals & Video Training Hub
+              Trainee Guides & Videos
             </h1>
             <span className="text-xs font-mono font-semibold text-[#00843D] bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-              የስልጠና መመሪያዎች እና ቪዲዮዎች
+              የስልጠና መመሪያዎች
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Official Ministry of Agriculture fitness center guidelines, safety SOP, and curated Ethiopian Amharic workout tutorials.
+            Exercise tutorials, safety checklists, and official gymnasium rules for Ministry staff.
           </p>
         </div>
 
-        {/* Tab switcher & Print Button */}
-        <div className="flex items-center gap-3 shrink-0 flex-wrap">
-          <div className="flex bg-slate-100 p-1 rounded-lg">
+        {/* View Switcher & Print Action */}
+        <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+          <div className="flex bg-slate-100 p-1 rounded-lg border border-slate-200/60">
             <button
               type="button"
               onClick={() => setActiveTab('VIDEOS')}
-              className={`px-3 py-1.5 rounded-md text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+              className={`px-3 py-1.5 rounded-md text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer ${
                 activeTab === 'VIDEOS'
-                  ? 'bg-white text-slate-900 shadow-xs'
+                  ? 'bg-white text-slate-900 shadow-xs font-bold'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <Video className="h-3.5 w-3.5 text-moa-gold" />
-              <span>Video Hub ({VIDEO_GUIDES.length})</span>
+              <Video className="h-3.5 w-3.5 text-[#00843D]" />
+              <span>Exercise Videos ({VIDEO_GUIDES.length})</span>
             </button>
             <button
               type="button"
               onClick={() => setActiveTab('MANUAL')}
-              className={`px-3 py-1.5 rounded-md text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+              className={`px-3 py-1.5 rounded-md text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer ${
                 activeTab === 'MANUAL'
-                  ? 'bg-white text-slate-900 shadow-xs'
+                  ? 'bg-white text-slate-900 shadow-xs font-bold'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <BookOpen className="h-3.5 w-3.5 text-[#00843D]" />
-              <span>Handbook SOP</span>
+              <BookOpen className="h-3.5 w-3.5 text-moa-gold" />
+              <span>Printable Handbook</span>
             </button>
           </div>
 
@@ -373,206 +372,118 @@ export const TraineeGuidesPage: React.FC = () => {
             className="px-3.5 h-8.5 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-[6px] shadow-2xs transition flex items-center gap-1.5 cursor-pointer"
           >
             <Printer className="h-3.5 w-3.5 text-slate-500" />
-            <span>Print / Save PDF</span>
+            <span>Print / PDF</span>
           </button>
         </div>
       </div>
 
       {/* ========================================================================= */}
-      {/* TAB 1: CURATED VIDEO TRAINING HUB (DEFAULT)                               */}
+      {/* TAB 1: CLEAN VIDEO TRAINING HUB (DEFAULT)                                 */}
       {/* ========================================================================= */}
       {activeTab === 'VIDEOS' && (
-        <div className="space-y-6">
-          {/* Ethiopian Amharic Fitness Video Highlight Banner */}
-          <div className="bg-gradient-to-r from-emerald-800 via-[#00843D] to-teal-900 rounded-2xl p-5 text-white shadow-md relative overflow-hidden">
-            <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-white/5 transform skew-x-12 pointer-events-none"></div>
-            
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
-              <div className="space-y-1.5">
-                <div className="inline-flex items-center gap-1.5 bg-amber-400 text-slate-950 font-extrabold text-[11px] px-2.5 py-0.5 rounded-full shadow-xs">
-                  <span>🇪🇹</span>
-                  <span>የአማርኛ ስፖርታዊ ልምምድ ቪዲዮዎች</span>
-                </div>
-                <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
-                  Learn Exercise Form with Ethiopian Trainers in Amharic
-                </h2>
-                <p className="text-xs text-emerald-100 max-w-xl leading-relaxed">
-                  ትክክለኛ የስፖርት አሰራር፣ የደረት እና የእግር ስኳት ልምምድ፣ የሆድና ቦርጭ ማጥፊያ፣ እና ለቢሮ ሰራተኞች የሚሆን የወገብ ማፍታቻ በአማርኛ ቪዲዮዎች ይከታተሉ።
-                </p>
-              </div>
-
-              {/* Direct YouTube Search External Action */}
-              <div className="shrink-0 flex items-center gap-2">
-                <a
-                  href="https://www.youtube.com/results?search_query=%E1%8B%A8%E1%8C%85%E1%88%9D%E1%8A%93%E1%8B%9A%E1%8B%A8%E1%88%9D+%E1%88%85%E1%8D%96%E1%88%AD%E1%89%85+%E1%8A%A0%E1%88%B0%E1%88%AB%E1%88%AD+%E1%89%A0%E1%80%8%E1%88%9B%E1%88%AD%E1%8A%9B"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-3.5 h-9 text-xs font-bold text-slate-900 bg-white hover:bg-slate-100 rounded-lg shadow-sm transition flex items-center gap-2 cursor-pointer"
-                >
-                  <Youtube className="h-4 w-4 text-red-600" />
-                  <span>በዩቲዩብ ተጨማሪ ፈልግ ↗</span>
-                </a>
-              </div>
-            </div>
-          </div>
-
-          {/* Search & Category Filter Bar */}
-          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="space-y-5">
+          {/* Minimal Filter & Search Strip */}
+          <div className="bg-white rounded-xl border border-slate-200 p-3 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
             {/* Search Input */}
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <div className="relative flex-1 max-w-sm">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="ስፖርቶችን ፈልግ (ደረት፣ ስኳት፣ ቦርጭ፣ ትሬድሚል፣ ማፍታቻ)..."
-                className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-[#00843D] text-slate-900"
+                placeholder="Search exercise or body part (ደረት፣ ስኳት፣ ቦርጭ)..."
+                className="w-full pl-8.5 pr-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-hidden focus:ring-1 focus:ring-[#00843D] text-slate-900 bg-slate-50/50"
               />
             </div>
 
-            {/* Category Pills */}
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <button
-                type="button"
-                onClick={() => setSelectedCategory('AMHARIC')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1 ${
-                  selectedCategory === 'AMHARIC'
-                    ? 'bg-[#00843D] text-white shadow-2xs'
-                    : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200'
-                }`}
-              >
-                <span>🇪🇹 በአማርኛ (Amharic)</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectedCategory('ALL')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
-                  selectedCategory === 'ALL'
-                    ? 'bg-slate-900 text-white shadow-2xs'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                All Videos
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectedCategory('Strength')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
-                  selectedCategory === 'Strength'
-                    ? 'bg-slate-900 text-white shadow-2xs'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                Strength & የጡንቻ
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectedCategory('Cardio')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
-                  selectedCategory === 'Cardio'
-                    ? 'bg-slate-900 text-white shadow-2xs'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                Cardio & ቦርጭ ማጥፊያ
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectedCategory('Mobility')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
-                  selectedCategory === 'Mobility'
-                    ? 'bg-slate-900 text-white shadow-2xs'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                Desk Mobility (ማፍታቻ)
-              </button>
+            {/* Clean Segmented Filter Tabs */}
+            <div className="flex items-center gap-1 overflow-x-auto pb-1 md:pb-0 text-xs">
+              {[
+                { key: 'ALL', label: 'All Guides' },
+                { key: 'AMHARIC', label: '🇪🇹 በአማርኛ' },
+                { key: 'Beginner', label: 'Beginner' },
+                { key: 'Strength', label: 'Strength' },
+                { key: 'Cardio', label: 'Cardio & Abs' },
+                { key: 'Mobility', label: 'Desk Mobility' },
+              ].map((tab) => (
+                <button
+                  key={tab.key}
+                  type="button"
+                  onClick={() => setSelectedCategory(tab.key)}
+                  className={`px-3 py-1.5 rounded-lg font-medium whitespace-nowrap transition cursor-pointer ${
+                    selectedCategory === tab.key
+                      ? 'bg-slate-900 text-white font-semibold shadow-2xs'
+                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Video Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Clean, Refined Video Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {filteredVideos.map((guide) => (
               <div
                 key={guide.id}
-                className="bg-white rounded-xl border border-slate-200 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col justify-between group"
+                onClick={() => {
+                  setActiveVideo(guide);
+                  setModalLanguage('AMHARIC');
+                }}
+                className="group bg-white rounded-xl border border-slate-200 hover:border-slate-300 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col justify-between cursor-pointer"
               >
                 <div>
-                  {/* Video Thumbnail with Play Button */}
-                  <div
-                    onClick={() => {
-                      setActiveVideo(guide);
-                      setModalLanguage('AMHARIC');
-                    }}
-                    className="relative aspect-video bg-slate-900 overflow-hidden cursor-pointer"
-                  >
+                  {/* Thumbnail Container */}
+                  <div className="relative aspect-video bg-slate-900 overflow-hidden">
                     <img
                       src={guide.thumbnailUrl}
                       alt={guide.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-90 group-hover:opacity-100"
+                      className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300 opacity-90 group-hover:opacity-100"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent"></div>
+                    <div className="absolute inset-0 bg-slate-950/20 group-hover:bg-slate-950/10 transition-colors"></div>
 
-                    {/* Play Badge */}
+                    {/* Centered Minimal Play Pill */}
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-12 h-12 rounded-full bg-[#00843D]/95 text-white flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:bg-[#00843D] transition-transform">
-                        <Play className="h-5 w-5 fill-white ml-0.5" />
+                      <div className="w-10 h-10 rounded-full bg-black/60 group-hover:bg-[#00843D] text-white flex items-center justify-center shadow-md backdrop-blur-xs transition-transform group-hover:scale-110">
+                        <Play className="h-4 w-4 fill-white ml-0.5" />
                       </div>
                     </div>
 
-                    {/* Duration badge */}
-                    <div className="absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-md bg-black/80 text-white font-mono text-[10px] font-bold">
+                    {/* Clean Corner Duration Tag */}
+                    <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/70 text-white font-mono text-[10px] font-semibold">
                       {guide.duration}
                     </div>
 
-                    {/* Amharic Language Badge */}
-                    <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
-                      {guide.isAmharicAudio && (
-                        <span className="px-2 py-0.5 rounded-md bg-amber-400 text-slate-950 text-[10px] font-extrabold flex items-center gap-1 shadow-xs">
-                          <span>🇪🇹</span>
-                          <span>በአማርኛ</span>
-                        </span>
-                      )}
-                      <span className="px-2 py-0.5 rounded-md bg-[#00843D] text-white text-[10px] font-bold uppercase tracking-wider">
-                        {guide.category}
-                      </span>
+                    {/* Minimal Category Pill */}
+                    <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-white/90 text-slate-800 text-[10px] font-semibold backdrop-blur-xs">
+                      {guide.category}
                     </div>
                   </div>
 
-                  {/* Body Content */}
-                  <div className="p-4 space-y-2">
-                    <h3 className="text-sm font-bold text-slate-900 group-hover:text-[#00843D] transition-colors leading-snug">
+                  {/* Clean Content Body */}
+                  <div className="p-4 space-y-1.5">
+                    <h3 className="text-sm font-bold text-slate-900 group-hover:text-[#00843D] transition-colors leading-snug line-clamp-1">
                       {guide.amharicTitle}
                     </h3>
                     <div className="text-xs text-slate-500 font-medium line-clamp-1">
                       {guide.title}
                     </div>
-                    <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-slate-600 line-clamp-2 mt-1 leading-relaxed">
                       {guide.amharicDescription}
                     </p>
-
-                    <div className="pt-2 text-[11px] text-slate-500 font-mono">
-                      አሰልጣኝ: <strong className="text-slate-800">{guide.amharicInstructor}</strong>
-                    </div>
                   </div>
                 </div>
 
-                {/* Footer Action */}
-                <div className="p-3.5 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between">
-                  <span className="text-[11px] text-slate-500 font-semibold truncate max-w-[140px]">
-                    {guide.amharicTargetMuscles}
+                {/* Clean Bottom Meta Row */}
+                <div className="px-4 py-3 bg-slate-50/60 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                  <span className="truncate font-medium text-slate-700">
+                    {guide.amharicInstructor}
                   </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveVideo(guide);
-                      setModalLanguage('AMHARIC');
-                    }}
-                    className="px-3 h-7.5 text-xs font-semibold text-white bg-[#00843D] hover:bg-[#007033] rounded-[6px] shadow-2xs transition flex items-center gap-1 cursor-pointer shrink-0"
-                  >
-                    <Play className="h-3 w-3 fill-white" />
-                    <span>ቪዲዮውን ይመልከቱ</span>
-                  </button>
+                  <span className="text-[#00843D] font-semibold flex items-center gap-1 group-hover:translate-x-0.5 transition-transform shrink-0">
+                    <span>Watch</span>
+                    <ArrowRight className="h-3 w-3" />
+                  </span>
                 </div>
               </div>
             ))}
@@ -581,240 +492,187 @@ export const TraineeGuidesPage: React.FC = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* TAB 2: TRAINEE MANUAL & OPERATING STANDARD (Printable Handbook)            */}
+      {/* TAB 2: CLEAN PRINTABLE HANDBOOK SOP                                       */}
       {/* ========================================================================= */}
       {activeTab === 'MANUAL' && (
         <div className="space-y-6">
-          {/* Printable Official Document Container */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden p-6 sm:p-10 space-y-8">
-            {/* Header Document Block */}
-            <div className="border-b-2 border-slate-800 pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden p-6 sm:p-10 space-y-7">
+            {/* Document Header */}
+            <div className="border-b border-slate-200 pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-4">
-                <MoaLogo className="h-16 w-16 text-[#00843D] shrink-0" size={64} />
+                <MoaLogo className="h-14 w-14 text-[#00843D] shrink-0" size={56} />
                 <div>
-                  <div className="text-xs font-bold text-slate-500 uppercase tracking-widest">
+                  <div className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">
                     Federal Democratic Republic of Ethiopia
                   </div>
-                  <h2 className="text-xl font-black text-slate-900 tracking-tight">
+                  <h2 className="text-lg font-bold text-slate-900 tracking-tight">
                     MINISTRY OF AGRICULTURE
                   </h2>
-                  <div className="text-sm font-bold text-[#00843D]">
-                    Staff Wellness & Fitness Gymnasium — Trainee Handbook & SOP
+                  <div className="text-xs font-semibold text-[#00843D]">
+                    Staff Gymnasium & Fitness Facility — Operating Rules & Trainee SOP
                   </div>
                 </div>
               </div>
 
-              <div className="text-right sm:border-l sm:border-slate-200 sm:pl-6 text-xs text-slate-500 space-y-1 font-mono">
-                <div>DOC NO: <strong className="text-slate-900">MoA-GYM-SOP-2026/01</strong></div>
-                <div>VERSION: <strong className="text-slate-900">2.4 (Active)</strong></div>
-                <div>FACILITY: <strong className="text-slate-900">HQ Wellness Wing</strong></div>
-                <div>INTERCOM: <strong className="text-slate-900">Ext. 4410</strong></div>
+              <div className="text-right sm:border-l sm:border-slate-200 sm:pl-6 text-xs text-slate-500 space-y-0.5 font-mono">
+                <div>DOC NO: <strong className="text-slate-800">MoA-GYM-SOP-2026/01</strong></div>
+                <div>VERSION: <strong className="text-slate-800">2.4 (Active)</strong></div>
+                <div>INTERCOM: <strong className="text-slate-800">Ext. 4410</strong></div>
               </div>
             </div>
 
-            {/* Quick Summary Highlights */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="bg-emerald-50/60 border border-emerald-200/80 rounded-xl p-4">
-                <div className="flex items-center gap-2 text-xs font-bold text-emerald-950">
-                  <Clock className="h-4 w-4 text-[#00843D]" />
+            {/* Highlight Summary */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-xs">
+              <div className="bg-slate-50 border border-slate-200 rounded-lg p-3.5">
+                <div className="font-bold text-slate-900 flex items-center gap-1.5 mb-1">
+                  <Clock className="h-3.5 w-3.5 text-[#00843D]" />
                   <span>Two Daily Shifts</span>
                 </div>
-                <div className="text-xs text-slate-600 mt-1">
+                <div className="text-slate-600 text-[11px]">
                   <strong>ጠዋት / Morning:</strong> 11:00 – 1:30 E.C. (6:00 – 8:30 AM)<br />
                   <strong>ማታ / Evening:</strong> 11:30 – 3:00 E.C. (5:30 – 9:00 PM)
                 </div>
               </div>
 
-              <div className="bg-amber-50/60 border border-amber-200/80 rounded-xl p-4">
-                <div className="flex items-center gap-2 text-xs font-bold text-amber-950">
-                  <Key className="h-4 w-4 text-amber-700" />
-                  <span>Locker Keys (1–40)</span>
+              <div className="bg-slate-50 border border-slate-200 rounded-lg p-3.5">
+                <div className="font-bold text-slate-900 flex items-center gap-1.5 mb-1">
+                  <Key className="h-3.5 w-3.5 text-amber-700" />
+                  <span>Lockers (1–40)</span>
                 </div>
-                <div className="text-xs text-slate-600 mt-1">
-                  Issued upon check-in at gate terminal. <strong>Day-use only</strong>; must be returned before exiting facility.
+                <div className="text-slate-600 text-[11px]">
+                  Keys issued at gate terminal. <strong>Session-use only</strong>; please return key upon departure.
                 </div>
               </div>
 
-              <div className="bg-blue-50/60 border border-blue-200/80 rounded-xl p-4">
-                <div className="flex items-center gap-2 text-xs font-bold text-blue-950">
-                  <ShieldCheck className="h-4 w-4 text-blue-700" />
-                  <span>Mandatory Hygiene</span>
+              <div className="bg-slate-50 border border-slate-200 rounded-lg p-3.5">
+                <div className="font-bold text-slate-900 flex items-center gap-1.5 mb-1">
+                  <ShieldCheck className="h-3.5 w-3.5 text-blue-700" />
+                  <span>Hygiene Mandate</span>
                 </div>
-                <div className="text-xs text-slate-600 mt-1">
-                  Personal sweat towel required. Indoor clean athletic sneakers only. Wipe down stations after each set.
+                <div className="text-slate-600 text-[11px]">
+                  Personal sweat towel required. Clean indoor sneakers only. Wipe equipment after sets.
                 </div>
               </div>
             </div>
 
-            {/* Section 1: Introduction & Mission */}
-            <section className="space-y-3">
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2 pb-1 border-b border-slate-100">
-                <span className="w-6 h-6 rounded-md bg-[#00843D] text-white flex items-center justify-center text-xs font-mono font-bold">1</span>
-                Mission & Scope of Facility
+            {/* Sections 1 to 6 */}
+            <section className="space-y-2">
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 pb-1 border-b border-slate-100">
+                <span className="w-5 h-5 rounded bg-slate-900 text-white flex items-center justify-center text-[10px] font-mono">1</span>
+                Mission & Membership Scope
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                The Ministry of Agriculture Staff Wellness & Fitness Gymnasium is an institutional health facility dedicated exclusively to promoting cardiovascular health, muscular fitness, mental well-being, and work-life balance for MoA employees. All active civil servants and verified staff who have claimed their digital membership pass are eligible to train during their assigned shift.
+                The MoA Staff Gymnasium is dedicated to promoting physical wellness, cardiovascular health, and stress relief for Ministry employees. All active staff who have activated their digital pass are entitled to train during their shift.
               </p>
             </section>
 
-            {/* Section 2: Gate Check-in & Entry Protocol */}
-            <section className="space-y-3">
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2 pb-1 border-b border-slate-100">
-                <span className="w-6 h-6 rounded-md bg-[#00843D] text-white flex items-center justify-center text-xs font-mono font-bold">2</span>
-                Gate Access & Verification Protocol
+            <section className="space-y-2">
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 pb-1 border-b border-slate-100">
+                <span className="w-5 h-5 rounded bg-slate-900 text-white flex items-center justify-center text-[10px] font-mono">2</span>
+                Gate Verification & Departure Protocol
               </h3>
-              <ul className="space-y-2 text-xs text-slate-600">
+              <ul className="space-y-1.5 text-xs text-slate-600">
                 <li className="flex items-start gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-[#00843D] shrink-0 mt-0.5" />
-                  <span><strong>Digital Pass Scanning:</strong> Present your permanent QR code (from your phone screen or printed pass) to the desk scanner at the entrance gate.</span>
+                  <CheckCircle2 className="h-3.5 w-3.5 text-[#00843D] shrink-0 mt-0.5" />
+                  <span><strong>Digital Pass:</strong> Scan your permanent QR code or present your MoA Staff ID to the front desk attendant upon entrance.</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-[#00843D] shrink-0 mt-0.5" />
-                  <span><strong>Physical ID Verification:</strong> In the absence of a digital pass, present your official MoA Employee ID card for manual terminal verification by the gym attendant.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-[#00843D] shrink-0 mt-0.5" />
-                  <span><strong>Departure Check-Out:</strong> Always scan out or click "Check Out" on your portal when leaving. This frees your locker and keeps accurate occupancy records.</span>
+                  <CheckCircle2 className="h-3.5 w-3.5 text-[#00843D] shrink-0 mt-0.5" />
+                  <span><strong>Check Out:</strong> Always scan your pass or tap "Check Out" on your phone portal when leaving to release your locker.</span>
                 </li>
               </ul>
             </section>
 
-            {/* Section 3: Locker Assignment Policy */}
-            <section className="space-y-3">
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2 pb-1 border-b border-slate-100">
-                <span className="w-6 h-6 rounded-md bg-[#00843D] text-white flex items-center justify-center text-xs font-mono font-bold">3</span>
-                Locker Usage & Personal Belongings Policy
+            <section className="space-y-2">
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 pb-1 border-b border-slate-100">
+                <span className="w-5 h-5 rounded bg-slate-900 text-white flex items-center justify-center text-[10px] font-mono">3</span>
+                Locker Usage Policy
               </h3>
-              <div className="bg-slate-50 rounded-xl p-4 border border-slate-200 text-xs text-slate-600 space-y-2">
-                <p>
-                  <strong>1. Temporary Session Use Only:</strong> Lockers numbered 1 through 40 are provided solely for temporary storage during an active workout session.
-                </p>
-                <p>
-                  <strong>2. Key Custody:</strong> The brass locker key issued to you at the front desk is your responsibility. Lost keys incur a 300 ETB lock replacement fee.
-                </p>
-                <p>
-                  <strong>3. No Overnight Storage:</strong> At the close of each day (09:15 PM), all lockers are audited and cleared by the gym attendant and security committee. Unclaimed items will be transferred to security lost-and-found.
-                </p>
-                <p>
-                  <strong>4. Valuables:</strong> While the facility has 24/7 gate security, the Ministry assumes no liability for large sums of cash, laptops, or high-value personal jewelry left unattended.
-                </p>
+              <div className="bg-slate-50 rounded-lg p-3.5 border border-slate-200 text-xs text-slate-600 space-y-1.5">
+                <p>• Lockers are allocated for <strong>active workout sessions only</strong>. Overnight storage is not permitted.</p>
+                <p>• Lockers are audited daily at 09:15 PM; unclaimed items are transferred to building security.</p>
+                <p>• Lost brass locker keys incur a 300 ETB lock replacement fee.</p>
               </div>
             </section>
 
-            {/* Section 4: Gym Floor Etiquette & Hygiene Rules */}
-            <section className="space-y-3">
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2 pb-1 border-b border-slate-100">
-                <span className="w-6 h-6 rounded-md bg-[#00843D] text-white flex items-center justify-center text-xs font-mono font-bold">4</span>
-                Floor Etiquette, Attire & Hygiene Standards
+            <section className="space-y-2">
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 pb-1 border-b border-slate-100">
+                <span className="w-5 h-5 rounded bg-slate-900 text-white flex items-center justify-center text-[10px] font-mono">4</span>
+                Equipment Safety & Etiquette
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-600">
-                <div className="p-3.5 rounded-lg border border-slate-200 bg-white space-y-1">
-                  <div className="font-bold text-slate-900 flex items-center gap-1.5">
-                    <span className="h-2 w-2 rounded-full bg-emerald-500"></span>
-                    Footwear & Sportswear
-                  </div>
-                  <p>Proper athletic footwear with rubber non-marking soles is mandatory. Sandals, bare feet, leather office dress shoes, or open-toe shoes are strictly barred.</p>
+                <div className="p-3 rounded-lg border border-slate-200 bg-white">
+                  <strong className="text-slate-900 block mb-0.5">Footwear & Attire:</strong>
+                  Athletic shoes with clean rubber soles only. Dress shoes, slippers, or bare feet are barred.
                 </div>
-
-                <div className="p-3.5 rounded-lg border border-slate-200 bg-white space-y-1">
-                  <div className="font-bold text-slate-900 flex items-center gap-1.5">
-                    <span className="h-2 w-2 rounded-full bg-emerald-500"></span>
-                    Personal Towel Rule
-                  </div>
-                  <p>Every trainee must carry a sweat towel. Lay your towel over leather machine seats and bench surfaces before lying or sitting down.</p>
+                <div className="p-3 rounded-lg border border-slate-200 bg-white">
+                  <strong className="text-slate-900 block mb-0.5">Treadmill Safety Clip:</strong>
+                  Always attach the red magnetic safety clip to your clothing during treadmill operation.
                 </div>
-
-                <div className="p-3.5 rounded-lg border border-slate-200 bg-white space-y-1">
-                  <div className="font-bold text-slate-900 flex items-center gap-1.5">
-                    <span className="h-2 w-2 rounded-full bg-emerald-500"></span>
-                    Re-Racking Weights
-                  </div>
-                  <p>Always return dumbbells, weight plates, and barbell collars to their numbered rack positions immediately after completing your sets. Do not leave plates on the floor.</p>
+                <div className="p-3 rounded-lg border border-slate-200 bg-white">
+                  <strong className="text-slate-900 block mb-0.5">Barbell Spring Collars:</strong>
+                  Fasten spring collar clips onto barbell ends to prevent plate slides.
                 </div>
-
-                <div className="p-3.5 rounded-lg border border-slate-200 bg-white space-y-1">
-                  <div className="font-bold text-slate-900 flex items-center gap-1.5">
-                    <span className="h-2 w-2 rounded-full bg-emerald-500"></span>
-                    Machine Sharing & Rest Periods
-                  </div>
-                  <p>Allow fellow colleagues to work in between sets during peak shift hours. Avoid sitting on equipment scrolling mobile phones while others wait.</p>
+                <div className="p-3 rounded-lg border border-slate-200 bg-white">
+                  <strong className="text-slate-900 block mb-0.5">Re-Racking Weights:</strong>
+                  Always return dumbbells and weight plates to racks immediately after finishing your set.
                 </div>
               </div>
             </section>
 
-            {/* Section 5: Safe Equipment Operation */}
-            <section className="space-y-3">
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2 pb-1 border-b border-slate-100">
-                <span className="w-6 h-6 rounded-md bg-[#00843D] text-white flex items-center justify-center text-xs font-mono font-bold">5</span>
-                Safe Equipment Operation Guide
+            <section className="space-y-2">
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 pb-1 border-b border-slate-100">
+                <span className="w-5 h-5 rounded bg-slate-900 text-white flex items-center justify-center text-[10px] font-mono">5</span>
+                Emergency Contacts
               </h3>
-              <div className="space-y-2 text-xs text-slate-600">
-                <div className="p-3 bg-amber-50/50 rounded-lg border border-amber-200/60">
-                  <strong className="text-amber-950">Treadmill Safety Stop:</strong> The red magnetic clip must be attached to your waistband. In the event of a stumble or dizziness, the detachment will immediately kill power to the motor and prevent injury.
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-600">
+                <div className="p-3 rounded-lg border border-slate-200 bg-slate-50">
+                  <strong className="text-slate-900 block">First Aid Kit:</strong>
+                  Front Desk next to Locker #01.
                 </div>
-                <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                  <strong className="text-slate-900">Barbell Spring Collars:</strong> When performing bench press, barbell squats, or overhead presses, spring clips must be fastened on both ends of the barbell to prevent unbalanced plate slides.
+                <div className="p-3 rounded-lg border border-slate-200 bg-slate-50">
+                  <strong className="text-slate-900 block">Intercom:</strong>
+                  Front Desk Ext. <strong>4410</strong> / Security <strong>4400</strong>.
                 </div>
-                <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                  <strong className="text-slate-900">Pin-Selected Machines:</strong> Ensure selector pins are fully pushed in until they click flush against the weight stack plate before lifting. Never hang foreign weights on selector pins.
+                <div className="p-3 rounded-lg border border-slate-200 bg-slate-50">
+                  <strong className="text-slate-900 block">Attendant on Duty:</strong>
+                  Coach Henok / Almaz Tadesse.
                 </div>
               </div>
             </section>
 
-            {/* Section 6: Emergency & Medical Support */}
-            <section className="space-y-3">
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2 pb-1 border-b border-slate-100">
-                <span className="w-6 h-6 rounded-md bg-[#00843D] text-white flex items-center justify-center text-xs font-mono font-bold">6</span>
-                Emergency, First Aid & Attendant Contacts
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                <div className="p-3 rounded-lg border border-slate-200 bg-slate-50">
-                  <div className="font-bold text-slate-900">First Aid Station</div>
-                  <div className="text-slate-500 mt-0.5">Located at the Front Desk counter next to Locker #01. Includes ice packs, bandages, and burn dressings.</div>
-                </div>
-                <div className="p-3 rounded-lg border border-slate-200 bg-slate-50">
-                  <div className="font-bold text-slate-900">Desk Intercom</div>
-                  <div className="text-slate-500 mt-0.5">Internal Extension <strong>4410</strong> / Security Gate <strong>4400</strong>. Call immediately for medical assistance.</div>
-                </div>
-                <div className="p-3 rounded-lg border border-slate-200 bg-slate-50">
-                  <div className="font-bold text-slate-900">Equipment Defects</div>
-                  <div className="text-slate-500 mt-0.5">Report frayed cables or loose bolts immediately to Coach Henok or any desk attendant. Do not operate defective gear.</div>
-                </div>
-              </div>
-            </section>
-
-            {/* Sign-off Footer */}
-            <div className="pt-6 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between text-[11px] text-slate-400 gap-2">
-              <div>Approved by: <strong>Ministry of Agriculture Staff Welfare & Health Committee</strong></div>
-              <div>Published: <strong>October 2026</strong> · Addis Ababa, Ethiopia</div>
+            {/* Footer */}
+            <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between text-[11px] text-slate-400 gap-1">
+              <div>Ministry of Agriculture Staff Welfare & Health Committee</div>
+              <div>Published: October 2026 · Addis Ababa</div>
             </div>
           </div>
         </div>
       )}
 
       {/* ========================================================================= */}
-      {/* VIDEO DETAIL & PLAYER MODAL                                               */}
+      {/* CLEAN VIDEO DETAIL MODAL                                                  */}
       {/* ========================================================================= */}
       {activeVideo && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/75 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 duration-200 max-h-[92vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl max-w-xl w-full p-6 shadow-xl border border-slate-200 animate-in fade-in zoom-in-95 duration-150 max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
             <div className="flex items-start justify-between pb-3 border-b border-slate-100">
               <div>
                 <div className="flex items-center gap-2">
-                  {activeVideo.isAmharicAudio && (
-                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-950 bg-amber-400 px-2 py-0.5 rounded-md shadow-2xs">
-                      🇪🇹 በአማርኛ (Amharic Audio)
-                    </span>
-                  )}
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#00843D] bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                  <span className="text-[10px] font-bold text-[#00843D] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                     {activeVideo.category} · {activeVideo.duration}
                   </span>
+                  {activeVideo.isAmharicAudio && (
+                    <span className="text-[10px] font-semibold text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded">
+                      🇪🇹 በአማርኛ
+                    </span>
+                  )}
                 </div>
                 <h2 className="text-base font-bold text-slate-900 mt-1.5 leading-snug">
                   {activeVideo.amharicTitle}
                 </h2>
-                <div className="text-xs font-medium text-slate-500">
+                <div className="text-xs text-slate-500 font-medium">
                   {activeVideo.title}
                 </div>
               </div>
@@ -827,76 +685,60 @@ export const TraineeGuidesPage: React.FC = () => {
               </button>
             </div>
 
-            {/* Video Player Display Container */}
+            {/* Clean Video Thumbnail / Preview */}
             <div className="mt-4 relative aspect-video bg-slate-950 rounded-xl overflow-hidden shadow-inner group">
               <img
                 src={activeVideo.thumbnailUrl}
                 alt={activeVideo.title}
-                className="w-full h-full object-cover opacity-75"
+                className="w-full h-full object-cover opacity-80"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/50 to-slate-950/20 flex flex-col items-center justify-center text-center p-6 text-white space-y-3">
-                <div className="w-16 h-16 rounded-full bg-[#00843D] text-white flex items-center justify-center shadow-xl ring-4 ring-white/20 animate-pulse">
-                  <Play className="h-7 w-7 fill-white ml-1" />
+              <div className="absolute inset-0 bg-slate-950/40 flex flex-col items-center justify-center p-4 text-center text-white space-y-2">
+                <div className="w-12 h-12 rounded-full bg-[#00843D] text-white flex items-center justify-center shadow-lg transition-transform group-hover:scale-105">
+                  <Play className="h-5 w-5 fill-white ml-0.5" />
                 </div>
-                <div className="space-y-1">
-                  <div className="text-xs font-extrabold text-amber-300">
-                    🇪🇹 {activeVideo.amharicInstructor}
+                <div>
+                  <div className="text-xs font-semibold text-slate-200">
+                    {activeVideo.amharicInstructor}
                   </div>
-                  <div className="text-sm font-bold text-white max-w-md">
-                    {activeVideo.amharicTitle}
-                  </div>
-                  <div className="text-[11px] text-slate-300">
-                    Target Muscles: {activeVideo.amharicTargetMuscles}
+                  <div className="text-[11px] text-slate-400 mt-0.5">
+                    Target: {activeVideo.amharicTargetMuscles}
                   </div>
                 </div>
 
-                {/* Direct Launch on YouTube Button */}
                 <a
                   href={`https://www.youtube.com/results?search_query=${encodeURIComponent(activeVideo.youtubeSearchTerm)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-2 inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold shadow-md transition transform hover:scale-105 cursor-pointer"
+                  className="mt-1 inline-flex items-center gap-1.5 px-3 py-1.5 bg-white text-slate-900 rounded-md text-xs font-semibold hover:bg-slate-100 transition shadow-xs cursor-pointer"
                 >
-                  <Youtube className="h-4 w-4" />
-                  <span>ቪዲዮውን በዩቲዩብ ይመልከቱ (Open on YouTube) ↗</span>
+                  <span>Open Video on YouTube ↗</span>
                 </a>
-              </div>
-
-              {/* Bottom Stream Info Bar */}
-              <div className="absolute bottom-0 inset-x-0 bg-black/85 p-2.5 flex items-center justify-between text-xs text-white">
-                <div className="flex items-center gap-2">
-                  <Play className="h-3.5 w-3.5 fill-white" />
-                  <span className="text-[10px] font-mono text-slate-300">HQ 1080p · {activeVideo.duration}</span>
-                </div>
-                <div className="text-[10px] font-semibold text-emerald-300">
-                  MoA Wellness Streaming Channel
-                </div>
               </div>
             </div>
 
-            {/* Language Switcher for Coaching Notes */}
-            <div className="mt-5 flex items-center justify-between border-b border-slate-100 pb-2">
-              <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                Coaching Cues & Instructions / የስልጠና መመሪያ
+            {/* Language Tab Switcher */}
+            <div className="mt-4 flex items-center justify-between border-b border-slate-100 pb-2">
+              <span className="text-xs font-bold text-slate-700">
+                Coaching Checklist / የስልጠና ቅደም ተከተል
               </span>
-              <div className="flex bg-slate-100 p-0.5 rounded-lg text-xs">
+              <div className="flex bg-slate-100 p-0.5 rounded text-xs">
                 <button
                   type="button"
                   onClick={() => setModalLanguage('AMHARIC')}
-                  className={`px-2.5 py-1 rounded-md font-bold transition cursor-pointer ${
+                  className={`px-2.5 py-1 rounded font-semibold transition cursor-pointer ${
                     modalLanguage === 'AMHARIC'
-                      ? 'bg-[#00843D] text-white shadow-2xs'
+                      ? 'bg-white text-slate-900 shadow-2xs'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  🇪🇹 በአማርኛ
+                  በአማርኛ
                 </button>
                 <button
                   type="button"
                   onClick={() => setModalLanguage('ENGLISH')}
-                  className={`px-2.5 py-1 rounded-md font-bold transition cursor-pointer ${
+                  className={`px-2.5 py-1 rounded font-semibold transition cursor-pointer ${
                     modalLanguage === 'ENGLISH'
-                      ? 'bg-slate-900 text-white shadow-2xs'
+                      ? 'bg-white text-slate-900 shadow-2xs'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
@@ -905,26 +747,24 @@ export const TraineeGuidesPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Step-by-Step Key Form Cues */}
-            <div className="mt-4 space-y-4">
+            {/* Checklist */}
+            <div className="mt-3.5 space-y-3.5">
               <div>
-                <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5 mb-2">
-                  <CheckCircle2 className="h-4 w-4 text-[#00843D]" />
+                <h4 className="text-xs font-bold text-slate-800 mb-1.5 flex items-center gap-1.5">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-[#00843D]" />
                   <span>
-                    {modalLanguage === 'AMHARIC'
-                      ? 'የልምምድ ቅደም ተከተል እና ትክክለኛ አሰራር (Checklist)'
-                      : 'Execution Form Checklist & Posture Rules'}
+                    {modalLanguage === 'AMHARIC' ? 'ትክክለኛ አሰራር እና አቋቋም' : 'Execution Form Checklist'}
                   </span>
                 </h4>
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   {(modalLanguage === 'AMHARIC' ? activeVideo.amharicCues : activeVideo.englishCues).map(
                     (cue, idx) => (
                       <div
                         key={idx}
-                        className="flex items-start gap-2 text-xs text-slate-700 bg-emerald-50/50 p-2.5 rounded-lg border border-emerald-100"
+                        className="flex items-start gap-2 text-xs text-slate-600 bg-slate-50 p-2 rounded-md"
                       >
-                        <span className="h-4 w-4 rounded-full bg-[#00843D] text-white font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
-                          {idx + 1}
+                        <span className="font-mono font-bold text-[#00843D] text-[11px] shrink-0">
+                          {idx + 1}.
                         </span>
                         <span className="leading-relaxed">{cue}</span>
                       </div>
@@ -933,22 +773,20 @@ export const TraineeGuidesPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Mistakes to Avoid */}
+              {/* Mistakes */}
               <div>
-                <h4 className="text-xs font-bold text-rose-900 uppercase tracking-wider flex items-center gap-1.5 mb-2">
-                  <AlertCircle className="h-4 w-4 text-rose-600" />
+                <h4 className="text-xs font-bold text-rose-800 mb-1.5 flex items-center gap-1.5">
+                  <AlertCircle className="h-3.5 w-3.5 text-rose-600" />
                   <span>
-                    {modalLanguage === 'AMHARIC'
-                      ? 'ሊወገዱ የሚገቡ ስህተቶች እና የአደጋ መከላከያ'
-                      : 'Common Safety Pitfalls & Mistakes to Avoid'}
+                    {modalLanguage === 'AMHARIC' ? 'ሊወገዱ የሚገቡ ስህተቶች' : 'Common Mistakes to Avoid'}
                   </span>
                 </h4>
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   {(modalLanguage === 'AMHARIC' ? activeVideo.amharicMistakes : activeVideo.englishMistakes).map(
                     (mistake, idx) => (
                       <div
                         key={idx}
-                        className="flex items-start gap-2 text-xs text-rose-800 bg-rose-50/70 p-2.5 rounded-lg border border-rose-200"
+                        className="flex items-start gap-2 text-xs text-rose-800 bg-rose-50/60 p-2 rounded-md"
                       >
                         <span className="text-rose-600 font-bold shrink-0">✕</span>
                         <span className="leading-relaxed">{mistake}</span>
@@ -960,16 +798,16 @@ export const TraineeGuidesPage: React.FC = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="mt-6 pt-3 border-t border-slate-100 flex items-center justify-between">
+            <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
               <span className="text-xs text-slate-500">
-                አሰልጣኝ: <strong className="text-slate-800">{activeVideo.amharicInstructor}</strong>
+                Instructor: <strong className="text-slate-700">{activeVideo.instructor}</strong>
               </span>
               <button
                 type="button"
                 onClick={() => setActiveVideo(null)}
-                className="px-4 h-8.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-[6px] transition cursor-pointer"
+                className="px-3.5 h-8 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-[6px] transition cursor-pointer"
               >
-                ዝጋ (Close)
+                Close
               </button>
             </div>
           </div>

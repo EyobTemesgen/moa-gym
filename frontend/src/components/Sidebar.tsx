@@ -13,6 +13,7 @@ import {
   UserCog,
   Settings,
   Flame,
+  KeyRound,
   LogOut,
   Calendar,
   Video,
@@ -339,7 +340,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {!collapsed && <span className="truncate">Gate Terminal</span>}
               </NavLink>
 
-              {/* 2. Live Floor & Lockers */}
+              {/* 2. Locker Control */}
               <NavLink
                 to="/active-floor"
                 onClick={onCloseMobile}
@@ -348,11 +349,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     ? 'bg-white/20 text-white shadow-xs'
                     : 'text-white/80 hover:text-white hover:bg-white/10'
                 }`}
-                title={collapsed ? 'Floor & Lockers' : undefined}
+                title={collapsed ? 'Locker Control' : undefined}
               >
                 {isActive('/active-floor') && <ActiveBar />}
-                <Flame className="h-5 w-5 text-amber-300 shrink-0" />
-                {!collapsed && <span className="truncate">Floor & Lockers</span>}
+                <KeyRound className="h-5 w-5 text-moa-gold shrink-0" />
+                {!collapsed && <span className="truncate">Locker Control</span>}
               </NavLink>
 
               {/* 3. Gym Schedule */}

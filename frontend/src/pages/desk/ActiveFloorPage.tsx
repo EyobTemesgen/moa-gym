@@ -40,7 +40,7 @@ interface LockerItem {
 export const ActiveFloorPage: React.FC = () => {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
-  const [activeTab, setActiveTab] = useState<'floor' | 'lockers'>('floor');
+  const [activeTab, setActiveTab] = useState<'lockers' | 'floor'>('lockers');
 
   // Floor occupancy data
   const { data: occupancy, isLoading: isFloorLoading } = useQuery<{
@@ -100,25 +100,14 @@ export const ActiveFloorPage: React.FC = () => {
       <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-            Live Gym Floor & Locker Control
+            Locker Control
           </h1>
           <p className="text-xs text-slate-500 mt-1">
-            Real-time tracking of staff currently inside the facility and active daily lockers.
+            Daily locker grid (L-01 to L-30), key assignment, and active occupants.
           </p>
         </div>
 
         <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-xl">
-          <button
-            type="button"
-            onClick={() => setActiveTab('floor')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
-              activeTab === 'floor'
-                ? 'bg-white text-moa-green shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            Active Staff ({occupancy?.current ?? 0})
-          </button>
           <button
             type="button"
             onClick={() => setActiveTab('lockers')}
@@ -129,6 +118,17 @@ export const ActiveFloorPage: React.FC = () => {
             }`}
           >
             Locker Grid (30)
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('floor')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
+              activeTab === 'floor'
+                ? 'bg-white text-moa-green shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            Active Occupants ({occupancy?.current ?? 0})
           </button>
         </div>
       </div>
@@ -223,7 +223,7 @@ export const ActiveFloorPage: React.FC = () => {
             <div className="text-center py-12">
               <Users className="mx-auto h-8 w-8 text-slate-300 mb-2" />
               <p className="text-xs text-slate-500">
-                {search ? 'No active staff match search filter.' : 'Gym floor is currently empty.'}
+                {search ? 'No active staff match search filter.' : 'Facility is currently empty.'}
               </p>
             </div>
           )}

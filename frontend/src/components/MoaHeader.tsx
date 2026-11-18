@@ -92,8 +92,8 @@ export const MoaHeader: React.FC<MoaHeaderProps> = ({ onOpenMobileSidebar }) => 
         };
       case '/active-floor':
         return {
-          title: 'Floor & Lockers',
-          subtitle: 'Active gym floor occupants and locker inventory',
+          title: 'Locker Control',
+          subtitle: 'Daily locker inventory, key assignments, and occupant tracking',
         };
       case '/reports':
       case '/admin/analytics':
@@ -305,8 +305,8 @@ export const MoaHeader: React.FC<MoaHeaderProps> = ({ onOpenMobileSidebar }) => 
                               }}
                               className="w-full flex items-center gap-2.5 px-3 py-2 text-left font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-900 rounded-lg transition cursor-pointer"
                             >
-                              <Flame className="w-4 h-4 text-amber-600 shrink-0" />
-                              <span>Floor & Lockers</span>
+                              <KeyRound className="w-4 h-4 text-emerald-700 shrink-0" />
+                              <span>Locker Control</span>
                             </button>
                           </>
                         )}

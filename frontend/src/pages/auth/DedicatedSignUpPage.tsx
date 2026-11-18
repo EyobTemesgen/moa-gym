@@ -233,29 +233,29 @@ export const DedicatedSignUpPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0c3924] via-[#115033] to-[#0a2f1c] flex flex-col justify-center items-center py-10 px-4 sm:px-6 lg:px-8 selection:bg-emerald-500 selection:text-white relative">
+    <div className="min-h-screen bg-gradient-to-br from-[#0c3924] via-[#115033] to-[#0a2f1c] flex flex-col justify-start items-center pt-3 sm:pt-5 pb-8 px-4 sm:px-6 lg:px-8 selection:bg-emerald-500 selection:text-white relative">
       {/* Background Decorative Rings */}
       <div className="absolute top-0 left-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
 
-      {/* MoA Header Badge & Branding (Matching Screenshot) */}
-      <div className="flex flex-col items-center mb-6 text-center z-10">
-        <div className="w-14 h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center border border-emerald-100/50 mb-3 transition-transform hover:scale-105">
-          <ShieldCheck className="w-8 h-8 text-emerald-700" />
+      {/* MoA Header Badge & Branding */}
+      <div className="flex flex-col items-center mb-2.5 text-center z-10">
+        <div className="w-10 h-10 bg-white rounded-xl shadow-md flex items-center justify-center border border-emerald-100/50 mb-1.5 transition-transform hover:scale-105">
+          <ShieldCheck className="w-5 h-5 text-emerald-700" />
         </div>
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white drop-shadow-sm">
+        <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white drop-shadow-sm">
           MoA Wellness & Fitness Center
         </h1>
-        <p className="text-sm font-medium text-emerald-200/90 tracking-wide mt-1">
+        <p className="text-xs font-medium text-emerald-200/90 tracking-wide">
           Ministry of Agriculture | የግብርና ሚኒስቴር
         </p>
       </div>
 
       {/* Main Container Card */}
-      <div className="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 max-w-xl w-full border border-slate-100 z-10 transition-all">
+      <div className="bg-white rounded-2xl shadow-2xl p-5 sm:p-6 max-w-xl w-full border border-slate-100 z-10 transition-all">
         {/* Step Progress Indicators */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between text-xs font-semibold text-slate-500 mb-2">
+        <div className="mb-4">
+          <div className="flex items-center justify-between text-xs font-semibold text-slate-500 mb-1.5">
             <span className={step >= 1 ? 'text-emerald-700 font-bold' : ''}>1. መለያ / Profile</span>
             <span className={step >= 2 ? 'text-emerald-700 font-bold' : ''}>2. ሰዓትና ክፍያ / Schedule & Fee</span>
             <span className={step >= 3 ? 'text-emerald-700 font-bold' : ''}>3. ሎከር / Locker</span>

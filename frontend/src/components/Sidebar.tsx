@@ -116,60 +116,56 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           )}
 
-          {/* Admin Navigation: Registration & Reports only */}
+          {/* Admin Navigation */}
           {(user.role === 'ADMIN' || user.role === 'HR_ADMIN') && (
-            <div>
-              {!collapsed && (
-                <div className="px-3 text-[10px] font-bold text-emerald-200/70 uppercase tracking-wider mb-2">
-                  Administration
-                </div>
-              )}
-              <div className="space-y-1.5">
-                {/* 1. Executive Dashboard */}
-                <NavLink
-                  to="/admin/dashboard"
-                  onClick={onCloseMobile}
-                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${isActive('/admin/dashboard')
-                      ? 'bg-white/20 text-white shadow-xs'
-                      : 'text-white/80 hover:text-white hover:bg-white/10'
-                    }`}
-                  title={collapsed ? 'Dashboard' : undefined}
-                >
-                  {isActive('/admin/dashboard') && <ActiveBar />}
-                  <LayoutDashboard className="h-5 w-5 text-moa-gold shrink-0" />
-                  {!collapsed && <span className="font-semibold text-xs">Dashboard</span>}
-                </NavLink>
+            <div className="space-y-1.5">
+              {/* 1. Executive Dashboard */}
+              <NavLink
+                to="/admin/dashboard"
+                onClick={onCloseMobile}
+                className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition ${
+                  isActive('/admin/dashboard')
+                    ? 'bg-white/20 text-white shadow-xs'
+                    : 'text-white/80 hover:text-white hover:bg-white/10'
+                }`}
+                title={collapsed ? 'Dashboard' : undefined}
+              >
+                {isActive('/admin/dashboard') && <ActiveBar />}
+                <LayoutDashboard className="h-5 w-5 text-moa-gold shrink-0" />
+                {!collapsed && <span className="truncate">Dashboard</span>}
+              </NavLink>
 
-                {/* 2. Staff Registration */}
-                <NavLink
-                  to="/registrations"
-                  onClick={onCloseMobile}
-                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${isActive('/registrations')
-                      ? 'bg-white/20 text-white shadow-xs'
-                      : 'text-white/80 hover:text-white hover:bg-white/10'
-                    }`}
-                  title={collapsed ? 'Staff Registrations' : undefined}
-                >
-                  {isActive('/registrations') && <ActiveBar />}
-                  <Users className="h-5 w-5 text-emerald-200 shrink-0" />
-                  {!collapsed && <span className="font-semibold text-xs">Staff Registrations</span>}
-                </NavLink>
+              {/* 2. Staff Registration */}
+              <NavLink
+                to="/registrations"
+                onClick={onCloseMobile}
+                className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition ${
+                  isActive('/registrations')
+                    ? 'bg-white/20 text-white shadow-xs'
+                    : 'text-white/80 hover:text-white hover:bg-white/10'
+                }`}
+                title={collapsed ? 'Staff Registrations' : undefined}
+              >
+                {isActive('/registrations') && <ActiveBar />}
+                <Users className="h-5 w-5 text-emerald-200 shrink-0" />
+                {!collapsed && <span className="truncate">Staff Registrations</span>}
+              </NavLink>
 
-                {/* 3. Reports */}
-                <NavLink
-                  to="/reports"
-                  onClick={onCloseMobile}
-                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${isActive('/reports') || isActive('/admin/analytics')
-                      ? 'bg-white/20 text-white shadow-xs'
-                      : 'text-white/80 hover:text-white hover:bg-white/10'
-                    }`}
-                  title={collapsed ? 'Reports' : undefined}
-                >
-                  {(isActive('/reports') || isActive('/admin/analytics')) && <ActiveBar />}
-                  <BarChart3 className="h-5 w-5 text-sky-300 shrink-0" />
-                  {!collapsed && <span className="font-semibold text-xs">Reports</span>}
-                </NavLink>
-              </div>
+              {/* 3. Reports */}
+              <NavLink
+                to="/reports"
+                onClick={onCloseMobile}
+                className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition ${
+                  isActive('/reports') || isActive('/admin/analytics')
+                    ? 'bg-white/20 text-white shadow-xs'
+                    : 'text-white/80 hover:text-white hover:bg-white/10'
+                }`}
+                title={collapsed ? 'Reports' : undefined}
+              >
+                {(isActive('/reports') || isActive('/admin/analytics')) && <ActiveBar />}
+                <BarChart3 className="h-5 w-5 text-sky-300 shrink-0" />
+                {!collapsed && <span className="truncate">Reports</span>}
+              </NavLink>
             </div>
           )}
 

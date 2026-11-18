@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '../../lib/api';
 import {
@@ -17,8 +17,31 @@ import {
   Mail,
   Building2,
   Lock,
+  Wand2,
+  Copy,
+  Check,
 } from 'lucide-react';
 import { btn } from '../../components/ui/theme';
+import { SearchableSelect } from '../../components/ui/SearchableSelect';
+
+/** Random temporary password generator matching Asset Tracking System (ATS) standard */
+export function makeTemporaryPassword(): string {
+  const letters = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ';
+  const digits = '23456789';
+  const pick = (set: string, n: number) => {
+    const bytes = new Uint32Array(n);
+    crypto.getRandomValues(bytes);
+    return [...bytes].map((b) => set[b % set.length]);
+  };
+  const chars = [...pick(letters, 7), ...pick(digits, 3)];
+  const order = new Uint32Array(chars.length);
+  crypto.getRandomValues(order);
+  return chars
+    .map((c, i) => [order[i], c] as const)
+    .sort((a, b) => a[0] - b[0])
+    .map(([, c]) => c)
+    .join('');
+}
 
 interface SystemUser {
   id: string;
@@ -44,14 +67,60 @@ export const UserManagementPage: React.FC = () => {
 
   // Modals state
   const [resetModalUser, setResetModalUser] = useState<SystemUser | null>(null);
-  const [isProvisionModalOpen, setIsProvisionModalOpen] = useState(false);
+  const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
 
-  // Provision Form state
-  const [lookupQuery, setLookupQuery] = useState('');
-  const [provisionRole, setProvisionRole] = useState<'ADMIN' | 'GYM_ATTENDANT' | 'STAFF_MEMBER'>('GYM_ATTENDANT');
-  const [foundEmployee, setFoundEmployee] = useState<any | null>(null);
-  const [isLookingUp, setIsLookingUp] = useState(false);
-  const [provisionError, setProvisionError] = useState<string | null>(null);
+  // Add User Form state (matching ATS standard)
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState('');
+  const [addUserRole, setAddUserRole] = useState<'ADMIN' | 'GYM_ATTENDANT' | 'STAFF_MEMBER'>('GYM_ATTENDANT');
+  const [temporaryPassword, setTemporaryPassword] = useState('');
+  const [addUserError, setAddUserError] = useState<string | null>(null);
+  const [copiedPassword, setCopiedPassword] = useState(false);
+
+  // Fetch candidates for Add User modal
+  const { data: candidates = [] } = useQuery<{
+    employeeId: string;
+    fullName: string;
+    department: string;
+    phone: string;
+    isUser: boolean;
+    currentRole: string | null;
+  }[]>({
+    queryKey: ['addUserCandidates'],
+    queryFn: () => apiRequest('/users/candidates'),
+    enabled: isAddUserModalOpen,
+  });
+
+  // Group candidates into "Can be added" and "Already users" (ATS standard)
+  const candidateGroups = useMemo(() => {
+    const unassigned = candidates.filter((c) => !c.isUser);
+    const existing = candidates.filter((c) => c.isUser);
+
+    return [
+      {
+        label: 'Can be added',
+        options: unassigned.map((c) => ({
+          value: c.employeeId,
+          label: `${c.fullName} (${c.employeeId})`,
+          note: c.department,
+        })),
+      },
+      {
+        label: 'Already users',
+        options: existing.map((c) => ({
+          value: c.employeeId,
+          label: `${c.fullName} (${c.employeeId})`,
+          note: c.currentRole || 'User',
+          disabled: true,
+        })),
+      },
+    ];
+  }, [candidates]);
+
+  // Selected candidate preview
+  const selectedCandidate = useMemo(
+    () => candidates.find((c) => c.employeeId === selectedEmployeeId),
+    [candidates, selectedEmployeeId],
+  );
 
   // Fetch users
   const { data, isLoading } = useQuery<{
@@ -122,41 +191,33 @@ export const UserManagementPage: React.FC = () => {
     },
   });
 
-  // Provision User Mutation
-  const provisionMutation = useMutation({
-    mutationFn: ({ employeeId, role }: { employeeId: string; role: string }) =>
+  // Add User Mutation (grant access)
+  const addUserMutation = useMutation({
+    mutationFn: ({
+      employeeId,
+      role,
+      password,
+    }: {
+      employeeId: string;
+      role: string;
+      password?: string;
+    }) =>
       apiRequest('/users/provision', {
         method: 'POST',
-        body: JSON.stringify({ employeeId, role }),
+        body: JSON.stringify({ employeeId, role, password }),
       }),
     onSuccess: (res: any) => {
-      showToast(res.message || 'User account provisioned successfully');
-      setIsProvisionModalOpen(false);
-      setFoundEmployee(null);
-      setLookupQuery('');
+      showToast(res.message || 'User added successfully');
+      setIsAddUserModalOpen(false);
+      setSelectedEmployeeId('');
+      setTemporaryPassword('');
       queryClient.invalidateQueries({ queryKey: ['systemUsers'] });
+      queryClient.invalidateQueries({ queryKey: ['addUserCandidates'] });
     },
     onError: (err: any) => {
-      setProvisionError(err.message || 'Failed to provision user');
+      setAddUserError(err.message || 'Failed to add user');
     },
   });
-
-  // Lookup employee for provisioning
-  const handleLookup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!lookupQuery.trim()) return;
-    setIsLookingUp(true);
-    setProvisionError(null);
-    setFoundEmployee(null);
-    try {
-      const res = await apiRequest<any>(`/auth/lookup?employeeId=${encodeURIComponent(lookupQuery.trim())}`);
-      setFoundEmployee(res);
-    } catch (err: any) {
-      setProvisionError(err.message || 'Employee not found on HR roster');
-    } finally {
-      setIsLookingUp(false);
-    }
-  };
 
   const users = data?.items || [];
   const adminCount = users.filter((u) => u.role === 'ADMIN').length;
@@ -195,15 +256,17 @@ export const UserManagementPage: React.FC = () => {
           <button
             type="button"
             onClick={() => {
-              setIsProvisionModalOpen(true);
-              setFoundEmployee(null);
-              setLookupQuery('');
-              setProvisionError(null);
+              setIsAddUserModalOpen(true);
+              setSelectedEmployeeId('');
+              setAddUserRole('GYM_ATTENDANT');
+              setTemporaryPassword(makeTemporaryPassword());
+              setAddUserError(null);
+              setCopiedPassword(false);
             }}
-            className={btn.primary}
+            className={`${btn.primary} shrink-0 cursor-pointer`}
           >
             <UserPlus className="h-4 w-4" />
-            <span>Provision User / Grant Role</span>
+            <span>Add user</span>
           </button>
         </div>
       </div>
@@ -495,124 +558,179 @@ export const UserManagementPage: React.FC = () => {
         </div>
       )}
 
-      {/* Modal: Provision User */}
-      {isProvisionModalOpen && (
+      {/* Modal: Add User (ATS standard) */}
+      {isAddUserModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2 text-slate-900 font-bold text-base">
-                <UserPlus className="h-5 w-5 text-[#00843D]" />
-                <span>Provision System User</span>
+              <div>
+                <div className="flex items-center gap-2 text-slate-900 font-bold text-base">
+                  <UserPlus className="h-5 w-5 text-[#00843D]" />
+                  <span>Add user</span>
+                </div>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Grant an employee sign-in access with an assigned system role.
+                </p>
               </div>
               <button
                 type="button"
-                onClick={() => setIsProvisionModalOpen(false)}
-                className="p-1 text-slate-400 hover:text-slate-700 rounded-lg"
+                onClick={() => setIsAddUserModalOpen(false)}
+                className="p-1 text-slate-400 hover:text-slate-700 rounded-lg cursor-pointer"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
-            <div className="py-4 space-y-4">
-              {provisionError && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-xs text-red-700">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!selectedEmployeeId) {
+                  setAddUserError('Please select an employee.');
+                  return;
+                }
+                addUserMutation.mutate({
+                  employeeId: selectedEmployeeId,
+                  role: addUserRole,
+                  password: temporaryPassword,
+                });
+              }}
+              className="py-4 space-y-4"
+            >
+              {addUserError && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-xs text-red-700">
                   <AlertCircle className="h-4 w-4 shrink-0" />
-                  <span>{provisionError}</span>
+                  <span>{addUserError}</span>
                 </div>
               )}
 
-              {/* Step 1: Lookup Employee */}
+              {/* 1. Employee Selection (SearchableSelect) */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center justify-between">
+                  <span>Employee <span className="text-red-500">*</span></span>
+                  <span className="text-[11px] font-normal text-slate-400">
+                    {candidates.filter((c) => !c.isUser).length} eligible staff
+                  </span>
+                </label>
+                <SearchableSelect
+                  id="add-user-employee"
+                  value={selectedEmployeeId}
+                  onChange={(val) => {
+                    setSelectedEmployeeId(val);
+                    setAddUserError(null);
+                  }}
+                  groups={candidateGroups}
+                  placeholder="Select an employee from staff directory…"
+                  searchPlaceholder="Search by name, employee ID, or directorate…"
+                />
+              </div>
+
+              {/* Preview card if employee is selected */}
+              {selectedCandidate && (
+                <div className="p-3 bg-emerald-50/70 rounded-xl border border-emerald-200 flex items-center gap-3">
+                  <div className="h-9 w-9 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
+                    {selectedCandidate.fullName.slice(0, 2).toUpperCase()}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-bold text-xs text-slate-900 truncate">
+                      {selectedCandidate.fullName}
+                    </div>
+                    <div className="text-[11px] text-emerald-800 font-mono truncate">
+                      {selectedCandidate.employeeId} · {selectedCandidate.department}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 2. System Role Selection */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  System Role <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={addUserRole}
+                  onChange={(e: any) => setAddUserRole(e.target.value)}
+                  className="w-full px-3 py-2 text-xs font-semibold border border-slate-300 rounded-xl bg-white focus:outline-none focus:border-moa-green focus:ring-2 focus:ring-moa-green/20"
+                >
+                  <option value="GYM_ATTENDANT">Gate Attendant (Front desk check-in, lockers & terminal)</option>
+                  <option value="ADMIN">Administrator (Full dashboard, reports, settings & users)</option>
+                  <option value="STAFF_MEMBER">Staff Member (Self-service digital pass & facility access)</option>
+                </select>
+              </div>
+
+              {/* 3. Temporary Password Field (with Generate & Copy buttons) */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Step 1: Find Staff Member on HR Whitelist
+                  Temporary password <span className="text-red-500">*</span>
                 </label>
-                <form onSubmit={handleLookup} className="flex gap-2">
+                <p className="text-[11px] text-slate-500 mb-1.5">
+                  They must choose their own password after first sign-in.
+                </p>
+                <div className="flex gap-2">
                   <input
                     type="text"
                     required
-                    value={lookupQuery}
-                    onChange={(e) => setLookupQuery(e.target.value)}
-                    placeholder="Enter Employee ID (e.g. EMP-MOA-002)"
-                    className="flex-1 px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:border-moa-green font-mono"
+                    value={temporaryPassword}
+                    onChange={(e) => setTemporaryPassword(e.target.value)}
+                    className="flex-1 px-3 py-2 text-xs font-mono font-bold border border-slate-300 rounded-xl focus:outline-none focus:border-moa-green focus:ring-2 focus:ring-moa-green/20 bg-slate-50/50"
                   />
                   <button
-                    type="submit"
-                    disabled={isLookingUp}
-                    className={btn.secondary}
+                    type="button"
+                    onClick={() => {
+                      const pwd = makeTemporaryPassword();
+                      setTemporaryPassword(pwd);
+                      setCopiedPassword(false);
+                    }}
+                    className="flex shrink-0 items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 cursor-pointer"
                   >
-                    {isLookingUp ? 'Searching...' : 'Lookup'}
+                    <Wand2 className="h-3.5 w-3.5 text-moa-green" />
+                    <span>Generate</span>
                   </button>
-                </form>
+                  <button
+                    type="button"
+                    disabled={!temporaryPassword}
+                    onClick={() => {
+                      if (!temporaryPassword) return;
+                      navigator.clipboard?.writeText(temporaryPassword).then(() => {
+                        setCopiedPassword(true);
+                        showToast('Temporary password copied to clipboard');
+                        setTimeout(() => setCopiedPassword(false), 3000);
+                      });
+                    }}
+                    title="Copy password"
+                    className="flex shrink-0 items-center gap-1 rounded-xl border border-slate-300 bg-white px-3 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
+                  >
+                    {copiedPassword ? (
+                      <>
+                        <Check className="h-3.5 w-3.5 text-moa-green" />
+                        <span className="text-moa-green">Copied</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-3.5 w-3.5" />
+                        <span>Copy</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
 
-              {/* Step 2: Display Found Employee */}
-              {foundEmployee && (
-                <div className="p-3.5 bg-emerald-50 rounded-xl border border-emerald-200 space-y-2">
-                  <div className="flex items-center gap-3">
-                    {foundEmployee.photoUrl ? (
-                      <img
-                        src={foundEmployee.photoUrl}
-                        alt={foundEmployee.fullName}
-                        className="h-10 w-10 rounded-xl object-cover ring-2 ring-emerald-500/20"
-                      />
-                    ) : (
-                      <div className="h-10 w-10 rounded-xl bg-white text-[#00843D] flex items-center justify-center font-bold">
-                        {foundEmployee.fullName.slice(0, 2).toUpperCase()}
-                      </div>
-                    )}
-                    <div>
-                      <div className="font-bold text-slate-900 text-sm">{foundEmployee.fullName}</div>
-                      <div className="text-xs font-mono text-emerald-800">{foundEmployee.employeeId} · {foundEmployee.department}</div>
-                    </div>
-                  </div>
-
-                  {foundEmployee.isClaimed && (
-                    <div className="text-[11px] text-amber-800 font-semibold bg-amber-100/70 p-2 rounded-lg">
-                      Notice: This user already has an active account. Provisioning will update their assigned system role.
-                    </div>
-                  )}
-
-                  {/* Step 3: Choose Role */}
-                  <div className="pt-2">
-                    <label className="block text-xs font-bold text-slate-800 mb-1">
-                      Step 2: Assign System Role
-                    </label>
-                    <select
-                      value={provisionRole}
-                      onChange={(e: any) => setProvisionRole(e.target.value)}
-                      className="w-full px-3 py-2 text-xs font-bold border border-slate-300 rounded-lg bg-white focus:outline-none focus:border-moa-green"
-                    >
-                      <option value="GYM_ATTENDANT">GYM_ATTENDANT (Gate Checking Fast Lane)</option>
-                      <option value="ADMIN">ADMIN (System & HR Administrator)</option>
-                      <option value="STAFF_MEMBER">STAFF_MEMBER (Standard Gym Pass)</option>
-                    </select>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
-              <button
-                type="button"
-                onClick={() => setIsProvisionModalOpen(false)}
-                className={btn.secondary}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                disabled={!foundEmployee || provisionMutation.isPending}
-                onClick={() =>
-                  provisionMutation.mutate({
-                    employeeId: foundEmployee.employeeId,
-                    role: provisionRole,
-                  })
-                }
-                className={btn.primary}
-              >
-                {provisionMutation.isPending ? 'Provisioning...' : 'Confirm Provisioning'}
-              </button>
-            </div>
+              <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsAddUserModalOpen(false)}
+                  className={btn.secondary}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={!selectedEmployeeId || addUserMutation.isPending}
+                  className={btn.primary}
+                >
+                  {addUserMutation.isPending ? 'Adding user...' : 'Add user'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

@@ -92,6 +92,14 @@ export class UsersController {
     return this.usersService.updateUserStatus(id, status);
   }
 
+  @Get('candidates')
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'Get active employees list with existing user account status for Add User modal' })
+  async getCandidates() {
+    return this.usersService.getAddUserCandidates();
+  }
+
   @Post(':id/reset-password')
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
@@ -106,11 +114,12 @@ export class UsersController {
   @Post('provision')
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
-  @ApiOperation({ summary: 'Provision or upgrade an employee to a system user with a role (Admin only)' })
+  @ApiOperation({ summary: 'Add user account or assign role to employee (Admin only)' })
   async provisionUser(
     @Body('employeeId') employeeId: string,
     @Body('role') role: Role,
+    @Body('password') password?: string,
   ) {
-    return this.usersService.provisionUser(employeeId, role);
+    return this.usersService.provisionUser(employeeId, role, password);
   }
 }

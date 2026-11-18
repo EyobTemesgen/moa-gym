@@ -301,7 +301,30 @@ export class UsersService {
     };
   }
 
-  async provisionUser(employeeId: string, role: Role) {
+  async getAddUserCandidates() {
+    const employees = await this.prisma.hrEmployeeRoster.findMany({
+      where: { employmentStatus: EmploymentStatus.ACTIVE },
+      include: {
+        userAccount: {
+          select: { id: true, role: true },
+        },
+      },
+      orderBy: { fullName: 'asc' },
+    });
+
+    return employees.map((e) => ({
+      employeeId: e.employeeId,
+      fullName: e.fullName,
+      department: e.department,
+      phone: e.phone,
+      email: e.email,
+      photoUrl: e.photoUrl,
+      isUser: !!e.userAccount,
+      currentRole: e.userAccount?.role || null,
+    }));
+  }
+
+  async provisionUser(employeeId: string, role: Role, password?: string) {
     const hrRecord = await this.prisma.hrEmployeeRoster.findUnique({
       where: { employeeId },
     });
@@ -309,13 +332,17 @@ export class UsersService {
       throw new NotFoundException(`Employee ${employeeId} not found on HR roster`);
     }
 
-    const defaultPassword = await bcrypt.hash('Password123!', 10);
+    const pwd = password?.trim() || 'Password123!';
+    const passwordHash = await bcrypt.hash(pwd, 10);
     const user = await this.prisma.user.upsert({
       where: { employeeId },
-      update: { role },
+      update: {
+        role,
+        passwordHash,
+      },
       create: {
         employeeId,
-        passwordHash: defaultPassword,
+        passwordHash,
         role,
         waiverSigned: true,
         waiverSignedAt: new Date(),
@@ -325,7 +352,7 @@ export class UsersService {
 
     return {
       success: true,
-      message: `User ${hrRecord.fullName} (${employeeId}) provisioned with role ${role}.`,
+      message: `User ${hrRecord.fullName} (${employeeId}) granted access as ${role}.`,
       user: {
         id: user.id,
         employeeId: user.employeeId,

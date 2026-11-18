@@ -177,6 +177,7 @@ export class UsersService {
       const q = params.query.trim();
       where.OR = [
         { employeeId: { contains: q, mode: 'insensitive' } },
+        { username: { contains: q, mode: 'insensitive' } },
         { hrRecord: { fullName: { contains: q, mode: 'insensitive' } } },
         { hrRecord: { department: { contains: q, mode: 'insensitive' } } },
         { hrRecord: { email: { contains: q, mode: 'insensitive' } } },
@@ -203,6 +204,7 @@ export class UsersService {
     const formatted = users.map((u) => ({
       id: u.id,
       employeeId: u.employeeId,
+      username: u.username,
       fullName: u.hrRecord.fullName,
       department: u.hrRecord.department,
       phone: u.hrRecord.phone,

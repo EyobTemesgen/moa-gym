@@ -4,6 +4,7 @@ import { apiRequest } from './api';
 export interface AuthUser {
   id: string;
   employeeId: string;
+  username?: string;
   fullName: string;
   department: string;
   email?: string;

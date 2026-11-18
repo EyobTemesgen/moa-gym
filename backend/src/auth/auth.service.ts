@@ -103,10 +103,11 @@ export class AuthService {
   async validateUserByIdentifier(identifier: string, pass: string) {
     const trimmed = identifier.trim();
 
-    // Find either by exact employeeId or by email in hrRecord
+    // Find by username, exact employeeId, or email in hrRecord
     const user = await this.prisma.user.findFirst({
       where: {
         OR: [
+          { username: { equals: trimmed, mode: 'insensitive' } },
           { employeeId: trimmed },
           { hrRecord: { email: { equals: trimmed, mode: 'insensitive' } } },
         ],
@@ -117,7 +118,7 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new UnauthorizedException('Invalid Employee ID or password');
+      throw new UnauthorizedException('Invalid username, Employee ID, or password');
     }
 
     if (user.hrRecord.employmentStatus !== EmploymentStatus.ACTIVE) {
@@ -126,7 +127,7 @@ export class AuthService {
 
     const isMatch = await bcrypt.compare(pass, user.passwordHash);
     if (!isMatch) {
-      throw new UnauthorizedException('Invalid Employee ID or password');
+      throw new UnauthorizedException('Invalid username, Employee ID, or password');
     }
 
     return user;
@@ -138,6 +139,7 @@ export class AuthService {
     const payload = {
       sub: user.id,
       employeeId: user.employeeId,
+      username: user.username,
       role: user.role,
     };
 
@@ -148,11 +150,13 @@ export class AuthService {
       user: {
         id: user.id,
         employeeId: user.employeeId,
+        username: user.username,
         fullName: user.hrRecord.fullName,
         department: user.hrRecord.department,
         email: user.hrRecord.email,
         photoUrl: user.hrRecord.photoUrl,
         role: user.role,
+        memberType: user.memberType,
         waiverSigned: user.waiverSigned,
       },
     };
@@ -357,16 +361,17 @@ export class AuthService {
     const newPwd = dto.newPassword.trim();
 
     if (!trimmedId) {
-      throw new BadRequestException('Enter your Employee ID or registered email.');
+      throw new BadRequestException('Enter your username, Employee ID, or registered email.');
     }
     if (!newPwd || newPwd.length < 6) {
       throw new BadRequestException('New password must be at least 6 characters.');
     }
 
-    // Find user by employeeId or email
+    // Find user by username, employeeId, or email
     const user = await this.prisma.user.findFirst({
       where: {
         OR: [
+          { username: { equals: trimmedId, mode: 'insensitive' } },
           { employeeId: trimmedId },
           { hrRecord: { email: { equals: trimmedId, mode: 'insensitive' } } },
         ],
@@ -375,7 +380,7 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new NotFoundException(`No account found matching "${trimmedId}". Please verify your Employee ID or register first.`);
+      throw new NotFoundException(`No account found matching "${trimmedId}". Please verify your credentials or register first.`);
     }
 
     if (user.hrRecord.employmentStatus !== EmploymentStatus.ACTIVE) {
@@ -458,17 +463,21 @@ export class AuthService {
       : dto.workoutDays || 'MON,WED,FRI';
     const monthlyFee = this.calculateGymFee(memberType, daysPerWeek);
 
+    const rawUsername = dto.username?.trim();
+    const normalizedUsername = rawUsername ? rawUsername.toLowerCase() : null;
+
     // Resolve or generate Employee ID / External Member ID
-    let employeeId = (dto.employeeId || dto.username || '').trim();
+    let employeeId = (dto.employeeId || '').trim();
     if (!employeeId) {
       const randNum = Math.floor(1000 + Math.random() * 9000);
       employeeId = memberType === 'INTERNAL' ? `EMP-MOA-${randNum}` : `EXT-MOA-${randNum}`;
     }
 
-    // Check if an active account already exists for this ID or Email
+    // Check if an active account already exists for this ID, Email, or Username
     const existingUser = await this.prisma.user.findFirst({
       where: {
         OR: [
+          ...(normalizedUsername ? [{ username: normalizedUsername }] : []),
           { employeeId },
           { hrRecord: { email } },
         ],
@@ -477,6 +486,11 @@ export class AuthService {
     });
 
     if (existingUser) {
+      if (normalizedUsername && existingUser.username?.toLowerCase() === normalizedUsername) {
+        throw new ConflictException(
+          `The username "${rawUsername}" is already taken. Please choose another username.`,
+        );
+      }
       throw new ConflictException(
         `An account already exists for ${existingUser.hrRecord.fullName} (${existingUser.employeeId}). Please sign in instead.`,
       );
@@ -523,6 +537,7 @@ export class AuthService {
       const createdUser = await tx.user.create({
         data: {
           employeeId,
+          username: normalizedUsername,
           passwordHash: hashedPassword,
           role: Role.STAFF_MEMBER,
           memberType,
@@ -620,6 +635,7 @@ export class AuthService {
     const payload = {
       sub: newUser.id,
       employeeId: newUser.employeeId,
+      username: newUser.username,
       role: newUser.role,
     };
     const token = this.jwtService.sign(payload);
@@ -629,6 +645,7 @@ export class AuthService {
       user: {
         id: newUser.id,
         employeeId: newUser.employeeId,
+        username: newUser.username,
         fullName: newUser.hrRecord.fullName,
         department: newUser.hrRecord.department,
         email: newUser.hrRecord.email,

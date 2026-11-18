@@ -47,6 +47,7 @@ model HrEmployeeRoster {
 model User {
   id                    String           @id @default(uuid())
   employeeId            String           @unique
+  username              String?          @unique
   hrRecord              HrEmployeeRoster @relation(fields: [employeeId], references: [employeeId])
   passwordHash          String
   role                  Role             @default(STAFF_MEMBER)

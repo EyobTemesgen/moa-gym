@@ -7,17 +7,13 @@ import {
   ShieldCheck,
   Users,
   BarChart3,
-  LogOut,
   ChevronLeft,
   ChevronRight,
-  User,
   LayoutDashboard,
   UserCog,
   Settings,
-  KeyRound,
   Flame,
 } from 'lucide-react';
-import { ChangePasswordModal } from './auth/ChangePasswordModal';
 
 interface SidebarProps {
   collapsed: boolean;
@@ -32,10 +28,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   mobileOpen,
   onCloseMobile,
 }) => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
 
   const isSettingsActive =
     location.pathname === '/registrations' ||
@@ -275,60 +270,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           )}
         </div>
-
-        {/* Bottom Section: User Profile & Logout */}
-        <div className="p-3 border-t border-white/10 bg-black/10">
-          <div className="flex items-center gap-3 overflow-hidden">
-            {user.photoUrl ? (
-              <img
-                src={user.photoUrl}
-                alt={user.fullName}
-                className="h-9 w-9 rounded-xl object-cover ring-2 ring-moa-gold shrink-0"
-              />
-            ) : (
-              <div className="h-9 w-9 rounded-xl bg-white/15 flex items-center justify-center text-white font-bold shrink-0">
-                <User className="h-4 w-4" />
-              </div>
-            )}
-
-            {!collapsed && (
-              <div className="flex-1 overflow-hidden">
-                <div className="text-xs font-bold text-white truncate">{user.fullName}</div>
-                <div className="text-[10px] font-mono text-emerald-200 truncate">
-                  {user.employeeId} ·{' '}
-                  <span className="font-semibold text-moa-gold">{user.role === 'HR_ADMIN' ? 'ADMIN' : user.role}</span>
-                </div>
-              </div>
-            )}
-
-            <div className="flex items-center gap-1 shrink-0 ml-auto">
-              <button
-                type="button"
-                onClick={() => setIsChangePasswordOpen(true)}
-                title="Change Password"
-                className="p-1.5 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition cursor-pointer"
-              >
-                <KeyRound className="h-4 w-4" />
-              </button>
-
-              <button
-                type="button"
-                onClick={logout}
-                title="Sign out"
-                className="p-1.5 text-white/70 hover:text-red-300 hover:bg-white/10 rounded-lg transition cursor-pointer"
-              >
-                <LogOut className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        </div>
       </aside>
-
-      {/* Change Password Modal */}
-      <ChangePasswordModal
-        isOpen={isChangePasswordOpen}
-        onClose={() => setIsChangePasswordOpen(false)}
-      />
     </>
   );
 };

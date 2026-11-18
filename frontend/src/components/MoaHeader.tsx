@@ -15,6 +15,9 @@ import {
   UserCog,
   QrCode,
   Building2,
+  Users,
+  BarChart3,
+  Flame,
 } from 'lucide-react';
 import { getTodayGcAndEc } from '../utils/eth-date';
 import { ChangePasswordModal } from './auth/ChangePasswordModal';
@@ -191,8 +194,8 @@ export const MoaHeader: React.FC<MoaHeaderProps> = ({ onOpenMobileSidebar }) => 
                       </div>
                     )}
 
-                    <div className="hidden md:flex flex-col text-left leading-tight">
-                      <span className="text-xs font-bold text-slate-900 truncate max-w-[120px]">
+                    <div className="hidden sm:flex flex-col text-left leading-tight">
+                      <span className="text-xs font-bold text-slate-900 truncate max-w-[140px]">
                         {user.fullName}
                       </span>
                       <span className="text-[10px] font-mono text-slate-500">
@@ -269,18 +272,33 @@ export const MoaHeader: React.FC<MoaHeaderProps> = ({ onOpenMobileSidebar }) => 
                         )}
 
                         {user.role === 'GYM_ATTENDANT' && (
-                          <button
-                            type="button"
-                            role="menuitem"
-                            onClick={() => {
-                              setShowUserMenu(false);
-                              navigate('/terminal');
-                            }}
-                            className="w-full flex items-center gap-2.5 px-3 py-2 text-left font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-900 rounded-lg transition cursor-pointer"
-                          >
-                            <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0" />
-                            <span>Gate Terminal</span>
-                          </button>
+                          <>
+                            <button
+                              type="button"
+                              role="menuitem"
+                              onClick={() => {
+                                setShowUserMenu(false);
+                                navigate('/terminal');
+                              }}
+                              className="w-full flex items-center gap-2.5 px-3 py-2 text-left font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-900 rounded-lg transition cursor-pointer"
+                            >
+                              <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0" />
+                              <span>Gate Terminal</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              role="menuitem"
+                              onClick={() => {
+                                setShowUserMenu(false);
+                                navigate('/active-floor');
+                              }}
+                              className="w-full flex items-center gap-2.5 px-3 py-2 text-left font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-900 rounded-lg transition cursor-pointer"
+                            >
+                              <Flame className="w-4 h-4 text-amber-600 shrink-0" />
+                              <span>Floor & Lockers</span>
+                            </button>
+                          </>
                         )}
 
                         {(user.role === 'ADMIN' || user.role === 'HR_ADMIN') && (
@@ -297,6 +315,33 @@ export const MoaHeader: React.FC<MoaHeaderProps> = ({ onOpenMobileSidebar }) => 
                               <LayoutDashboard className="w-4 h-4 text-emerald-700 shrink-0" />
                               <span>Dashboard</span>
                             </button>
+
+                            <button
+                              type="button"
+                              role="menuitem"
+                              onClick={() => {
+                                setShowUserMenu(false);
+                                navigate('/registrations');
+                              }}
+                              className="w-full flex items-center gap-2.5 px-3 py-2 text-left font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-900 rounded-lg transition cursor-pointer"
+                            >
+                              <Users className="w-4 h-4 text-emerald-700 shrink-0" />
+                              <span>Staff Registrations</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              role="menuitem"
+                              onClick={() => {
+                                setShowUserMenu(false);
+                                navigate('/reports');
+                              }}
+                              className="w-full flex items-center gap-2.5 px-3 py-2 text-left font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-900 rounded-lg transition cursor-pointer"
+                            >
+                              <BarChart3 className="w-4 h-4 text-emerald-700 shrink-0" />
+                              <span>Reports</span>
+                            </button>
+
                             <button
                               type="button"
                               role="menuitem"

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { apiRequest } from '../../lib/api';
+import { useToast } from '../../context/ToastContext';
 import {
   X,
   Search,
@@ -26,6 +27,7 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
   onClose,
   onSuccess,
 }) => {
+  const toast = useToast();
   const [employeeId, setEmployeeId] = useState('');
   const [fullName, setFullName] = useState('');
   const [department, setDepartment] = useState('');
@@ -152,7 +154,7 @@ export const RegisterStaffModal: React.FC<RegisterStaffModalProps> = ({
     } catch (err) {
       console.warn('Webcam failed to start:', err);
       setWebcamActive(false);
-      alert('Unable to access webcam. Please check permissions or upload an image file.');
+      toast.warning('Webcam Inaccessible', 'Unable to access webcam. Please check browser permissions or upload an image file.');
     }
   };
 

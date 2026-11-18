@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../lib/auth-context';
+import { useToast } from '../../context/ToastContext';
 import { apiRequest } from '../../lib/api';
 import { MoaLogo } from '../../components/MoaLogo';
 import {
@@ -48,6 +49,7 @@ const WEEK_DAYS = [
 export const DedicatedSignUpPage: React.FC = () => {
   const { registerStaff } = useAuth();
   const navigate = useNavigate();
+  const toast = useToast();
 
   // Wizard Step: 1 = Profile, 2 = Schedule & Fee, 3 = Locker, 4 = Success
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
@@ -392,6 +394,7 @@ export const DedicatedSignUpPage: React.FC = () => {
     if (errorCount > 0) {
       const firstErrorMsg = Object.values(newErrors)[0];
       setError(firstErrorMsg);
+      toast.warning('Check Required Fields', firstErrorMsg);
       return;
     }
 
@@ -408,6 +411,7 @@ export const DedicatedSignUpPage: React.FC = () => {
       setFieldErrors((prev) => ({ ...prev, selectedDays: err }));
       setTouched((prev) => ({ ...prev, selectedDays: true }));
       setError(err);
+      toast.warning('Schedule Incomplete', err);
       return;
     }
 
@@ -437,7 +441,9 @@ export const DedicatedSignUpPage: React.FC = () => {
     setFieldErrors((prev) => ({ ...prev, ...newErrors }));
 
     if (Object.keys(newErrors).length > 0) {
-      setError(Object.values(newErrors)[0]);
+      const firstError = Object.values(newErrors)[0];
+      setError(firstError);
+      toast.warning('Terms & Agreement Required', firstError);
       return;
     }
 
@@ -469,8 +475,11 @@ export const DedicatedSignUpPage: React.FC = () => {
       const result = await registerStaff(payload);
       setRegistrationResult(result);
       setStep(4);
+      toast.success('Registration Complete', 'Your gym membership has been created successfully!');
     } catch (err: any) {
-      setError(err.message || 'Failed to complete registration. Please check your information.');
+      const errMsg = err.message || 'Failed to complete registration. Please check your information.';
+      setError(errMsg);
+      toast.error('Registration Failed', errMsg);
     } finally {
       setIsSubmitting(false);
     }

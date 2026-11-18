@@ -22,6 +22,7 @@ import { EditRegistrantModal } from '../../components/registrations/EditRegistra
 import { SortableHeader, SortDirection } from '../../components/ui/SortableHeader';
 import { usePagination, Pagination } from '../../components/ui/Pagination';
 import { btn, table, statusTone, pill } from '../../components/ui/theme';
+import { useToast } from '../../context/ToastContext';
 import { downloadCsv } from '../../utils/csv';
 
 export interface Registrant {
@@ -59,6 +60,7 @@ const TABS: { key: TabFilter; label: string }[] = [
 
 export const RegistrationsPage: React.FC = () => {
   const queryClient = useQueryClient();
+  const toast = useToast();
   const [activeTab, setActiveTab] = useState<TabFilter>('ALL');
   const [search, setSearch] = useState('');
   const [selectedDept, setSelectedDept] = useState('ALL');
@@ -70,7 +72,6 @@ export const RegistrationsPage: React.FC = () => {
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [cardModalRegistrant, setCardModalRegistrant] = useState<Registrant | null>(null);
   const [editModalRegistrant, setEditModalRegistrant] = useState<Registrant | null>(null);
-  const [notification, setNotification] = useState<string | null>(null);
 
   // Fetch Registrations
   const { data, isLoading } = useQuery<{
@@ -164,6 +165,7 @@ export const RegistrationsPage: React.FC = () => {
       'Status': r.status,
     }));
     downloadCsv(`moa-gym-registrations-${new Date().toISOString().slice(0, 10)}.csv`, rows);
+    toast.success('CSV Export Complete', `Exported ${rows.length} member records.`);
   };
 
   const clearAllFilters = () => {
@@ -238,23 +240,6 @@ export const RegistrationsPage: React.FC = () => {
           </button>
         </div>
       </div>
-
-      {/* Success Notification Alert */}
-      {notification && (
-        <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg text-xs font-semibold text-emerald-900 flex items-center justify-between shadow-2xs">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="h-4 w-4 text-[#00843D] shrink-0" />
-            <span>{notification}</span>
-          </div>
-          <button
-            type="button"
-            onClick={() => setNotification(null)}
-            className="text-slate-400 hover:text-slate-600 cursor-pointer"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-      )}
 
       {/* Main Table Container Card */}
       <div className={table.card}>
@@ -600,8 +585,9 @@ export const RegistrationsPage: React.FC = () => {
         onSuccess={(newReg) => {
           queryClient.invalidateQueries({ queryKey: ['gymRegistrations'] });
           queryClient.invalidateQueries({ queryKey: ['registrationStats'] });
-          setNotification(
-            `Staff member "${newReg.fullName}" was successfully registered under Reg # ${newReg.regNumber}.`,
+          toast.success(
+            'Member Registered',
+            `Staff member "${newReg.fullName}" was successfully registered under Reg #${newReg.regNumber}.`,
           );
         }}
       />
@@ -612,7 +598,7 @@ export const RegistrationsPage: React.FC = () => {
         onSuccess={() => {
           queryClient.invalidateQueries({ queryKey: ['gymRegistrations'] });
           queryClient.invalidateQueries({ queryKey: ['registrationStats'] });
-          setNotification('Batch registration completed successfully.');
+          toast.success('Batch Upload Complete', 'Batch registration completed successfully.');
         }}
       />
 
@@ -636,7 +622,7 @@ export const RegistrationsPage: React.FC = () => {
         registrant={editModalRegistrant}
         onSuccess={() => {
           queryClient.invalidateQueries({ queryKey: ['gymRegistrations'] });
-          setNotification('Member registration details updated successfully.');
+          toast.success('Member Updated', 'Member registration details updated successfully.');
         }}
       />
     </div>

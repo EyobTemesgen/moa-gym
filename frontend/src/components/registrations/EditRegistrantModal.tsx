@@ -12,6 +12,7 @@ import {
   Edit3,
 } from 'lucide-react';
 import { apiRequest } from '../../lib/api';
+import { useToast } from '../../context/ToastContext';
 import { btn } from '../ui/theme';
 import { Registrant } from '../../pages/desk/RegistrationsPage';
 
@@ -28,6 +29,7 @@ export const EditRegistrantModal: React.FC<EditRegistrantModalProps> = ({
   registrant,
   onSuccess,
 }) => {
+  const toast = useToast();
   const [phone, setPhone] = useState('');
   const [shiftPreference, setShiftPreference] = useState('FLEXIBLE');
   const [department, setDepartment] = useState('');
@@ -67,7 +69,9 @@ export const EditRegistrantModal: React.FC<EditRegistrantModalProps> = ({
       onSuccess?.();
       onClose();
     } catch (err: any) {
-      setError(err.message || 'Failed to update member registration details');
+      const errMsg = err.message || 'Failed to update member registration details';
+      setError(errMsg);
+      toast.error('Update Failed', errMsg);
     } finally {
       setLoading(false);
     }

@@ -11,6 +11,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { apiRequest } from '../../lib/api';
+import { useToast } from '../../context/ToastContext';
 import { btn } from '../ui/theme';
 
 interface ChangePasswordModalProps {
@@ -24,6 +25,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
   onClose,
   onSuccess,
 }) => {
+  const toast = useToast();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -80,12 +82,15 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
       });
 
       setSuccess(true);
+      toast.success('Password Changed', 'Your security password has been updated.');
       setTimeout(() => {
         onSuccess?.();
         handleClose();
       }, 1500);
     } catch (err: any) {
-      setError(err.message || 'Failed to change password. Please check your current password.');
+      const errMsg = err.message || 'Failed to change password. Please check your current password.';
+      setError(errMsg);
+      toast.error('Update Failed', errMsg);
     } finally {
       setLoading(false);
     }

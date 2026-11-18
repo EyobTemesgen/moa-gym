@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../lib/auth-context';
+import { useToast } from '../../context/ToastContext';
 import { MoaLogo } from '../../components/MoaLogo';
 import {
   Lock,
@@ -25,6 +26,7 @@ export const LoginPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const toast = useToast();
 
   // Forgot / Reset Password Modal State (matching ATS standard)
   const [showForgotModal, setShowForgotModal] = useState(false);
@@ -48,6 +50,7 @@ export const LoginPage: React.FC = () => {
     setIsSubmitting(true);
     try {
       const user = await login(identifier.trim(), password);
+      toast.success('Signed In', `Welcome back, ${user.fullName || user.employeeId || 'Member'}!`);
       if (user.role === 'STAFF_MEMBER') {
         navigate('/dashboard');
       } else if (user.role === 'GYM_ATTENDANT') {
@@ -56,7 +59,9 @@ export const LoginPage: React.FC = () => {
         navigate('/admin/dashboard');
       }
     } catch (err: any) {
-      setError(err.message || 'Login failed. Please verify credentials.');
+      const errMsg = err.message || 'Login failed. Please verify credentials.';
+      setError(errMsg);
+      toast.error('Authentication Failed', errMsg);
     } finally {
       setIsSubmitting(false);
     }
@@ -102,6 +107,7 @@ export const LoginPage: React.FC = () => {
       });
 
       setForgotSuccess(res.message || 'Password updated successfully.');
+      toast.success('Password Updated', res.message || 'Password updated successfully. You can now sign in.');
       setIdentifier(res.employeeId || trimmedId);
       setPassword(newPassword);
       setTimeout(() => {
@@ -109,7 +115,9 @@ export const LoginPage: React.FC = () => {
         setForgotSuccess(null);
       }, 2500);
     } catch (err: any) {
-      setForgotError(err.message || 'Failed to update password. Please check your credentials.');
+      const errMsg = err.message || 'Failed to update password. Please check your credentials.';
+      setForgotError(errMsg);
+      toast.error('Reset Failed', errMsg);
     } finally {
       setForgotLoading(false);
     }

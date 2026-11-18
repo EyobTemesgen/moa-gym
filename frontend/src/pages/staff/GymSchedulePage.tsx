@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../../lib/auth-context';
+import { useToast } from '../../context/ToastContext';
 import { apiRequest } from '../../lib/api';
 import {
   Calendar,
@@ -83,7 +84,7 @@ export const GymSchedulePage: React.FC = () => {
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [viewParticipantsClass, setViewParticipantsClass] = useState<WellnessClass | null>(null);
-  const [actionMessage, setActionMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const toast = useToast();
 
   const [newTitle, setNewTitle] = useState('');
   const [newInstructor, setNewInstructor] = useState('Coach Henok');
@@ -104,12 +105,10 @@ export const GymSchedulePage: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['wellness-classes'] });
-      setActionMessage({ type: 'success', text: 'Class spot booked successfully!' });
-      setTimeout(() => setActionMessage(null), 3500);
+      toast.success('Spot Booked', 'Class spot booked successfully!');
     },
     onError: (err: any) => {
-      setActionMessage({ type: 'error', text: err.message || 'Failed to book class.' });
-      setTimeout(() => setActionMessage(null), 4000);
+      toast.error('Booking Failed', err.message || 'Failed to book class.');
     },
   });
 
@@ -119,12 +118,10 @@ export const GymSchedulePage: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['wellness-classes'] });
-      setActionMessage({ type: 'success', text: 'Reservation cancelled.' });
-      setTimeout(() => setActionMessage(null), 3500);
+      toast.info('Reservation Cancelled', 'Your reservation was cancelled.');
     },
     onError: (err: any) => {
-      setActionMessage({ type: 'error', text: err.message || 'Failed to cancel reservation.' });
-      setTimeout(() => setActionMessage(null), 4000);
+      toast.error('Cancellation Failed', err.message || 'Failed to cancel reservation.');
     },
   });
 
@@ -146,11 +143,10 @@ export const GymSchedulePage: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['wellness-classes'] });
       setIsAddModalOpen(false);
       setNewTitle('');
-      setActionMessage({ type: 'success', text: 'Class scheduled successfully.' });
-      setTimeout(() => setActionMessage(null), 3500);
+      toast.success('Session Scheduled', 'Class scheduled successfully.');
     },
     onError: (err: any) => {
-      setActionMessage({ type: 'error', text: err.message || 'Failed to create class.' });
+      toast.error('Scheduling Failed', err.message || 'Failed to create class.');
     },
   });
 
@@ -217,33 +213,6 @@ export const GymSchedulePage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Toast Alert */}
-      {actionMessage && (
-        <div
-          className={`p-3.5 rounded-xl border flex items-center justify-between shadow-xs transition-all ${
-            actionMessage.type === 'success'
-              ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
-              : 'bg-rose-50 border-rose-200 text-rose-900'
-          }`}
-        >
-          <div className="flex items-center gap-2 text-xs font-semibold">
-            {actionMessage.type === 'success' ? (
-              <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-            ) : (
-              <AlertCircle className="h-4 w-4 text-rose-600 shrink-0" />
-            )}
-            <span>{actionMessage.text}</span>
-          </div>
-          <button
-            type="button"
-            onClick={() => setActionMessage(null)}
-            className="text-slate-400 hover:text-slate-700 cursor-pointer"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-      )}
-
       {/* Clean Top Header */}
       <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -480,7 +449,7 @@ export const GymSchedulePage: React.FC = () => {
                       type="button"
                       onClick={() => {
                         if (isTemplate) {
-                          alert(`You have reserved a spot for "${item.title}" on ${selectedDate}.`);
+                          toast.success('Spot Reserved', `You have reserved a spot for "${item.title}" on ${selectedDate}.`);
                         } else {
                           bookMutation.mutate(item.id);
                         }

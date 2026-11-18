@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { btn } from '../../components/ui/theme';
 import { SearchableSelect } from '../../components/ui/SearchableSelect';
+import { useToast } from '../../context/ToastContext';
 
 /** Random temporary password generator matching Asset Tracking System (ATS) standard */
 export function makeTemporaryPassword(): string {
@@ -60,7 +61,7 @@ export const UserManagementPage: React.FC = () => {
   const [search, setSearch] = useState('');
   const [selectedRole, setSelectedRole] = useState<string>('ALL');
   const [selectedStatus, setSelectedStatus] = useState<string>('ALL');
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const toast = useToast();
 
   // Modals state
   const [resetModalUser, setResetModalUser] = useState<SystemUser | null>(null);
@@ -136,11 +137,6 @@ export const UserManagementPage: React.FC = () => {
     },
   });
 
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 4000);
-  };
-
   // Role Update Mutation
   const updateRoleMutation = useMutation({
     mutationFn: ({ id, role }: { id: string; role: string }) =>
@@ -149,11 +145,11 @@ export const UserManagementPage: React.FC = () => {
         body: JSON.stringify({ role }),
       }),
     onSuccess: (res: any) => {
-      showToast(res.message || 'User role updated successfully');
+      toast.success('Role Updated', res.message || 'User role updated successfully');
       queryClient.invalidateQueries({ queryKey: ['systemUsers'] });
     },
     onError: (err: any) => {
-      alert(err.message || 'Failed to update user role');
+      toast.error('Role Update Failed', err.message || 'Failed to update user role');
     },
   });
 
@@ -165,11 +161,11 @@ export const UserManagementPage: React.FC = () => {
         body: JSON.stringify({ status }),
       }),
     onSuccess: (res: any) => {
-      showToast(res.message || 'User status updated successfully');
+      toast.success('Status Updated', res.message || 'User status updated successfully');
       queryClient.invalidateQueries({ queryKey: ['systemUsers'] });
     },
     onError: (err: any) => {
-      alert(err.message || 'Failed to update user status');
+      toast.error('Status Update Failed', err.message || 'Failed to update user status');
     },
   });
 
@@ -180,11 +176,11 @@ export const UserManagementPage: React.FC = () => {
         method: 'POST',
       }),
     onSuccess: (res: any) => {
-      showToast(res.message || 'Password successfully reset to default');
+      toast.success('Password Reset', res.message || 'Password successfully reset to default');
       setResetModalUser(null);
     },
     onError: (err: any) => {
-      alert(err.message || 'Failed to reset password');
+      toast.error('Reset Failed', err.message || 'Failed to reset password');
     },
   });
 
@@ -204,7 +200,7 @@ export const UserManagementPage: React.FC = () => {
         body: JSON.stringify({ employeeId, role, password }),
       }),
     onSuccess: (res: any) => {
-      showToast(res.message || 'User added successfully');
+      toast.success('Access Granted', res.message || 'User added successfully');
       setIsAddUserModalOpen(false);
       setSelectedEmployeeId('');
       setTemporaryPassword('');
@@ -213,6 +209,7 @@ export const UserManagementPage: React.FC = () => {
     },
     onError: (err: any) => {
       setAddUserError(err.message || 'Failed to add user');
+      toast.error('Failed to Add User', err.message || 'Failed to add user');
     },
   });
 
@@ -220,13 +217,6 @@ export const UserManagementPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className="fixed top-16 right-5 z-50 bg-emerald-900 text-white px-4 py-3 rounded-xl shadow-lg border border-emerald-500 flex items-center gap-2.5 text-xs animate-in fade-in slide-in-from-top-2">
-          <CheckCircle2 className="h-4 w-4 text-moa-gold shrink-0" />
-          <span>{toastMessage}</span>
-        </div>
-      )}
 
       {/* Page Header */}
       <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col xl:flex-row xl:items-center justify-between gap-4">
@@ -658,7 +648,7 @@ export const UserManagementPage: React.FC = () => {
                       if (!temporaryPassword) return;
                       navigator.clipboard?.writeText(temporaryPassword).then(() => {
                         setCopiedPassword(true);
-                        showToast('Temporary password copied to clipboard');
+                        toast.info('Copied', 'Temporary password copied to clipboard');
                         setTimeout(() => setCopiedPassword(false), 3000);
                       });
                     }}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../lib/auth-context';
 import { useToast } from '../../context/ToastContext';
@@ -29,9 +29,22 @@ export const LoginPage: React.FC = () => {
   });
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const navigate = useNavigate();
   const toast = useToast();
+
+  // Auto-redirect if already authenticated
+  useEffect(() => {
+    if (user) {
+      if (user.role === 'STAFF_MEMBER') {
+        navigate('/dashboard', { replace: true });
+      } else if (user.role === 'GYM_ATTENDANT') {
+        navigate('/terminal', { replace: true });
+      } else {
+        navigate('/admin/dashboard', { replace: true });
+      }
+    }
+  }, [user, navigate]);
 
   // Forgot / Reset Password Modal State (matching ATS standard)
   const [showForgotModal, setShowForgotModal] = useState(false);
@@ -66,11 +79,11 @@ export const LoginPage: React.FC = () => {
       const user = await login(trimmedId, password);
       toast.success('Signed In', `Welcome back, ${user.fullName || user.employeeId || 'Member'}!`);
       if (user.role === 'STAFF_MEMBER') {
-        navigate('/dashboard');
+        navigate('/dashboard', { replace: true });
       } else if (user.role === 'GYM_ATTENDANT') {
-        navigate('/terminal');
+        navigate('/terminal', { replace: true });
       } else {
-        navigate('/admin/dashboard');
+        navigate('/admin/dashboard', { replace: true });
       }
     } catch (err: any) {
       const errMsg = err.message || 'Login failed. Please verify credentials.';

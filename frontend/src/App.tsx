@@ -134,7 +134,7 @@ export const App: React.FC = () => {
               <Route
                 path="/terminal"
                 element={
-                  <RoleGuard allowedRoles={['GYM_ATTENDANT']}>
+                  <RoleGuard allowedRoles={['GYM_ATTENDANT', 'ADMIN', 'HR_ADMIN']}>
                     <CheckInTerminalPage />
                   </RoleGuard>
                 }

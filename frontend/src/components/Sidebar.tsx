@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/auth-context';
 import { MoaLogo } from './MoaLogo';
 import {
@@ -106,14 +106,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Branding & Logo */}
         <div className="p-4 border-b border-white/10 flex items-center justify-between">
-          <div className="flex items-center gap-3 overflow-hidden">
-            <MoaLogo className="h-10 w-10 shrink-0" size={40} />
+          <Link
+            to={
+              user.role === 'GYM_ATTENDANT'
+                ? '/terminal'
+                : user.role === 'STAFF_MEMBER'
+                ? '/dashboard'
+                : '/admin/dashboard'
+            }
+            title="Go to Home"
+            className="flex items-center gap-3 overflow-hidden cursor-pointer group"
+          >
+            <MoaLogo className="h-10 w-10 shrink-0 group-hover:scale-105 transition-transform" size={40} />
             {!collapsed && (
               <span className="font-bold text-sm text-white tracking-tight truncate">
                 MoA Gym
               </span>
             )}
-          </div>
+          </Link>
 
           {/* Desktop Collapse Toggle */}
           <button

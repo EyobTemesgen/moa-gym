@@ -482,96 +482,136 @@ export class AuthService {
       );
     }
 
-    // Ensure HR roster record exists
-    const existingRoster = await this.prisma.hrEmployeeRoster.findUnique({
-      where: { employeeId },
-    });
-
     const departmentName = memberType === 'EXTERNAL'
       ? (dto.organization ? `External - ${dto.organization.trim()}` : (dto.department?.trim() || 'Community Trainee'))
       : (dto.department?.trim() || 'General Ministry Staff');
 
-    if (!existingRoster) {
-      await this.prisma.hrEmployeeRoster.create({
-        data: {
-          employeeId,
-          fullName,
-          department: departmentName,
-          phone: phone || '+251 90 000 0000',
-          email,
-          employmentStatus: EmploymentStatus.ACTIVE,
-        },
-      });
-    } else {
-      // Update contact details
-      await this.prisma.hrEmployeeRoster.update({
-        where: { employeeId },
-        data: {
-          email,
-          ...(phone ? { phone } : {}),
-        },
-      });
-    }
-
     // Hash password
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
-    // Create User record
-    const newUser = await this.prisma.user.create({
-      data: {
-        employeeId,
-        passwordHash: hashedPassword,
-        role: Role.STAFF_MEMBER,
-        memberType,
-        waiverSigned: true,
-        waiverSignedAt: new Date(),
-        emergencyContactName: dto.emergencyContactName?.trim() || null,
-        emergencyContactPhone: dto.emergencyContactPhone?.trim() || null,
-      },
-      include: { hrRecord: true },
-    });
-
-    // Handle locker assignment if requested
-    let assignedLocker: string | null = null;
-    if (dto.lockerNumber && dto.lockerNumber.trim()) {
-      const targetLocker = await this.prisma.locker.findUnique({
-        where: { lockerNumber: dto.lockerNumber.trim() },
+    // Atomic transaction across HR, User, Locker, and GymRegistration
+    const { newUser, newRegistration } = await this.prisma.$transaction(async (tx) => {
+      // 1. Ensure HR roster record exists
+      const existingRoster = await tx.hrEmployeeRoster.findUnique({
+        where: { employeeId },
       });
-      if (targetLocker && targetLocker.status === LockerStatus.AVAILABLE) {
-        await this.prisma.locker.update({
-          where: { lockerNumber: targetLocker.lockerNumber },
+
+      if (!existingRoster) {
+        await tx.hrEmployeeRoster.create({
           data: {
-            status: LockerStatus.OCCUPIED,
-            assignedUserId: newUser.id,
+            employeeId,
+            fullName,
+            department: departmentName,
+            phone: phone || '+251 90 000 0000',
+            email,
+            employmentStatus: EmploymentStatus.ACTIVE,
           },
         });
-        assignedLocker = targetLocker.lockerNumber;
+      } else {
+        await tx.hrEmployeeRoster.update({
+          where: { employeeId },
+          data: {
+            email,
+            ...(phone ? { phone } : {}),
+          },
+        });
       }
-    }
 
-    // Create GymRegistration record
-    const newRegistration = await this.prisma.gymRegistration.create({
-      data: {
-        employeeId,
-        fullName,
-        department: departmentName,
-        phone,
-        email,
-        gender: dto.gender || null,
-        shiftPreference: dto.shiftPreference || 'MORNING',
-        memberType,
-        organization: dto.organization?.trim() || (memberType === 'INTERNAL' ? 'Ministry of Agriculture' : null),
-        daysPerWeek,
-        workoutDays,
-        monthlyFee,
-        paymentMethod: dto.paymentMethod || (memberType === 'INTERNAL' ? 'PAYROLL_DEDUCTION' : 'TELEBIRR'),
-        fitnessGoal: dto.fitnessGoal?.trim() || null,
-        lockerNumber: assignedLocker,
-        registrationSource: 'SELF_SERVICE',
-        registeredBy: 'Self-Serve Portal',
-        status: 'ACTIVE',
-        signatureConfirmed: true,
-      },
+      // 2. Create User record
+      const createdUser = await tx.user.create({
+        data: {
+          employeeId,
+          passwordHash: hashedPassword,
+          role: Role.STAFF_MEMBER,
+          memberType,
+          waiverSigned: true,
+          waiverSignedAt: new Date(),
+          emergencyContactName: dto.emergencyContactName?.trim() || null,
+          emergencyContactPhone: dto.emergencyContactPhone?.trim() || null,
+        },
+        include: { hrRecord: true },
+      });
+
+      // 3. Handle locker assignment if requested
+      let assignedLocker: string | null = null;
+      if (dto.lockerNumber && dto.lockerNumber.trim()) {
+        const targetLocker = await tx.locker.findUnique({
+          where: { lockerNumber: dto.lockerNumber.trim() },
+        });
+        if (targetLocker && targetLocker.status === LockerStatus.AVAILABLE) {
+          await tx.locker.update({
+            where: { lockerNumber: targetLocker.lockerNumber },
+            data: {
+              status: LockerStatus.OCCUPIED,
+              assignedUserId: createdUser.id,
+            },
+          });
+          assignedLocker = targetLocker.lockerNumber;
+        }
+      }
+
+      // 4. Create or Update GymRegistration record with safe sequential regNumber
+      const existingReg = await tx.gymRegistration.findFirst({
+        where: { employeeId },
+      });
+
+      let regRecord;
+      if (existingReg) {
+        regRecord = await tx.gymRegistration.update({
+          where: { id: existingReg.id },
+          data: {
+            fullName,
+            department: departmentName,
+            phone: phone || existingReg.phone,
+            email: email || existingReg.email,
+            gender: dto.gender || existingReg.gender,
+            shiftPreference: dto.shiftPreference || existingReg.shiftPreference,
+            memberType,
+            organization: dto.organization?.trim() || (memberType === 'INTERNAL' ? 'Ministry of Agriculture' : null),
+            daysPerWeek,
+            workoutDays,
+            monthlyFee,
+            paymentMethod: dto.paymentMethod || existingReg.paymentMethod,
+            fitnessGoal: dto.fitnessGoal?.trim() || existingReg.fitnessGoal,
+            lockerNumber: assignedLocker || existingReg.lockerNumber,
+            status: 'ACTIVE',
+            signatureConfirmed: true,
+          },
+        });
+      } else {
+        const maxReg = await tx.gymRegistration.findFirst({
+          orderBy: { regNumber: 'desc' },
+          select: { regNumber: true },
+        });
+        const nextRegNumber = (maxReg?.regNumber || 0) + 1;
+
+        regRecord = await tx.gymRegistration.create({
+          data: {
+            regNumber: nextRegNumber,
+            employeeId,
+            fullName,
+            department: departmentName,
+            phone,
+            email,
+            gender: dto.gender || null,
+            shiftPreference: dto.shiftPreference || 'MORNING',
+            memberType,
+            organization: dto.organization?.trim() || (memberType === 'INTERNAL' ? 'Ministry of Agriculture' : null),
+            daysPerWeek,
+            workoutDays,
+            monthlyFee,
+            paymentMethod: dto.paymentMethod || (memberType === 'INTERNAL' ? 'PAYROLL_DEDUCTION' : 'TELEBIRR'),
+            fitnessGoal: dto.fitnessGoal?.trim() || null,
+            lockerNumber: assignedLocker,
+            registrationSource: 'SELF_SERVICE',
+            registeredBy: 'Self-Serve Portal',
+            status: 'ACTIVE',
+            signatureConfirmed: true,
+          },
+        });
+      }
+
+      return { newUser: createdUser, newRegistration: regRecord };
     });
 
     // Create JWT Session

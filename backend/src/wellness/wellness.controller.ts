@@ -50,6 +50,17 @@ export class WellnessController {
     return this.wellnessService.cancelBooking(classId, req.user.id);
   }
 
+  @Patch('classes/:classId/attendance/:userId')
+  @Roles(Role.GYM_ATTENDANT, Role.ADMIN)
+  @ApiOperation({ summary: 'Toggle attendance status for a booked participant' })
+  async toggleAttendance(
+    @Param('classId') classId: string,
+    @Param('userId') attendeeUserId: string,
+    @Body('attended') attended: boolean,
+  ) {
+    return this.wellnessService.toggleAttendance(classId, attendeeUserId, attended);
+  }
+
   @Get('equipment-issues')
   @Roles(Role.GYM_ATTENDANT, Role.ADMIN)
   @ApiOperation({ summary: 'List reported equipment defects and maintenance log' })

@@ -152,55 +152,89 @@ export const GymSchedulePage: React.FC = () => {
 
   const isStaffOrAdmin = user?.role === 'ADMIN' || user?.role === 'HR_ADMIN' || user?.role === 'GYM_ATTENDANT';
 
-  const defaultTemplates: WellnessClass[] = [
-    {
-      id: `tmpl-morning-${selectedDate}`,
-      title: 'Morning Aerobics & Conditioning',
-      instructorName: 'Coach Henok',
-      scheduledDate: selectedDate,
-      startTime: '06:15',
-      endTime: '07:15',
-      capacity: 15,
-      bookedCount: 8,
-      isFull: false,
-      isBookedByMe: false,
-      participants: [],
-      category: 'Aerobics',
-      ethiopianTime: 'ከማለዳው 12:15 – 1:15',
+  const toggleAttendanceMutation = useMutation({
+    mutationFn: async ({
+      classId,
+      userId,
+      attended,
+    }: {
+      classId: string;
+      userId: string;
+      attended: boolean;
+    }) => {
+      return apiRequest(`/wellness/classes/${classId}/attendance/${userId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ attended }),
+      });
     },
-    {
-      id: `tmpl-evening-${selectedDate}`,
-      title: 'Post-Work Strength & Form',
-      instructorName: 'Trainer Bethel',
-      scheduledDate: selectedDate,
-      startTime: '17:30',
-      endTime: '18:30',
-      capacity: 18,
-      bookedCount: 12,
-      isFull: false,
-      isBookedByMe: false,
-      participants: [],
-      category: 'Strength',
-      ethiopianTime: 'ከምሽቱ 11:30 – 12:30',
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['wellness-classes'] });
+      if (viewParticipantsClass) {
+        setViewParticipantsClass((prev) => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            participants: prev.participants.map((p) =>
+              p.userId === variables.userId ? { ...p, attended: variables.attended } : p,
+            ),
+          };
+        });
+      }
+      toast.success(
+        'Attendance Updated',
+        `Participant marked as ${variables.attended ? 'Attended' : 'Registered'}.`,
+      );
     },
-    {
-      id: `tmpl-yoga-${selectedDate}`,
-      title: 'Desk Worker Posture & Mobility',
-      instructorName: 'Coach Tigist',
-      scheduledDate: selectedDate,
-      startTime: '18:45',
-      endTime: '19:45',
-      capacity: 14,
-      bookedCount: 9,
-      isFull: false,
-      isBookedByMe: false,
-      participants: [],
-      category: 'Mobility',
-      ethiopianTime: 'ከምሽቱ 12:45 – 1:45',
+    onError: (err: any) => {
+      toast.error('Update Failed', err.message || 'Failed to update attendance.');
     },
-  ];
+  });
 
-  const displayClasses = dbClasses.length > 0 ? dbClasses : defaultTemplates;
+  const isClassConcluded = (scheduledDate: string, startTime: string): boolean => {
+    const toLocalDateStr = (d: Date) => {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
+    const now = new Date();
+    const classDate = new Date(scheduledDate);
+    const classDateStr = toLocalDateStr(classDate);
+    const todayDateStr = toLocalDateStr(now);
+
+    if (classDateStr < todayDateStr) {
+      return true;
+    }
+    if (classDateStr === todayDateStr) {
+      const curHours = String(now.getHours()).padStart(2, '0');
+      const curMins = String(now.getMinutes()).padStart(2, '0');
+      const curTime = `${curHours}:${curMins}`;
+      return startTime <= curTime;
+    }
+    return false;
+  };
+
+  const getEthiopianTimeRange = (startTime: string, endTime: string): string => {
+    const formatTime = (t: string) => {
+      const [hStr, mStr] = t.split(':');
+      const h = parseInt(hStr, 10);
+      let etHour = (h - 6 + 24) % 12;
+      if (etHour === 0) etHour = 12;
+      return `${etHour}:${mStr}`;
+    };
+
+    const [hStart] = startTime.split(':').map((n) => parseInt(n, 10));
+    let period = 'ከጠዋቱ';
+    if (hStart >= 6 && hStart < 12) period = 'ከማለዳው';
+    else if (hStart >= 12 && hStart < 16) period = 'ከቀኑ';
+    else if (hStart >= 16 && hStart < 19) period = 'ከምሽቱ';
+    else period = 'ከሌሊቱ';
+
+    return `${period} ${formatTime(startTime)} – ${formatTime(endTime)}`;
+  };
+
+  const displayClasses = dbClasses;
 
   const filteredClasses = displayClasses.filter((c) => {
     const isMorning = c.startTime < '12:00';
@@ -334,8 +368,10 @@ export const GymSchedulePage: React.FC = () => {
       ) : filteredClasses.length === 0 ? (
         <div className="bg-white rounded-xl border border-dashed border-slate-300 p-12 text-center text-slate-500">
           <Calendar className="h-7 w-7 mx-auto text-slate-400 mb-2" />
-          <p className="text-sm font-semibold text-slate-700">No classes for this shift</p>
-          <p className="text-xs text-slate-400 mt-0.5">Switch shifts or pick another day of the week.</p>
+          <p className="text-sm font-semibold text-slate-700">No classes scheduled for this shift</p>
+          <p className="text-xs text-slate-400 mt-0.5">
+            Switch shifts, pick another weekday, or click &ldquo;Schedule Class&rdquo; above.
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -343,7 +379,8 @@ export const GymSchedulePage: React.FC = () => {
             const isMorning = item.startTime < '12:00';
             const capacityPercent = Math.min(100, Math.round((item.bookedCount / item.capacity) * 100));
             const spotsRemaining = Math.max(0, item.capacity - item.bookedCount);
-            const isTemplate = item.id.startsWith('tmpl-');
+            const isConcluded = isClassConcluded(item.scheduledDate, item.startTime);
+            const ethiopianDisplay = getEthiopianTimeRange(item.startTime, item.endTime);
 
             return (
               <div
@@ -351,6 +388,8 @@ export const GymSchedulePage: React.FC = () => {
                 className={`bg-white rounded-xl border transition-all duration-150 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-md ${
                   item.isBookedByMe
                     ? 'border-emerald-500 ring-1 ring-emerald-500/20'
+                    : isConcluded
+                    ? 'border-slate-200 opacity-85'
                     : 'border-slate-200'
                 }`}
               >
@@ -361,15 +400,21 @@ export const GymSchedulePage: React.FC = () => {
                       {isMorning ? 'ጠዋት · Morning' : 'ማታ · Evening'}
                     </span>
 
-                    {item.isBookedByMe && (
+                    {item.isBookedByMe ? (
                       <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 flex items-center gap-1">
                         <Check className="h-3 w-3" /> Reserved
                       </span>
-                    )}
-
-                    {item.isFull && !item.isBookedByMe && (
+                    ) : isConcluded ? (
+                      <span className="text-[10px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                        Concluded
+                      </span>
+                    ) : item.isFull ? (
                       <span className="text-[10px] font-semibold text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
                         Full
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-medium text-emerald-700 bg-emerald-50/60 px-2 py-0.5 rounded border border-emerald-100">
+                        {spotsRemaining} {spotsRemaining === 1 ? 'spot' : 'spots'} left
                       </span>
                     )}
                   </div>
@@ -386,16 +431,16 @@ export const GymSchedulePage: React.FC = () => {
                   <div className="mt-3.5 flex items-center gap-1.5 text-xs text-slate-600 font-mono">
                     <Clock className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                     <span>{item.startTime} – {item.endTime}</span>
-                    {item.ethiopianTime && (
-                      <span className="text-slate-400 text-[11px]">({item.ethiopianTime})</span>
+                    {ethiopianDisplay && (
+                      <span className="text-slate-400 text-[11px]">({ethiopianDisplay})</span>
                     )}
                   </div>
 
                   {/* Clean Capacity Meter */}
                   <div className="mt-3 space-y-1">
                     <div className="flex items-center justify-between text-[11px] text-slate-500 font-mono">
-                      <span>{item.bookedCount} / {item.capacity} spots</span>
-                      <span>{spotsRemaining > 0 ? `${spotsRemaining} left` : '0 left'}</span>
+                      <span>{item.bookedCount} / {item.capacity} spots booked</span>
+                      <span>{Math.round(capacityPercent)}%</span>
                     </div>
                     <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
                       <div
@@ -414,7 +459,7 @@ export const GymSchedulePage: React.FC = () => {
 
                 {/* Card Actions */}
                 <div className="px-4 py-3 bg-slate-50/60 border-t border-slate-100 flex items-center justify-between gap-2">
-                  {isStaffOrAdmin && item.participants.length > 0 ? (
+                  {isStaffOrAdmin ? (
                     <button
                       type="button"
                       onClick={() => setViewParticipantsClass(item)}
@@ -424,17 +469,37 @@ export const GymSchedulePage: React.FC = () => {
                       <span>Roster ({item.participants.length})</span>
                     </button>
                   ) : (
-                    <span className="text-[11px] text-slate-400">Regular Session</span>
+                    <span className="text-[11px] text-slate-400 font-mono">
+                      Max {item.capacity} Staff
+                    </span>
                   )}
 
                   {item.isBookedByMe ? (
+                    isConcluded ? (
+                      <button
+                        type="button"
+                        disabled
+                        className="px-2.5 h-7.5 text-xs font-semibold text-slate-400 bg-slate-100 rounded-[6px] cursor-not-allowed"
+                      >
+                        Attended
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => cancelMutation.mutate(item.id)}
+                        disabled={cancelMutation.isPending}
+                        className="px-2.5 h-7.5 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-[6px] transition cursor-pointer disabled:opacity-50"
+                      >
+                        {cancelMutation.isPending ? 'Cancelling...' : 'Cancel Spot'}
+                      </button>
+                    )
+                  ) : isConcluded ? (
                     <button
                       type="button"
-                      onClick={() => cancelMutation.mutate(item.id)}
-                      disabled={cancelMutation.isPending}
-                      className="px-2.5 h-7.5 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-[6px] transition cursor-pointer disabled:opacity-50"
+                      disabled
+                      className="px-2.5 h-7.5 text-xs font-medium text-slate-400 bg-slate-100 rounded-[6px] cursor-not-allowed"
                     >
-                      {cancelMutation.isPending ? 'Cancelling...' : 'Cancel'}
+                      Booking Closed
                     </button>
                   ) : item.isFull ? (
                     <button
@@ -447,13 +512,7 @@ export const GymSchedulePage: React.FC = () => {
                   ) : (
                     <button
                       type="button"
-                      onClick={() => {
-                        if (isTemplate) {
-                          toast.success('Spot Reserved', `You have reserved a spot for "${item.title}" on ${selectedDate}.`);
-                        } else {
-                          bookMutation.mutate(item.id);
-                        }
-                      }}
+                      onClick={() => bookMutation.mutate(item.id)}
                       disabled={bookMutation.isPending}
                       className="px-3 h-7.5 text-xs font-semibold text-white bg-[#00843D] hover:bg-[#007033] rounded-[6px] shadow-2xs transition cursor-pointer disabled:opacity-50"
                     >
@@ -609,22 +668,48 @@ export const GymSchedulePage: React.FC = () => {
 
             <div className="mt-3 max-h-72 overflow-y-auto divide-y divide-slate-100">
               {viewParticipantsClass.participants.map((p, idx) => (
-                <div key={p.bookingId || idx} className="py-2 flex items-center justify-between gap-3 text-xs">
+                <div key={p.bookingId || idx} className="py-2.5 flex items-center justify-between gap-3 text-xs">
                   <div>
                     <div className="font-semibold text-slate-900">{p.fullName}</div>
                     <div className="text-[11px] text-slate-500 font-mono">
                       {p.employeeId} · {p.department}
                     </div>
                   </div>
-                  <span
-                    className={`text-[10px] font-semibold px-2 py-0.5 rounded ${
-                      p.attended
-                        ? 'bg-emerald-50 text-emerald-800'
-                        : 'bg-slate-100 text-slate-600'
-                    }`}
-                  >
-                    {p.attended ? 'Attended' : 'Registered'}
-                  </span>
+                  {isStaffOrAdmin ? (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        toggleAttendanceMutation.mutate({
+                          classId: viewParticipantsClass.id,
+                          userId: p.userId,
+                          attended: !p.attended,
+                        })
+                      }
+                      disabled={toggleAttendanceMutation.isPending}
+                      className={`px-2.5 py-1 text-xs font-semibold rounded-md transition flex items-center gap-1.5 cursor-pointer ${
+                        p.attended
+                          ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border border-emerald-300'
+                          : 'bg-slate-100 text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 border border-slate-200'
+                      }`}
+                    >
+                      <CheckCircle2
+                        className={`h-3.5 w-3.5 ${
+                          p.attended ? 'text-emerald-700' : 'text-slate-400'
+                        }`}
+                      />
+                      <span>{p.attended ? 'Attended' : 'Mark Attended'}</span>
+                    </button>
+                  ) : (
+                    <span
+                      className={`text-[10px] font-semibold px-2 py-0.5 rounded ${
+                        p.attended
+                          ? 'bg-emerald-50 text-emerald-800'
+                          : 'bg-slate-100 text-slate-600'
+                      }`}
+                    >
+                      {p.attended ? 'Attended' : 'Registered'}
+                    </span>
+                  )}
                 </div>
               ))}
             </div>

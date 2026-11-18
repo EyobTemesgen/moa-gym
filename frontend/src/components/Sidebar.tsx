@@ -237,23 +237,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {!collapsed && <span className="truncate">Gym Schedule</span>}
               </NavLink>
 
-              {/* 3. Exercise Videos */}
-              <NavLink
-                to="/guides"
-                onClick={onCloseMobile}
-                className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition ${
-                  isActive('/guides')
-                    ? 'bg-white/20 text-white shadow-xs'
-                    : 'text-white/80 hover:text-white hover:bg-white/10'
-                }`}
-                title={collapsed ? 'Exercise Videos' : undefined}
-              >
-                {isActive('/guides') && <ActiveBar />}
-                <Video className="h-5 w-5 text-sky-300 shrink-0" />
-                {!collapsed && <span className="truncate">Exercise Videos</span>}
-              </NavLink>
-
-              {/* 4. Reports */}
+              {/* 3. Reports */}
               <NavLink
                 to="/reports"
                 onClick={onCloseMobile}
@@ -380,22 +364,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {isActive('/schedule') && <ActiveBar />}
                 <Calendar className="h-5 w-5 text-emerald-300 shrink-0" />
                 {!collapsed && <span className="truncate">Gym Schedule</span>}
-              </NavLink>
-
-              {/* 4. Exercise Videos */}
-              <NavLink
-                to="/guides"
-                onClick={onCloseMobile}
-                className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition ${
-                  isActive('/guides')
-                    ? 'bg-white/20 text-white shadow-xs'
-                    : 'text-white/80 hover:text-white hover:bg-white/10'
-                }`}
-                title={collapsed ? 'Exercise Videos' : undefined}
-              >
-                {isActive('/guides') && <ActiveBar />}
-                <Video className="h-5 w-5 text-sky-300 shrink-0" />
-                {!collapsed && <span className="truncate">Exercise Videos</span>}
               </NavLink>
             </div>
           )}

@@ -79,11 +79,16 @@ export const DedicatedSignUpPage: React.FC = () => {
   const [fitnessGoal, setFitnessGoal] = useState('Cardio & Aerobics');
   const [paymentMethod, setPaymentMethod] = useState('PAYROLL_DEDUCTION');
 
-  // Step 3: Locker
+  // Step 3: Locker & Terms
   const [wantsLocker, setWantsLocker] = useState(true);
   const [selectedLocker, setSelectedLocker] = useState<string>('');
   const [lockers, setLockers] = useState<LockerItem[]>([]);
   const [isLoadingLockers, setIsLoadingLockers] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+
+  // Field Validation & Touched State
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
 
   // Departments & Metadata
   const [departments, setDepartments] = useState<string[]>([]);
@@ -240,33 +245,153 @@ export const DedicatedSignUpPage: React.FC = () => {
   const monthlyFee = calculateFee();
   const perSessionEst = Math.round(monthlyFee / (daysPerWeek * 4));
 
+  // Field Validation Rules
+  const validateField = (name: string, value: any): string => {
+    switch (name) {
+      case 'firstName': {
+        const val = String(value ?? '').trim();
+        if (!val) return 'First name is required.';
+        if (val.length < 2) return 'First name must be at least 2 characters.';
+        if (!/^[a-zA-ZÀ-ÿ\s'-]+$/.test(val)) return 'First name can only contain letters.';
+        return '';
+      }
+      case 'lastName': {
+        const val = String(value ?? '').trim();
+        if (!val) return 'Last name is required.';
+        if (val.length < 2) return 'Last name must be at least 2 characters.';
+        if (!/^[a-zA-ZÀ-ÿ\s'-]+$/.test(val)) return 'Last name can only contain letters.';
+        return '';
+      }
+      case 'username': {
+        const val = String(value ?? '').trim();
+        if (!val) return 'Username is required.';
+        if (val.length < 3) return 'Username must be at least 3 characters.';
+        if (!/^[a-zA-Z0-9._-]+$/.test(val)) return 'Username can only contain letters, numbers, ".", "_", or "-".';
+        return '';
+      }
+      case 'email': {
+        const val = String(value ?? '').trim();
+        if (!val) return 'Email address is required.';
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(val)) return 'Please enter a valid email address (e.g. name@moa.gov.et).';
+        return '';
+      }
+      case 'department': {
+        if (memberType === 'INTERNAL' && !String(value ?? '').trim()) {
+          return 'Please select your MoA Directorate / Department.';
+        }
+        return '';
+      }
+      case 'organization': {
+        if (memberType === 'EXTERNAL') {
+          const val = String(value ?? '').trim();
+          if (!val) return 'Organization / institution name is required.';
+          if (val.length < 2) return 'Organization name must be at least 2 characters.';
+        }
+        return '';
+      }
+      case 'employeeId': {
+        if (memberType === 'INTERNAL') {
+          const val = String(value ?? '').trim();
+          if (!val) return 'Employee ID is required for MoA staff (e.g. EMP-MOA-007).';
+          if (val.length < 3) return 'Employee ID must be at least 3 characters.';
+        }
+        return '';
+      }
+      case 'phone': {
+        const val = String(value ?? '').trim().replace(/[\s-]/g, '');
+        if (!val) return 'Phone number is required.';
+        if (!/^(?:\+251|0)?[79]\d{8}$/.test(val) && !/^\+?[0-9]{9,15}$/.test(val)) {
+          return 'Enter a valid mobile number (e.g. 0911234567 or +251 91 123 4567).';
+        }
+        return '';
+      }
+      case 'password': {
+        const val = String(value ?? '');
+        if (!val) return 'Password is required.';
+        if (val.length < 6) return 'Password must be at least 6 characters.';
+        if (!/(?=.*[a-zA-Z])(?=.*[0-9])/.test(val)) {
+          return 'Password must contain at least one letter and one number.';
+        }
+        return '';
+      }
+      case 'confirmPassword': {
+        const val = String(value ?? '');
+        if (!val) return 'Please confirm your password.';
+        if (val !== password) return 'Passwords do not match.';
+        return '';
+      }
+      case 'selectedDays': {
+        const days = Array.isArray(value) ? value : [];
+        if (days.length === 0) return 'Please select at least 1 workout day for your weekly schedule.';
+        return '';
+      }
+      case 'selectedLocker': {
+        if (wantsLocker && !String(value ?? '').trim()) {
+          return 'Please select an available locker number, or choose "Skip Locker".';
+        }
+        return '';
+      }
+      case 'termsAccepted': {
+        if (!value) return 'You must agree to the Gym Trainee safety rules and code of conduct.';
+        return '';
+      }
+      default:
+        return '';
+    }
+  };
+
+  const markTouched = (name: string, value: any) => {
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    const err = validateField(name, value);
+    setFieldErrors((prev) => ({ ...prev, [name]: err }));
+  };
+
+  const getInputClass = (fieldName: string) => {
+    const hasError = touched[fieldName] && fieldErrors[fieldName];
+    const isValid = touched[fieldName] && !fieldErrors[fieldName];
+    return `w-full px-3.5 py-2.5 bg-slate-50 border rounded-xl text-sm transition-all focus:outline-none focus:ring-2 ${
+      hasError
+        ? 'border-rose-400 bg-rose-50/20 text-slate-900 focus:ring-rose-500 focus:border-rose-500'
+        : isValid
+        ? 'border-emerald-300 text-slate-900 focus:ring-emerald-500 focus:border-emerald-500 focus:bg-white'
+        : 'border-slate-200 text-slate-900 placeholder-slate-400 focus:ring-emerald-500 focus:border-emerald-500 focus:bg-white'
+    }`;
+  };
+
   // Step 1 Validation
   const handleProceedToStep2 = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    if (!firstName.trim() || !lastName.trim()) {
-      setError('Please enter both your First Name and Last Name.');
-      return;
-    }
-    if (!email.trim() || !email.includes('@')) {
-      setError('Please provide a valid email address.');
-      return;
-    }
-    if (memberType === 'INTERNAL' && !department) {
-      setError('Please select your MoA Directorate / Department.');
-      return;
-    }
-    if (memberType === 'EXTERNAL' && !organization.trim()) {
-      setError('Please state your organization, company, or "Individual Member".');
-      return;
-    }
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters long.');
-      return;
-    }
-    if (password !== confirmPassword) {
-      setError('Passwords do not match. Please verify.');
+    const step1Fields: Record<string, any> = {
+      firstName,
+      lastName,
+      username,
+      email,
+      department: memberType === 'INTERNAL' ? department : undefined,
+      organization: memberType === 'EXTERNAL' ? organization : undefined,
+      employeeId: memberType === 'INTERNAL' ? employeeId : undefined,
+      phone,
+      password,
+      confirmPassword,
+    };
+
+    const newErrors: Record<string, string> = {};
+    const newTouched: Record<string, boolean> = {};
+
+    Object.entries(step1Fields).forEach(([k, v]) => {
+      newTouched[k] = true;
+      const err = validateField(k, v);
+      if (err) newErrors[k] = err;
+    });
+
+    setTouched((prev) => ({ ...prev, ...newTouched }));
+    setFieldErrors((prev) => ({ ...prev, ...newErrors }));
+
+    const errorCount = Object.keys(newErrors).length;
+    if (errorCount > 0) {
+      const firstErrorMsg = Object.values(newErrors)[0];
+      setError(firstErrorMsg);
       return;
     }
 
@@ -277,17 +402,45 @@ export const DedicatedSignUpPage: React.FC = () => {
   const handleProceedToStep3 = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    if (selectedDays.length === 0) {
-      setError('Please select at least 1 workout day.');
+
+    const err = validateField('selectedDays', selectedDays);
+    if (err) {
+      setFieldErrors((prev) => ({ ...prev, selectedDays: err }));
+      setTouched((prev) => ({ ...prev, selectedDays: true }));
+      setError(err);
       return;
     }
+
     setStep(3);
   };
 
-  // Final Submission
+  // Final Submission with Step 3 Validation
   const handleFinalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    const step3Fields: Record<string, any> = {
+      selectedLocker: wantsLocker ? selectedLocker : undefined,
+      termsAccepted,
+    };
+
+    const newErrors: Record<string, string> = {};
+    const newTouched: Record<string, boolean> = {};
+
+    Object.entries(step3Fields).forEach(([k, v]) => {
+      newTouched[k] = true;
+      const err = validateField(k, v);
+      if (err) newErrors[k] = err;
+    });
+
+    setTouched((prev) => ({ ...prev, ...newTouched }));
+    setFieldErrors((prev) => ({ ...prev, ...newErrors }));
+
+    if (Object.keys(newErrors).length > 0) {
+      setError(Object.values(newErrors)[0]);
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -523,12 +676,23 @@ export const DedicatedSignUpPage: React.FC = () => {
                 </label>
                 <input
                   type="text"
-                  required
                   placeholder="e.g. Eyob"
                   value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all"
+                  onChange={(e) => {
+                    setFirstName(e.target.value);
+                    if (touched.firstName) {
+                      setFieldErrors((prev) => ({ ...prev, firstName: validateField('firstName', e.target.value) }));
+                    }
+                  }}
+                  onBlur={(e) => markTouched('firstName', e.target.value)}
+                  className={getInputClass('firstName')}
                 />
+                {touched.firstName && fieldErrors.firstName && (
+                  <p className="flex items-center gap-1 text-[11px] font-medium text-rose-600 mt-1">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>{fieldErrors.firstName}</span>
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-700 mb-1">
@@ -536,12 +700,23 @@ export const DedicatedSignUpPage: React.FC = () => {
                 </label>
                 <input
                   type="text"
-                  required
                   placeholder="e.g. Temesgen"
                   value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all"
+                  onChange={(e) => {
+                    setLastName(e.target.value);
+                    if (touched.lastName) {
+                      setFieldErrors((prev) => ({ ...prev, lastName: validateField('lastName', e.target.value) }));
+                    }
+                  }}
+                  onBlur={(e) => markTouched('lastName', e.target.value)}
+                  className={getInputClass('lastName')}
                 />
+                {touched.lastName && fieldErrors.lastName && (
+                  <p className="flex items-center gap-1 text-[11px] font-medium text-rose-600 mt-1">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>{fieldErrors.lastName}</span>
+                  </p>
+                )}
               </div>
             </div>
 
@@ -552,12 +727,27 @@ export const DedicatedSignUpPage: React.FC = () => {
               </label>
               <input
                 type="text"
-                required
                 placeholder="e.g. eyob-moa"
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all"
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                  if (touched.username) {
+                    setFieldErrors((prev) => ({ ...prev, username: validateField('username', e.target.value) }));
+                  }
+                }}
+                onBlur={(e) => markTouched('username', e.target.value)}
+                className={getInputClass('username')}
               />
+              {touched.username && fieldErrors.username ? (
+                <p className="flex items-center gap-1 text-[11px] font-medium text-rose-600 mt-1">
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                  <span>{fieldErrors.username}</span>
+                </p>
+              ) : (
+                <p className="text-[10px] text-slate-400 mt-0.5">
+                  Used for sign-in and personalized member identification.
+                </p>
+              )}
             </div>
 
             {/* Email */}
@@ -567,12 +757,23 @@ export const DedicatedSignUpPage: React.FC = () => {
               </label>
               <input
                 type="email"
-                required
                 placeholder="e.g. eyobatem@gmail.com or name@moa.gov.et"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all"
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (touched.email) {
+                    setFieldErrors((prev) => ({ ...prev, email: validateField('email', e.target.value) }));
+                  }
+                }}
+                onBlur={(e) => markTouched('email', e.target.value)}
+                className={getInputClass('email')}
               />
+              {touched.email && fieldErrors.email && (
+                <p className="flex items-center gap-1 text-[11px] font-medium text-rose-600 mt-1">
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                  <span>{fieldErrors.email}</span>
+                </p>
+              )}
             </div>
 
             {/* Department (if Internal) or Organization (if External) */}
@@ -582,10 +783,15 @@ export const DedicatedSignUpPage: React.FC = () => {
                   Directorate / Department <span className="text-red-500">*</span>
                 </label>
                 <select
-                  required
                   value={department}
-                  onChange={(e) => setDepartment(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all"
+                  onChange={(e) => {
+                    setDepartment(e.target.value);
+                    if (touched.department) {
+                      setFieldErrors((prev) => ({ ...prev, department: validateField('department', e.target.value) }));
+                    }
+                  }}
+                  onBlur={(e) => markTouched('department', e.target.value)}
+                  className={getInputClass('department')}
                 >
                   <option value="">Select your directorate / department...</option>
                   {departments.map((dept) => (
@@ -597,6 +803,12 @@ export const DedicatedSignUpPage: React.FC = () => {
                     <option value="General MoA Staff">Ministry of Agriculture General Staff</option>
                   )}
                 </select>
+                {touched.department && fieldErrors.department && (
+                  <p className="flex items-center gap-1 text-[11px] font-medium text-rose-600 mt-1">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>{fieldErrors.department}</span>
+                  </p>
+                )}
               </div>
             ) : (
               <div>
@@ -605,12 +817,23 @@ export const DedicatedSignUpPage: React.FC = () => {
                 </label>
                 <input
                   type="text"
-                  required
                   placeholder="e.g. UNDP Ethiopia, Private, or Community Member"
                   value={organization}
-                  onChange={(e) => setOrganization(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all"
+                  onChange={(e) => {
+                    setOrganization(e.target.value);
+                    if (touched.organization) {
+                      setFieldErrors((prev) => ({ ...prev, organization: validateField('organization', e.target.value) }));
+                    }
+                  }}
+                  onBlur={(e) => markTouched('organization', e.target.value)}
+                  className={getInputClass('organization')}
                 />
+                {touched.organization && fieldErrors.organization && (
+                  <p className="flex items-center gap-1 text-[11px] font-medium text-rose-600 mt-1">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>{fieldErrors.organization}</span>
+                  </p>
+                )}
               </div>
             )}
 
@@ -618,27 +841,57 @@ export const DedicatedSignUpPage: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-medium text-slate-700 mb-1">
-                  {memberType === 'INTERNAL' ? 'Employee ID' : 'National / Kebele ID'}
+                  {memberType === 'INTERNAL' ? (
+                    <>
+                      Employee ID <span className="text-red-500">*</span>
+                    </>
+                  ) : (
+                    'National / Kebele ID (Optional)'
+                  )}
                 </label>
                 <input
                   type="text"
                   placeholder={memberType === 'INTERNAL' ? 'e.g. EMP-MOA-007' : 'e.g. ID-89472'}
                   value={employeeId}
-                  onChange={(e) => setEmployeeId(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all"
+                  onChange={(e) => {
+                    setEmployeeId(e.target.value);
+                    if (touched.employeeId) {
+                      setFieldErrors((prev) => ({ ...prev, employeeId: validateField('employeeId', e.target.value) }));
+                    }
+                  }}
+                  onBlur={(e) => markTouched('employeeId', e.target.value)}
+                  className={getInputClass('employeeId')}
                 />
+                {touched.employeeId && fieldErrors.employeeId && (
+                  <p className="flex items-center gap-1 text-[11px] font-medium text-rose-600 mt-1">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>{fieldErrors.employeeId}</span>
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Phone Number
+                  Phone Number <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="tel"
-                  placeholder="e.g. 0927847332"
+                  placeholder="e.g. 0911234567 or +251 91 123 4567"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all"
+                  onChange={(e) => {
+                    setPhone(e.target.value);
+                    if (touched.phone) {
+                      setFieldErrors((prev) => ({ ...prev, phone: validateField('phone', e.target.value) }));
+                    }
+                  }}
+                  onBlur={(e) => markTouched('phone', e.target.value)}
+                  className={getInputClass('phone')}
                 />
+                {touched.phone && fieldErrors.phone && (
+                  <p className="flex items-center gap-1 text-[11px] font-medium text-rose-600 mt-1">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>{fieldErrors.phone}</span>
+                  </p>
+                )}
               </div>
             </div>
 
@@ -650,20 +903,41 @@ export const DedicatedSignUpPage: React.FC = () => {
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
-                  required
-                  placeholder="Min. 6 characters"
+                  placeholder="At least 6 characters (letters & numbers)"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-3.5 py-2.5 pr-10 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all"
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (touched.password) {
+                      setFieldErrors((prev) => ({
+                        ...prev,
+                        password: validateField('password', e.target.value),
+                        ...(touched.confirmPassword
+                          ? { confirmPassword: e.target.value === confirmPassword ? '' : 'Passwords do not match.' }
+                          : {}),
+                      }));
+                    }
+                  }}
+                  onBlur={(e) => markTouched('password', e.target.value)}
+                  className={`${getInputClass('password')} pr-10`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
+              {touched.password && fieldErrors.password ? (
+                <p className="flex items-center gap-1 text-[11px] font-medium text-rose-600 mt-1">
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                  <span>{fieldErrors.password}</span>
+                </p>
+              ) : (
+                <p className="text-[10px] text-slate-400 mt-0.5">
+                  Must be at least 6 characters long and include both letters and numbers.
+                </p>
+              )}
             </div>
 
             {/* Confirm Password */}
@@ -673,12 +947,37 @@ export const DedicatedSignUpPage: React.FC = () => {
               </label>
               <input
                 type={showPassword ? 'text' : 'password'}
-                required
                 placeholder="Re-enter password"
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all"
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value);
+                  if (touched.confirmPassword) {
+                    setFieldErrors((prev) => ({
+                      ...prev,
+                      confirmPassword: e.target.value === password ? '' : 'Passwords do not match.',
+                    }));
+                  }
+                }}
+                onBlur={(e) => {
+                  setTouched((prev) => ({ ...prev, confirmPassword: true }));
+                  setFieldErrors((prev) => ({
+                    ...prev,
+                    confirmPassword: e.target.value === password ? '' : 'Passwords do not match.',
+                  }));
+                }}
+                className={getInputClass('confirmPassword')}
               />
+              {touched.confirmPassword && fieldErrors.confirmPassword ? (
+                <p className="flex items-center gap-1 text-[11px] font-medium text-rose-600 mt-1">
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                  <span>{fieldErrors.confirmPassword}</span>
+                </p>
+              ) : confirmPassword && confirmPassword === password ? (
+                <p className="flex items-center gap-1 text-[11px] font-medium text-emerald-600 mt-1">
+                  <Check className="w-3.5 h-3.5 shrink-0" />
+                  <span>Passwords match</span>
+                </p>
+              ) : null}
             </div>
 
             {/* Submit Button (Matching Green "Request Account" button) */}
@@ -790,6 +1089,12 @@ export const DedicatedSignUpPage: React.FC = () => {
                   );
                 })}
               </div>
+              {touched.selectedDays && fieldErrors.selectedDays && (
+                <p className="flex items-center gap-1 text-[11px] font-medium text-rose-600 mt-1">
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                  <span>{fieldErrors.selectedDays}</span>
+                </p>
+              )}
             </div>
 
             {/* Dynamic Fee Calculation Card */}
@@ -961,13 +1266,42 @@ export const DedicatedSignUpPage: React.FC = () => {
                     })}
                   </div>
                 )}
+                {touched.selectedLocker && fieldErrors.selectedLocker && (
+                  <p className="flex items-center gap-1 text-[11px] font-medium text-rose-600 mt-1">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>{fieldErrors.selectedLocker}</span>
+                  </p>
+                )}
               </div>
             )}
 
             {/* Terms / Waiver Check */}
-            <div className="p-3 bg-emerald-50/70 border border-emerald-100 rounded-xl text-xs text-emerald-900 leading-relaxed">
-              <strong>Gym Trainee Agreement:</strong> By completing registration, you confirm physical fitness readiness
-              and agree to follow the Ministry of Agriculture Fitness Center code of conduct and safety regulations.
+            <div>
+              <label className="flex items-start gap-3 p-3.5 bg-emerald-50/70 border border-emerald-200/90 rounded-xl cursor-pointer hover:bg-emerald-50 transition select-none">
+                <input
+                  type="checkbox"
+                  checked={termsAccepted}
+                  onChange={(e) => {
+                    setTermsAccepted(e.target.checked);
+                    if (touched.termsAccepted) {
+                      setFieldErrors((prev) => ({
+                        ...prev,
+                        termsAccepted: validateField('termsAccepted', e.target.checked),
+                      }));
+                    }
+                  }}
+                  className="mt-0.5 h-4 w-4 rounded border-slate-300 text-[#00843D] focus:ring-[#00843D] cursor-pointer"
+                />
+                <div className="text-xs text-slate-700 leading-relaxed">
+                  <strong className="text-slate-900">Gym Trainee Safety & Conduct Agreement:</strong> I confirm physical fitness readiness and agree to observe the Ministry of Agriculture Fitness Center facility rules, locker protocols, shift hours, and hygiene regulations.
+                </div>
+              </label>
+              {touched.termsAccepted && fieldErrors.termsAccepted && (
+                <p className="flex items-center gap-1 text-[11px] font-medium text-rose-600 mt-1.5">
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                  <span>{fieldErrors.termsAccepted}</span>
+                </p>
+              )}
             </div>
 
             {/* Navigation Buttons */}

@@ -568,6 +568,8 @@ export class AuthService {
         await tx.hrEmployeeRoster.update({
           where: { employeeId },
           data: {
+            fullName,
+            department: departmentName,
             email,
             ...(phone ? { phone } : {}),
             ...(dto.photoUrl?.trim() ? { photoUrl: dto.photoUrl.trim() } : {}),

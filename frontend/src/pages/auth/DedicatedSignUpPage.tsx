@@ -170,6 +170,8 @@ export const DedicatedSignUpPage: React.FC = () => {
           ctx.drawImage(img, startX, startY, minDim, minDim, 0, 0, 250, 250);
           const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
           setPhotoUrl(dataUrl);
+          setTouched((prev) => ({ ...prev, photoUrl: true }));
+          setFieldErrors((prev) => ({ ...prev, photoUrl: '' }));
         }
       };
       img.src = event.target?.result as string;
@@ -213,6 +215,8 @@ export const DedicatedSignUpPage: React.FC = () => {
       ctx.drawImage(videoRef.current, 0, 0, 250, 250);
       const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
       setPhotoUrl(dataUrl);
+      setTouched((prev) => ({ ...prev, photoUrl: true }));
+      setFieldErrors((prev) => ({ ...prev, photoUrl: '' }));
     }
     stopWebcam();
   };
@@ -246,6 +250,11 @@ export const DedicatedSignUpPage: React.FC = () => {
   // Field Validation Rules
   const validateField = (name: string, value: any): string => {
     switch (name) {
+      case 'photoUrl': {
+        const val = String(value ?? '').trim();
+        if (!val) return 'Profile photo is required for member ID pass and gate access verification.';
+        return '';
+      }
       case 'firstName': {
         const val = String(value ?? '').trim();
         if (!val) return 'First name is required.';
@@ -362,6 +371,7 @@ export const DedicatedSignUpPage: React.FC = () => {
     setError(null);
 
     const step1Fields: Record<string, any> = {
+      photoUrl,
       firstName,
       lastName,
       username,
@@ -638,7 +648,13 @@ export const DedicatedSignUpPage: React.FC = () => {
             </div>
 
             {/* Member Profile Photo Section (Take with Camera or Attach Photo) */}
-            <div className="bg-slate-50 border border-slate-200/90 rounded-[4px] p-3 sm:p-3.5 space-y-2.5">
+            <div
+              className={`border rounded-[4px] p-3 sm:p-3.5 space-y-2.5 transition-all ${
+                touched.photoUrl && fieldErrors.photoUrl
+                  ? 'bg-rose-50/20 border-rose-300 ring-1 ring-rose-400/20'
+                  : 'bg-slate-50 border-slate-200/90'
+              }`}
+            >
               <div className="flex items-center gap-3.5">
                 <div className="relative shrink-0">
                   {photoUrl ? (
@@ -662,7 +678,7 @@ export const DedicatedSignUpPage: React.FC = () => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-slate-900 text-xs">
-                      Profile Photo
+                      Profile Photo <span className="text-rose-500">*</span>
                     </span>
                     <span className="text-[10px] font-semibold text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded-[4px]">
                       Pass & Gate Verification
@@ -702,13 +718,27 @@ export const DedicatedSignUpPage: React.FC = () => {
                     {photoUrl && (
                       <button
                         type="button"
-                        onClick={() => setPhotoUrl('')}
+                        onClick={() => {
+                          setPhotoUrl('');
+                          setTouched((prev) => ({ ...prev, photoUrl: true }));
+                          setFieldErrors((prev) => ({
+                            ...prev,
+                            photoUrl: 'Profile photo is required for member ID pass and gate access verification.',
+                          }));
+                        }}
                         className="text-xs text-rose-600 hover:text-rose-800 hover:underline cursor-pointer ml-1"
                       >
                         Remove
                       </button>
                     )}
                   </div>
+
+                  {touched.photoUrl && fieldErrors.photoUrl && (
+                    <p className="flex items-center gap-1 text-[11px] font-medium text-rose-600 mt-2">
+                      <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                      <span>{fieldErrors.photoUrl}</span>
+                    </p>
+                  )}
                 </div>
               </div>
 

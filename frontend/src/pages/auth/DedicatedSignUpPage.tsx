@@ -606,17 +606,17 @@ export const DedicatedSignUpPage: React.FC = () => {
 
             {/* Member Category Segmented Toggle */}
             <div className="space-y-1">
-              <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider">
+              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider">
                 Membership Category <span className="text-red-500">*</span>
               </label>
-              <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-xl">
+              <div className="grid grid-cols-2 gap-1.5 p-1 bg-slate-100 rounded-[4px] border border-slate-200">
                 <button
                   type="button"
                   onClick={() => setMemberType('INTERNAL')}
-                  className={`flex items-center justify-center gap-2 py-2 px-3 text-xs font-semibold rounded-lg transition-all ${
+                  className={`flex items-center justify-center gap-2 py-2 px-3 text-xs font-semibold rounded-[4px] transition-all cursor-pointer ${
                     memberType === 'INTERNAL'
-                      ? 'bg-white text-emerald-800 shadow-sm'
-                      : 'text-slate-600 hover:text-slate-900'
+                      ? 'bg-white text-emerald-800 shadow-xs border border-slate-200/80 font-bold'
+                      : 'text-slate-600 hover:text-slate-900 border border-transparent'
                   }`}
                 >
                   <Building2 className="w-3.5 h-3.5 text-emerald-600" />
@@ -625,10 +625,10 @@ export const DedicatedSignUpPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setMemberType('EXTERNAL')}
-                  className={`flex items-center justify-center gap-2 py-2 px-3 text-xs font-semibold rounded-lg transition-all ${
+                  className={`flex items-center justify-center gap-2 py-2 px-3 text-xs font-semibold rounded-[4px] transition-all cursor-pointer ${
                     memberType === 'EXTERNAL'
-                      ? 'bg-white text-emerald-800 shadow-sm'
-                      : 'text-slate-600 hover:text-slate-900'
+                      ? 'bg-white text-emerald-800 shadow-xs border border-slate-200/80 font-bold'
+                      : 'text-slate-600 hover:text-slate-900 border border-transparent'
                   }`}
                 >
                   <Globe className="w-3.5 h-3.5 text-teal-600" />
@@ -638,17 +638,17 @@ export const DedicatedSignUpPage: React.FC = () => {
             </div>
 
             {/* Member Profile Photo Section (Take with Camera or Attach Photo) */}
-            <div className="bg-slate-50 border border-slate-200/90 rounded-xl p-3 sm:p-3.5 space-y-2.5">
+            <div className="bg-slate-50 border border-slate-200/90 rounded-[4px] p-3 sm:p-3.5 space-y-2.5">
               <div className="flex items-center gap-3.5">
                 <div className="relative shrink-0">
                   {photoUrl ? (
                     <img
                       src={photoUrl}
                       alt="Profile Preview"
-                      className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl object-cover ring-2 ring-[#00843D] shadow-xs"
+                      className="w-14 h-14 sm:w-16 sm:h-16 rounded-[4px] object-cover ring-2 ring-[#00843D] shadow-xs"
                     />
                   ) : (
-                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-emerald-100/80 text-[#00843D] flex items-center justify-center font-bold text-xl border border-emerald-200 shadow-2xs">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-[4px] bg-emerald-100/80 text-[#00843D] flex items-center justify-center font-bold text-xl border border-emerald-200 shadow-2xs">
                       <User className="w-7 h-7 sm:w-8 sm:h-8 text-[#00843D]" />
                     </div>
                   )}
@@ -664,7 +664,7 @@ export const DedicatedSignUpPage: React.FC = () => {
                     <span className="font-bold text-slate-900 text-xs">
                       Profile Photo
                     </span>
-                    <span className="text-[10px] font-semibold text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded-full">
+                    <span className="text-[10px] font-semibold text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded-[4px]">
                       Pass & Gate Verification
                     </span>
                   </div>
@@ -684,7 +684,7 @@ export const DedicatedSignUpPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={webcamActive ? stopWebcam : startWebcam}
-                      className="px-2.5 py-1 text-xs font-semibold text-white bg-[#00843D] hover:bg-[#0B6B3A] rounded-[6px] shadow-xs transition cursor-pointer flex items-center gap-1.5"
+                      className="px-2.5 py-1 text-xs font-semibold text-white bg-[#00843D] hover:bg-[#0B6B3A] rounded-[4px] shadow-xs transition cursor-pointer flex items-center gap-1.5"
                     >
                       <Camera className="w-3.5 h-3.5" />
                       <span>{webcamActive ? 'Cancel Camera' : 'Take with Camera'}</span>
@@ -693,7 +693,7 @@ export const DedicatedSignUpPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="px-2.5 py-1 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 rounded-[6px] shadow-2xs transition cursor-pointer flex items-center gap-1.5"
+                      className="px-2.5 py-1 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 rounded-[4px] shadow-2xs transition cursor-pointer flex items-center gap-1.5"
                     >
                       <Upload className="w-3.5 h-3.5 text-slate-500" />
                       <span>Attach Photo</span>
@@ -714,12 +714,12 @@ export const DedicatedSignUpPage: React.FC = () => {
 
               {/* Webcam Live Capture Viewfinder */}
               {webcamActive && (
-                <div className="p-3 bg-slate-900 rounded-xl flex flex-col items-center gap-2.5 text-white animate-fadeIn">
+                <div className="p-3 bg-slate-900 rounded-[4px] flex flex-col items-center gap-2.5 text-white animate-fadeIn">
                   <div className="text-xs font-semibold flex items-center gap-1.5 text-emerald-400">
                     <Camera className="w-3.5 h-3.5" />
                     <span>Live Camera Viewfinder</span>
                   </div>
-                  <div className="relative w-44 h-44 rounded-xl overflow-hidden border-2 border-emerald-500/50 shadow-inner bg-black">
+                  <div className="relative w-44 h-44 rounded-[4px] overflow-hidden border-2 border-emerald-500/50 shadow-inner bg-black">
                     <video
                       ref={videoRef}
                       autoPlay
@@ -732,7 +732,7 @@ export const DedicatedSignUpPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={captureWebcamPhoto}
-                      className="px-4 py-1.5 bg-[#00843D] hover:bg-[#0B6B3A] text-white text-xs font-bold rounded-[6px] shadow-xs cursor-pointer flex items-center gap-1.5"
+                      className="px-4 py-1.5 bg-[#00843D] hover:bg-[#0B6B3A] text-white text-xs font-bold rounded-[4px] shadow-xs cursor-pointer flex items-center gap-1.5"
                     >
                       <Camera className="w-3.5 h-3.5" />
                       <span>Capture Photo</span>
@@ -740,7 +740,7 @@ export const DedicatedSignUpPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={stopWebcam}
-                      className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold rounded-[6px] cursor-pointer"
+                      className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold rounded-[4px] cursor-pointer"
                     >
                       Cancel
                     </button>

@@ -33,7 +33,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const location = useLocation();
   const navigate = useNavigate();
 
-  const isSettingsActive = location.pathname === '/admin/users';
+  const isSettingsActive =
+    location.pathname === '/registrations' ||
+    location.pathname === '/admin/users';
 
   const [settingsOpen, setSettingsOpen] = useState<boolean>(() => {
     if (isSettingsActive) return true;
@@ -154,23 +156,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {!collapsed && <span className="truncate">Dashboard</span>}
               </NavLink>
 
-              {/* 2. Staff Registration */}
-              <NavLink
-                to="/registrations"
-                onClick={onCloseMobile}
-                className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition ${
-                  isActive('/registrations')
-                    ? 'bg-white/20 text-white shadow-xs'
-                    : 'text-white/80 hover:text-white hover:bg-white/10'
-                }`}
-                title={collapsed ? 'Staff Registrations' : undefined}
-              >
-                {isActive('/registrations') && <ActiveBar />}
-                <Users className="h-5 w-5 text-emerald-200 shrink-0" />
-                {!collapsed && <span className="truncate">Staff Registrations</span>}
-              </NavLink>
-
-              {/* 3. Reports */}
+              {/* 2. Reports */}
               <NavLink
                 to="/reports"
                 onClick={onCloseMobile}
@@ -186,11 +172,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {!collapsed && <span className="truncate">Reports</span>}
               </NavLink>
 
-              {/* 4. Settings Menu (Collapsible, matching Asset Tracking System) */}
+              {/* 3. Settings Menu (Collapsible, matching Asset Tracking System) */}
               <div className="pt-1">
                 <button
                   type="button"
-                  onClick={() => (collapsed ? navigate('/admin/users') : toggleSettingsOpen())}
+                  onClick={() => (collapsed ? navigate('/registrations') : toggleSettingsOpen())}
                   className={`w-full relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition cursor-pointer ${
                     isSettingsActive && (collapsed || !settingsOpen)
                       ? 'bg-white/20 text-white shadow-xs'
@@ -215,6 +201,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {/* Submenu items */}
                 {!collapsed && settingsOpen && (
                   <div className="mt-1 ml-4 pl-3 border-l border-white/15 space-y-1">
+                    {/* Staff Registrations */}
+                    <NavLink
+                      to="/registrations"
+                      onClick={onCloseMobile}
+                      className={`relative flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-medium transition ${
+                        isActive('/registrations')
+                          ? 'bg-white/20 text-white shadow-2xs font-semibold'
+                          : 'text-white/70 hover:text-white hover:bg-white/10'
+                      }`}
+                    >
+                      <Users className="h-4 w-4 text-emerald-300 shrink-0" />
+                      <span className="truncate">Staff Registrations</span>
+                    </NavLink>
+
                     {/* Users */}
                     <NavLink
                       to="/admin/users"

@@ -78,7 +78,7 @@ export const MoaHeader: React.FC<MoaHeaderProps> = ({ onOpenMobileSidebar }) => 
         };
       case '/registrations':
         return {
-          title: 'Member Directory',
+          title: 'Membership',
           subtitle: 'Gym membership records, shift roster, and locker allocation',
         };
       case '/admin/users':

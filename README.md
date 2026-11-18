@@ -24,7 +24,7 @@ All default passwords: **`Password123!`**
 
 | Role | Name | Identifier / Email | Default Landing | Primary Responsibilities |
 |---|---|---|---|---|
-| **ADMIN** | Dr. Girma Bekele | `EMP-ADM-01` / `admin@moa.gov.et` | `/admin/dashboard` | Directorate analytics, member directory, user RBAC, reports |
+| **ADMIN** | Dr. Girma Bekele | `EMP-ADM-01` / `admin@moa.gov.et` | `/admin/dashboard` | Directorate analytics, membership records, user RBAC, reports |
 | **GYM_ATTENDANT** | Tigist Alemayehu | `EMP-DSK-01` / `desk@moa.gov.et` | `/terminal` | Fast-lane QR check-in & 30-locker assignment |
 | **STAFF_MEMBER** | Dawit Yohannes | `EMP-MOA-001` / `dawit.y@moa.gov.et` | `/dashboard` | Personal digital QR entry pass, timetable & video guides |
 
@@ -44,7 +44,7 @@ All default passwords: **`Password123!`**
 
 ### 3. Executive Administrators (`ADMIN` / `HR_ADMIN`)
 * **Executive Dashboard (`/admin/dashboard`)**: Directorate wellness engagement metrics, live floor count, and session preference distribution.
-* **Member Directory (`/registrations`)**: Search and manage members, import staff rosters via Excel/CSV, print official A4 membership cards.
+* **Membership (`/registrations`)**: Search and manage members, import staff rosters via Excel/CSV, print official A4 membership cards.
 * **User Management (`/admin/users`)**: Role-based access control (RBAC), password resets, and account status management.
 * **Attendance Reports (`/reports`)**: Date-range attendance analytics, peak utilization graphs, and exportable CSV audit records.
 

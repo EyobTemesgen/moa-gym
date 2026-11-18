@@ -266,7 +266,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {/* Submenu items */}
                 {!collapsed && settingsOpen && (
                   <div className="mt-1 ml-4 pl-3 border-l border-white/15 space-y-1">
-                    {/* Member Directory */}
+                    {/* Membership */}
                     <NavLink
                       to="/registrations"
                       onClick={onCloseMobile}
@@ -277,7 +277,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       }`}
                     >
                       <Users className="h-4 w-4 text-emerald-300 shrink-0" />
-                      <span className="truncate">Member Directory</span>
+                      <span className="truncate">Membership</span>
                     </NavLink>
 
                     {/* Users */}

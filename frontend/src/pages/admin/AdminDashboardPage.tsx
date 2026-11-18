@@ -95,7 +95,7 @@ export const AdminDashboardPage: React.FC = () => {
 
           <Link to="/registrations" className={btn.primary}>
             <Users className="h-4 w-4" />
-            <span>Member Directory</span>
+            <span>Membership</span>
           </Link>
         </div>
       </div>
@@ -327,7 +327,7 @@ export const AdminDashboardPage: React.FC = () => {
                     <Users className="h-4 w-4" />
                   </div>
                   <div>
-                    <div className="font-bold text-slate-900">Member Directory & Roster</div>
+                    <div className="font-bold text-slate-900">Membership</div>
                     <div className="text-[11px] text-slate-500 font-normal">View enrolled members, shifts & lockers</div>
                   </div>
                 </div>

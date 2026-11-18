@@ -436,20 +436,15 @@ export class AuthService {
   }
 
   calculateGymFee(memberType: 'INTERNAL' | 'EXTERNAL', daysPerWeek: number): number {
-    const days = Math.min(Math.max(daysPerWeek || 3, 1), 6);
-    if (memberType === 'EXTERNAL') {
-      // External community / corporate rate (ETB/month)
-      if (days <= 2) return 800;
-      if (days === 3) return 1200;
-      if (days === 4) return 1600;
-      return 2200; // 5 or 6 days / Full Access
-    } else {
-      // Internal MoA staff subsidized rate (ETB/month)
-      if (days <= 2) return 250;
-      if (days === 3) return 350;
-      if (days === 4) return 450;
-      return 600; // 5 or 6 days / Full Access
+    if (memberType === 'INTERNAL') {
+      return 0; // 100% Free institutional wellness benefit for MoA civil servants
     }
+    const days = Math.min(Math.max(daysPerWeek || 3, 1), 6);
+    // External community / corporate rate (ETB/month)
+    if (days <= 2) return 800;
+    if (days === 3) return 1200;
+    if (days === 4) return 1600;
+    return 2200; // 5 or 6 days / Full Access
   }
 
   async register(dto: RegisterStaffDto) {
@@ -588,7 +583,7 @@ export class AuthService {
             daysPerWeek,
             workoutDays,
             monthlyFee,
-            paymentMethod: dto.paymentMethod || existingReg.paymentMethod,
+            paymentMethod: memberType === 'INTERNAL' ? 'GOVERNMENT_BENEFIT' : (dto.paymentMethod || existingReg.paymentMethod || 'TELEBIRR'),
             fitnessGoal: dto.fitnessGoal?.trim() || existingReg.fitnessGoal,
             lockerNumber: assignedLocker || existingReg.lockerNumber,
             status: 'ACTIVE',
@@ -617,7 +612,7 @@ export class AuthService {
             daysPerWeek,
             workoutDays,
             monthlyFee,
-            paymentMethod: dto.paymentMethod || (memberType === 'INTERNAL' ? 'PAYROLL_DEDUCTION' : 'TELEBIRR'),
+            paymentMethod: memberType === 'INTERNAL' ? 'GOVERNMENT_BENEFIT' : (dto.paymentMethod || 'TELEBIRR'),
             fitnessGoal: dto.fitnessGoal?.trim() || null,
             lockerNumber: assignedLocker,
             registrationSource: 'SELF_SERVICE',

@@ -229,23 +229,19 @@ export const DedicatedSignUpPage: React.FC = () => {
 
   const daysPerWeek = selectedDays.length;
 
-  // Fee calculation in ETB
+  // Fee calculation in ETB (Internal staff: 100% Free / Institutional Benefit; External: Paid subscription)
   const calculateFee = () => {
-    if (memberType === 'EXTERNAL') {
-      if (daysPerWeek <= 2) return 800;
-      if (daysPerWeek === 3) return 1200;
-      if (daysPerWeek === 4) return 1600;
-      return 2200; // 5 or 6 days / Full Access
-    } else {
-      if (daysPerWeek <= 2) return 250;
-      if (daysPerWeek === 3) return 350;
-      if (daysPerWeek === 4) return 450;
-      return 600; // 5 or 6 days / Full Access
+    if (memberType === 'INTERNAL') {
+      return 0; // Free institutional wellness benefit for MoA civil servants
     }
+    if (daysPerWeek <= 2) return 800;
+    if (daysPerWeek === 3) return 1200;
+    if (daysPerWeek === 4) return 1600;
+    return 2200; // 5 or 6 days / Full Access
   };
 
   const monthlyFee = calculateFee();
-  const perSessionEst = Math.round(monthlyFee / (daysPerWeek * 4));
+  const perSessionEst = daysPerWeek > 0 ? Math.round(monthlyFee / (daysPerWeek * 4)) : 0;
 
   // Field Validation Rules
   const validateField = (name: string, value: any): string => {
@@ -468,7 +464,7 @@ export const DedicatedSignUpPage: React.FC = () => {
         fitnessGoal,
         lockerNumber: wantsLocker && selectedLocker ? selectedLocker : undefined,
         monthlyFee,
-        paymentMethod,
+        paymentMethod: memberType === 'INTERNAL' ? 'GOVERNMENT_BENEFIT' : paymentMethod,
         photoUrl: photoUrl.trim() || undefined,
       };
 
@@ -1106,66 +1102,79 @@ export const DedicatedSignUpPage: React.FC = () => {
               )}
             </div>
 
-            {/* Dynamic Fee Calculation Card */}
-            <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                  <DollarSign className="w-4 h-4 text-emerald-700" />
-                  Calculated Monthly Fee
-                </span>
-                <span
-                  className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${
-                    memberType === 'INTERNAL'
-                      ? 'bg-emerald-100/80 text-emerald-900 border-emerald-200'
-                      : 'bg-amber-100/80 text-amber-900 border-amber-200'
-                  }`}
-                >
-                  {memberType === 'INTERNAL' ? 'MoA Subsidized Benefit' : 'External Standard Rate'}
-                </span>
-              </div>
+            {/* Dynamic Fee & Payment Card (Internal: 100% Free Staff Benefit; External: Paid Subscription) */}
+            {memberType === 'INTERNAL' ? (
+              <div className="p-4 bg-emerald-50/70 rounded-2xl border border-emerald-200/90 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-emerald-900 uppercase tracking-wider flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-700" />
+                    MoA Staff Wellness Benefit
+                  </span>
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-200">
+                    100% Free · Institutional Sponsorship
+                  </span>
+                </div>
 
-              <div className="flex items-baseline justify-between bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs">
+                <div className="flex items-baseline justify-between bg-white p-3.5 rounded-xl border border-emerald-100 shadow-xs">
+                  <div>
+                    <div className="text-2xl font-extrabold text-emerald-800">
+                      0 <span className="text-sm font-bold text-emerald-600">ETB / Month</span>
+                    </div>
+                    <div className="text-[11px] text-slate-500 mt-0.5">
+                      Provided at no cost to Ministry of Agriculture employees. No payment or deduction required.
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-[11px] font-medium text-slate-500">Locker Access</div>
+                    <div className="text-xs font-bold text-emerald-700">Included Free</div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                    <DollarSign className="w-4 h-4 text-emerald-700" />
+                    Calculated Monthly Fee
+                  </span>
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-100/80 text-amber-900 border border-amber-200">
+                    External Standard Rate
+                  </span>
+                </div>
+
+                <div className="flex items-baseline justify-between bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs">
+                  <div>
+                    <div className="text-2xl font-extrabold text-slate-900">
+                      {monthlyFee.toLocaleString()}{' '}
+                      <span className="text-sm font-bold text-emerald-700">ETB / Month</span>
+                    </div>
+                    <div className="text-[11px] text-slate-500 mt-0.5">
+                      {daysPerWeek} days per week (~{perSessionEst} ETB per workout session)
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-[11px] font-medium text-slate-500">Locker Access</div>
+                    <div className="text-xs font-bold text-emerald-700">Included Free</div>
+                  </div>
+                </div>
+
+                {/* Payment Method Selector for External Members */}
                 <div>
-                  <div className="text-2xl font-extrabold text-slate-900">
-                    {monthlyFee.toLocaleString()}{' '}
-                    <span className="text-sm font-bold text-emerald-700">ETB / Month</span>
-                  </div>
-                  <div className="text-[11px] text-slate-500 mt-0.5">
-                    {daysPerWeek} days per week (~{perSessionEst} ETB per workout session)
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-[11px] font-medium text-slate-500">Locker Access</div>
-                  <div className="text-xs font-bold text-emerald-700">Included Free</div>
+                  <label className="block text-[11px] font-semibold text-slate-600 mb-1.5">
+                    Preferred Payment Method
+                  </label>
+                  <select
+                    value={paymentMethod}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  >
+                    <option value="TELEBIRR">Telebirr Direct</option>
+                    <option value="CBE_BIRR">Commercial Bank of Ethiopia (CBE Birr)</option>
+                    <option value="CASH_DESK">Gym Front Desk Cash / Receipt</option>
+                  </select>
                 </div>
               </div>
-
-              {/* Payment Method Selector */}
-              <div>
-                <label className="block text-[11px] font-semibold text-slate-600 mb-1.5">
-                  Preferred Payment Method
-                </label>
-                <select
-                  value={paymentMethod}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                  className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                >
-                  {memberType === 'INTERNAL' ? (
-                    <>
-                      <option value="PAYROLL_DEDUCTION">MoA Monthly Payroll Deduction</option>
-                      <option value="TELEBIRR">Telebirr Direct</option>
-                      <option value="CASH_DESK">Gym Front Desk Receipt</option>
-                    </>
-                  ) : (
-                    <>
-                      <option value="TELEBIRR">Telebirr Direct</option>
-                      <option value="CBE_BIRR">Commercial Bank of Ethiopia (CBE Birr)</option>
-                      <option value="CASH_DESK">Gym Front Desk Cash / Receipt</option>
-                    </>
-                  )}
-                </select>
-              </div>
-            </div>
+            )}
 
             {/* Navigation Buttons */}
             <div className="flex items-center gap-3 pt-2">
@@ -1399,7 +1408,9 @@ export const DedicatedSignUpPage: React.FC = () => {
               <div className="flex items-center justify-between">
                 <span className="text-slate-500">Monthly Fee:</span>
                 <span className="font-bold text-emerald-700">
-                  {registrationResult.registration?.monthlyFee} ETB / Month
+                  {registrationResult.registration?.memberType === 'INTERNAL'
+                    ? 'Free (MoA Institutional Benefit)'
+                    : `${registrationResult.registration?.monthlyFee} ETB / Month`}
                 </span>
               </div>
               {registrationResult.registration?.lockerNumber && (

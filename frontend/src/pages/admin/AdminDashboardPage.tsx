@@ -14,6 +14,7 @@ import {
   Clock,
   TrendingUp,
   AlertCircle,
+  UserCog,
 } from 'lucide-react';
 import { StatCard } from '../../components/ui/StatCard';
 import { btn, pill, statusTone } from '../../components/ui/theme';
@@ -77,6 +78,11 @@ export const AdminDashboardPage: React.FC = () => {
 
         {/* Quick Top Actions */}
         <div className="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap">
+          <Link to="/admin/users" className={btn.secondary}>
+            <UserCog className="h-4 w-4 text-slate-500" />
+            <span>User Management</span>
+          </Link>
+
           <Link to="/terminal" className={btn.secondary}>
             <ShieldCheck className="h-4 w-4 text-slate-500" />
             <span>Gate Terminal</span>
@@ -296,6 +302,22 @@ export const AdminDashboardPage: React.FC = () => {
             </h2>
 
             <div className="mt-3 space-y-2">
+              <Link
+                to="/admin/users"
+                className="flex items-center justify-between p-2.5 rounded-lg hover:bg-slate-50 transition border border-transparent hover:border-slate-200 text-xs font-semibold text-slate-800"
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className="p-1.5 rounded-md bg-amber-100 text-amber-800">
+                    <UserCog className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <div className="font-bold text-slate-900">User Management</div>
+                    <div className="text-[11px] text-slate-500 font-normal">Roles, accounts & password reset</div>
+                  </div>
+                </div>
+                <ChevronRightIcon className="h-4 w-4 text-slate-400" />
+              </Link>
+
               <Link
                 to="/registrations"
                 className="flex items-center justify-between p-2.5 rounded-lg hover:bg-slate-50 transition border border-transparent hover:border-slate-200 text-xs font-semibold text-slate-800"

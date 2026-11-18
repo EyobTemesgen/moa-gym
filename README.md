@@ -15,6 +15,7 @@ Built strictly aligned with the MoA Design System (`#00843D` green, `#FCDD09` go
 1. **Administration (`ADMIN`)**:
    * **Executive Dashboard (`/admin/dashboard`)**: High-level KPI cards (Total Registrants, Active Members, Registered Today, Live On Floor), directorate wellness engagement progress bars, and workout shift breakdowns.
    * **Staff Registrations (`/registrations`)**: Single staff intake from HR whitelist or paper forms, photo sync, bulk Excel/CSV import, and official printable A4 rosters.
+   * **User Management (`/admin/users`)**: Institutional access control, live role assignment (ADMIN, GYM_ATTENDANT, STAFF_MEMBER), account status toggling (ACTIVE / SUSPENDED), and 1-click password reset.
    * **Reports (`/reports`)**: Attendance volume curves, peak hours, and filtered CSV exports for civil service leadership.
 
 2. **Gate Checking Fast Lane (`GYM_ATTENDANT`)**:
@@ -115,7 +116,7 @@ All default passwords: **`Password123!`**
 
 | Role | Name | Identifier / Email | Default Password | Primary Screens |
 |---|---|---|---|---|
-| **ADMIN** | Dr. Girma Bekele | `EMP-ADM-01` / `admin@moa.gov.et` | `Password123!` | `/admin/dashboard`, `/registrations`, `/reports` |
+| **ADMIN** | Dr. Girma Bekele | `EMP-ADM-01` / `admin@moa.gov.et` | `Password123!` | `/admin/dashboard`, `/registrations`, `/admin/users`, `/reports` |
 | **GYM_ATTENDANT** | Tigist Alemayehu | `EMP-DSK-01` / `desk@moa.gov.et` | `Password123!` | `/terminal` (Gate Fast Lane) |
 | **STAFF_MEMBER** | Dawit Yohannes | `EMP-MOA-001` / `dawit.y@moa.gov.et` | `Password123!` | `/dashboard` (Digital Pass) |
 

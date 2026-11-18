@@ -27,6 +27,11 @@ export const MoaHeader: React.FC<MoaHeaderProps> = ({ onOpenMobileSidebar }) => 
           title: 'Staff Registrations',
           subtitle: 'Staff gym membership records and directory',
         };
+      case '/admin/users':
+        return {
+          title: 'User Management',
+          subtitle: 'System access control, role assignment, and administrative credentials',
+        };
       case '/terminal':
         return {
           title: 'Gate Terminal',

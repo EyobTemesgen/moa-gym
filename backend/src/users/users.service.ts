@@ -1,6 +1,8 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcryptjs';
+import { Role, EmploymentStatus } from '@prisma/client';
 import { SubmitWaiverDto } from './dto/waiver.dto';
 
 @Injectable()
@@ -146,6 +148,190 @@ export class UsersService {
         fullName: user.hrRecord.fullName,
         department: user.hrRecord.department,
         photoUrl: user.hrRecord.photoUrl,
+      },
+    };
+  }
+
+  // --- Admin User Management Operations ---
+
+  async listUsers(params: {
+    query?: string;
+    role?: Role;
+    status?: EmploymentStatus;
+    page?: number;
+    limit?: number;
+  }) {
+    const page = params.page || 1;
+    const limit = params.limit || 50;
+    const where: any = {};
+
+    if (params.role) {
+      where.role = params.role;
+    }
+
+    if (params.status) {
+      where.hrRecord = { employmentStatus: params.status };
+    }
+
+    if (params.query) {
+      const q = params.query.trim();
+      where.OR = [
+        { employeeId: { contains: q, mode: 'insensitive' } },
+        { hrRecord: { fullName: { contains: q, mode: 'insensitive' } } },
+        { hrRecord: { department: { contains: q, mode: 'insensitive' } } },
+        { hrRecord: { email: { contains: q, mode: 'insensitive' } } },
+      ];
+    }
+
+    const [users, total] = await Promise.all([
+      this.prisma.user.findMany({
+        where,
+        include: {
+          hrRecord: true,
+          attendanceLogs: {
+            orderBy: { checkInTime: 'desc' },
+            take: 1,
+          },
+        },
+        orderBy: [{ role: 'asc' }, { createdAt: 'desc' }],
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.prisma.user.count({ where }),
+    ]);
+
+    const formatted = users.map((u) => ({
+      id: u.id,
+      employeeId: u.employeeId,
+      fullName: u.hrRecord.fullName,
+      department: u.hrRecord.department,
+      phone: u.hrRecord.phone,
+      email: u.hrRecord.email,
+      photoUrl: u.hrRecord.photoUrl,
+      role: u.role,
+      status: u.hrRecord.employmentStatus,
+      waiverSigned: u.waiverSigned,
+      createdAt: u.createdAt,
+      lastActive: u.attendanceLogs[0]?.checkInTime || null,
+    }));
+
+    return {
+      items: formatted,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
+
+  async updateUserRole(userId: string, role: Role, currentAdminId?: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: { hrRecord: true },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (user.id === currentAdminId && role !== Role.ADMIN) {
+      const adminCount = await this.prisma.user.count({ where: { role: Role.ADMIN } });
+      if (adminCount <= 1) {
+        throw new BadRequestException('Cannot demote the only remaining administrator');
+      }
+    }
+
+    const updated = await this.prisma.user.update({
+      where: { id: userId },
+      data: { role },
+      include: { hrRecord: true },
+    });
+
+    return {
+      success: true,
+      message: `Role for ${updated.hrRecord.fullName} updated to ${role}`,
+      user: {
+        id: updated.id,
+        employeeId: updated.employeeId,
+        fullName: updated.hrRecord.fullName,
+        role: updated.role,
+      },
+    };
+  }
+
+  async updateUserStatus(userId: string, status: EmploymentStatus) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    await this.prisma.hrEmployeeRoster.update({
+      where: { employeeId: user.employeeId },
+      data: { employmentStatus: status },
+    });
+
+    return {
+      success: true,
+      message: `Account status for ${user.employeeId} set to ${status}`,
+      status,
+    };
+  }
+
+  async resetUserPassword(userId: string, newPassword?: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: { hrRecord: true },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const pwd = newPassword?.trim() || 'Password123!';
+    const passwordHash = await bcrypt.hash(pwd, 10);
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash },
+    });
+
+    return {
+      success: true,
+      message: `Password for ${user.hrRecord.fullName} (${user.employeeId}) reset to default (Password123!)`,
+    };
+  }
+
+  async provisionUser(employeeId: string, role: Role) {
+    const hrRecord = await this.prisma.hrEmployeeRoster.findUnique({
+      where: { employeeId },
+    });
+    if (!hrRecord) {
+      throw new NotFoundException(`Employee ${employeeId} not found on HR roster`);
+    }
+
+    const defaultPassword = await bcrypt.hash('Password123!', 10);
+    const user = await this.prisma.user.upsert({
+      where: { employeeId },
+      update: { role },
+      create: {
+        employeeId,
+        passwordHash: defaultPassword,
+        role,
+        waiverSigned: true,
+        waiverSignedAt: new Date(),
+      },
+      include: { hrRecord: true },
+    });
+
+    return {
+      success: true,
+      message: `User ${hrRecord.fullName} (${employeeId}) provisioned with role ${role}.`,
+      user: {
+        id: user.id,
+        employeeId: user.employeeId,
+        fullName: user.hrRecord.fullName,
+        role: user.role,
+        status: user.hrRecord.employmentStatus,
       },
     };
   }

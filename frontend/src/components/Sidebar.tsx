@@ -12,6 +12,7 @@ import {
   ChevronRight,
   User,
   LayoutDashboard,
+  UserCog,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -140,7 +141,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {!collapsed && <span className="truncate">Staff Registrations</span>}
               </NavLink>
 
-              {/* 3. Reports */}
+              {/* 3. User Management */}
+              <NavLink
+                to="/admin/users"
+                onClick={onCloseMobile}
+                className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition ${
+                  isActive('/admin/users')
+                    ? 'bg-white/20 text-white shadow-xs'
+                    : 'text-white/80 hover:text-white hover:bg-white/10'
+                }`}
+                title={collapsed ? 'User Management' : undefined}
+              >
+                {isActive('/admin/users') && <ActiveBar />}
+                <UserCog className="h-5 w-5 text-amber-300 shrink-0" />
+                {!collapsed && <span className="truncate">User Management</span>}
+              </NavLink>
+
+              {/* 4. Reports */}
               <NavLink
                 to="/reports"
                 onClick={onCloseMobile}

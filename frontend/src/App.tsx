@@ -14,6 +14,7 @@ import { CheckInTerminalPage } from './pages/desk/CheckInTerminalPage';
 import { ActiveFloorPage } from './pages/desk/ActiveFloorPage';
 import { RegistrationsPage } from './pages/desk/RegistrationsPage';
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
+import { UserManagementPage } from './pages/admin/UserManagementPage';
 import { HrRosterPage } from './pages/admin/HrRosterPage';
 import { AnalyticsPage } from './pages/admin/AnalyticsPage';
 import { SettingsPage } from './pages/admin/SettingsPage';
@@ -88,6 +89,16 @@ export const App: React.FC = () => {
                 element={
                   <RoleGuard allowedRoles={['ADMIN', 'HR_ADMIN']}>
                     <RegistrationsPage />
+                  </RoleGuard>
+                }
+              />
+
+              {/* Admin: System User Management */}
+              <Route
+                path="/admin/users"
+                element={
+                  <RoleGuard allowedRoles={['ADMIN', 'HR_ADMIN']}>
+                    <UserManagementPage />
                   </RoleGuard>
                 }
               />

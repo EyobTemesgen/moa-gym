@@ -6,20 +6,14 @@ import {
   Calendar,
   Clock,
   Users,
-  Flame,
   CheckCircle2,
   AlertCircle,
   Plus,
   X,
-  Filter,
   UserCheck,
   Check,
-  ChevronRight,
-  ShieldCheck,
-  Sparkles,
   RefreshCw,
 } from 'lucide-react';
-import { btn, pill, statusTone } from '../../components/ui/theme';
 
 interface Participant {
   bookingId: string;
@@ -47,7 +41,6 @@ interface WellnessClass {
   ethiopianTime?: string;
 }
 
-// Days of the active gym week (Mon - Sat)
 const DAYS_OF_WEEK = [
   { key: 1, name: 'Monday', amharic: 'ሰኞ', short: 'Mon' },
   { key: 2, name: 'Tuesday', amharic: 'ማክሰኞ', short: 'Tue' },
@@ -61,17 +54,14 @@ export const GymSchedulePage: React.FC = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  // Calculate current week dates
   const today = new Date();
-  const currentDayIndex = today.getDay(); // 0 is Sun, 1 is Mon...
+  const currentDayIndex = today.getDay();
   
-  // Find Monday of current week
   const monday = new Date(today);
   const diffToMonday = currentDayIndex === 0 ? -6 : 1 - currentDayIndex;
   monday.setDate(today.getDate() + diffToMonday);
   monday.setHours(0, 0, 0, 0);
 
-  // Generate 6 days from Monday to Saturday
   const weekDays = DAYS_OF_WEEK.map((d, idx) => {
     const dayDate = new Date(monday);
     dayDate.setDate(monday.getDate() + idx);
@@ -87,27 +77,20 @@ export const GymSchedulePage: React.FC = () => {
     };
   });
 
-  // Selected date defaults to today if Mon-Sat, else Monday
   const defaultDateStr = weekDays.find((d) => d.isToday)?.dateStr || weekDays[0].dateStr;
   const [selectedDate, setSelectedDate] = useState<string>(defaultDateStr);
-
-  // Filters
   const [shiftFilter, setShiftFilter] = useState<'ALL' | 'MORNING' | 'EVENING'>('ALL');
-  const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
 
-  // Modals
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [viewParticipantsClass, setViewParticipantsClass] = useState<WellnessClass | null>(null);
   const [actionMessage, setActionMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  // New Class Form State (for Admin/Attendant)
   const [newTitle, setNewTitle] = useState('');
   const [newInstructor, setNewInstructor] = useState('Coach Henok');
   const [newStartTime, setNewStartTime] = useState('06:30');
   const [newEndTime, setNewEndTime] = useState('07:30');
   const [newCapacity, setNewCapacity] = useState(15);
 
-  // Query classes from backend
   const { data: dbClasses = [], isLoading, refetch } = useQuery<WellnessClass[]>({
     queryKey: ['wellness-classes', selectedDate],
     queryFn: async () => {
@@ -115,23 +98,21 @@ export const GymSchedulePage: React.FC = () => {
     },
   });
 
-  // Book mutation
   const bookMutation = useMutation({
     mutationFn: async (classId: string) => {
       return apiRequest(`/wellness/classes/${classId}/book`, { method: 'POST' });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['wellness-classes'] });
-      setActionMessage({ type: 'success', text: 'Class spot booked successfully! See you on the floor.' });
-      setTimeout(() => setActionMessage(null), 4000);
+      setActionMessage({ type: 'success', text: 'Class spot booked successfully!' });
+      setTimeout(() => setActionMessage(null), 3500);
     },
     onError: (err: any) => {
       setActionMessage({ type: 'error', text: err.message || 'Failed to book class.' });
-      setTimeout(() => setActionMessage(null), 5000);
+      setTimeout(() => setActionMessage(null), 4000);
     },
   });
 
-  // Cancel booking mutation
   const cancelMutation = useMutation({
     mutationFn: async (classId: string) => {
       return apiRequest(`/wellness/classes/${classId}/book`, { method: 'DELETE' });
@@ -139,15 +120,14 @@ export const GymSchedulePage: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['wellness-classes'] });
       setActionMessage({ type: 'success', text: 'Reservation cancelled.' });
-      setTimeout(() => setActionMessage(null), 4000);
+      setTimeout(() => setActionMessage(null), 3500);
     },
     onError: (err: any) => {
       setActionMessage({ type: 'error', text: err.message || 'Failed to cancel reservation.' });
-      setTimeout(() => setActionMessage(null), 5000);
+      setTimeout(() => setActionMessage(null), 4000);
     },
   });
 
-  // Create class mutation (Attendant / Admin)
   const createClassMutation = useMutation({
     mutationFn: async () => {
       return apiRequest('/wellness/classes', {
@@ -166,8 +146,8 @@ export const GymSchedulePage: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['wellness-classes'] });
       setIsAddModalOpen(false);
       setNewTitle('');
-      setActionMessage({ type: 'success', text: 'New group class scheduled!' });
-      setTimeout(() => setActionMessage(null), 4000);
+      setActionMessage({ type: 'success', text: 'Class scheduled successfully.' });
+      setTimeout(() => setActionMessage(null), 3500);
     },
     onError: (err: any) => {
       setActionMessage({ type: 'error', text: err.message || 'Failed to create class.' });
@@ -176,11 +156,10 @@ export const GymSchedulePage: React.FC = () => {
 
   const isStaffOrAdmin = user?.role === 'ADMIN' || user?.role === 'HR_ADMIN' || user?.role === 'GYM_ATTENDANT';
 
-  // Standard recurring template sessions if none created for the day
   const defaultTemplates: WellnessClass[] = [
     {
       id: `tmpl-morning-${selectedDate}`,
-      title: 'Morning Energizer Aerobics & Cardio Blast',
+      title: 'Morning Aerobics & Conditioning',
       instructorName: 'Coach Henok',
       scheduledDate: selectedDate,
       startTime: '06:15',
@@ -190,12 +169,12 @@ export const GymSchedulePage: React.FC = () => {
       isFull: false,
       isBookedByMe: false,
       participants: [],
-      category: 'Aerobics & Cardio',
+      category: 'Aerobics',
       ethiopianTime: 'ከማለዳው 12:15 – 1:15',
     },
     {
       id: `tmpl-evening-${selectedDate}`,
-      title: 'Post-Work Core & Functional Strength',
+      title: 'Post-Work Strength & Form',
       instructorName: 'Trainer Bethel',
       scheduledDate: selectedDate,
       startTime: '17:30',
@@ -205,12 +184,12 @@ export const GymSchedulePage: React.FC = () => {
       isFull: false,
       isBookedByMe: false,
       participants: [],
-      category: 'Strength & Conditioning',
+      category: 'Strength',
       ethiopianTime: 'ከምሽቱ 11:30 – 12:30',
     },
     {
       id: `tmpl-yoga-${selectedDate}`,
-      title: 'Desk Worker Posture, Spine & Mobility Yoga',
+      title: 'Desk Worker Posture & Mobility',
       instructorName: 'Coach Tigist',
       scheduledDate: selectedDate,
       startTime: '18:45',
@@ -220,20 +199,17 @@ export const GymSchedulePage: React.FC = () => {
       isFull: false,
       isBookedByMe: false,
       participants: [],
-      category: 'Yoga & Mobility',
+      category: 'Mobility',
       ethiopianTime: 'ከምሽቱ 12:45 – 1:45',
     },
   ];
 
-  // Merge DB classes with templates if DB is empty for this date
   const displayClasses = dbClasses.length > 0 ? dbClasses : defaultTemplates;
 
-  // Filter classes
   const filteredClasses = displayClasses.filter((c) => {
     const isMorning = c.startTime < '12:00';
     if (shiftFilter === 'MORNING' && !isMorning) return false;
     if (shiftFilter === 'EVENING' && isMorning) return false;
-    if (categoryFilter !== 'ALL' && c.category && c.category !== categoryFilter) return false;
     return true;
   });
 
@@ -241,16 +217,16 @@ export const GymSchedulePage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Action Notification Alert */}
+      {/* Toast Alert */}
       {actionMessage && (
         <div
-          className={`p-4 rounded-xl border flex items-center justify-between shadow-xs transition-all ${
+          className={`p-3.5 rounded-xl border flex items-center justify-between shadow-xs transition-all ${
             actionMessage.type === 'success'
               ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
               : 'bg-rose-50 border-rose-200 text-rose-900'
           }`}
         >
-          <div className="flex items-center gap-2.5 text-xs font-semibold">
+          <div className="flex items-center gap-2 text-xs font-semibold">
             {actionMessage.type === 'success' ? (
               <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
             ) : (
@@ -268,49 +244,35 @@ export const GymSchedulePage: React.FC = () => {
         </div>
       )}
 
-      {/* Top Banner: Shift Hours & Overview */}
-      <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+      {/* Clean Top Header */}
+      <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-lg font-bold text-slate-900 tracking-tight">
-              Weekly Gym Timetable & Group Classes
+              Gym Schedule
             </h1>
-            <span className="text-xs font-mono font-semibold text-[#00843D] bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+            <span className="text-xs font-mono font-semibold text-[#00843D] bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
               የሳምንቱ መርሃግብር
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Browse structured group fitness classes, morning/evening shifts, and reserve your spot.
+            Weekly class schedule, shift timings, and session reservations.
           </p>
         </div>
 
-        {/* Shift Timings Quick Reference */}
+        {/* Clean Shift Summary & Action */}
         <div className="flex items-center gap-3 shrink-0 flex-wrap">
-          <div className="bg-amber-50 border border-amber-200/80 rounded-lg px-3 py-2 text-xs">
-            <div className="font-bold text-amber-900 flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-amber-500"></span>
-              ጠዋት / Morning Shift
-            </div>
-            <div className="font-mono text-slate-700 font-semibold text-[11px] mt-0.5">
-              ከ11:00 – 1:30 <span className="text-slate-400">(6:00 – 8:30 AM)</span>
-            </div>
-          </div>
-
-          <div className="bg-indigo-50 border border-indigo-200/80 rounded-lg px-3 py-2 text-xs">
-            <div className="font-bold text-indigo-900 flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-indigo-500"></span>
-              ማታ / Evening Shift
-            </div>
-            <div className="font-mono text-slate-700 font-semibold text-[11px] mt-0.5">
-              ከ11:30 – 3:00 <span className="text-slate-400">(5:30 – 9:00 PM)</span>
-            </div>
+          <div className="text-[11px] text-slate-500 font-mono hidden md:block">
+            <span>Morning: 6:00 – 8:30 AM</span>
+            <span className="mx-1.5 text-slate-300">·</span>
+            <span>Evening: 5:30 – 9:00 PM</span>
           </div>
 
           {isStaffOrAdmin && (
             <button
               type="button"
               onClick={() => setIsAddModalOpen(true)}
-              className="px-3.5 h-9 text-xs font-semibold text-white bg-[#00843D] hover:bg-[#007033] rounded-[6px] shadow-xs transition flex items-center gap-1.5 cursor-pointer"
+              className="px-3.5 h-8.5 text-xs font-semibold text-white bg-[#00843D] hover:bg-[#007033] rounded-[6px] shadow-2xs transition flex items-center gap-1.5 cursor-pointer"
             >
               <Plus className="h-4 w-4" />
               <span>Schedule Class</span>
@@ -319,9 +281,9 @@ export const GymSchedulePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Day Selector (Mon – Sat) */}
-      <div className="bg-white rounded-xl border border-slate-200 p-2 shadow-xs">
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+      {/* Clean Horizontal Day Selector (Mon – Sat) */}
+      <div className="bg-white rounded-xl border border-slate-200 p-1.5 shadow-xs">
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
           {weekDays.map((d) => {
             const isSelected = d.dateStr === selectedDate;
             return (
@@ -329,23 +291,23 @@ export const GymSchedulePage: React.FC = () => {
                 key={d.key}
                 type="button"
                 onClick={() => setSelectedDate(d.dateStr)}
-                className={`flex flex-col items-center justify-center p-3 rounded-lg transition-all cursor-pointer text-center relative ${
+                className={`flex flex-col items-center justify-center py-2.5 px-2 rounded-lg transition-all cursor-pointer text-center relative ${
                   isSelected
-                    ? 'bg-[#00843D] text-white shadow-xs font-bold ring-2 ring-[#00843D]/20'
-                    : 'bg-slate-50 text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+                    ? 'bg-slate-900 text-white font-bold shadow-xs'
+                    : 'bg-slate-50/70 text-slate-700 hover:bg-slate-100 hover:text-slate-900'
                 }`}
               >
                 {d.isToday && (
                   <span
-                    className={`absolute top-1 right-1 text-[9px] font-bold px-1 rounded-xs uppercase ${
-                      isSelected ? 'bg-moa-gold text-slate-900' : 'bg-emerald-100 text-emerald-800'
+                    className={`absolute top-1 right-1 text-[8px] font-bold px-1 rounded-xs uppercase tracking-wider ${
+                      isSelected ? 'bg-moa-gold text-slate-950' : 'bg-emerald-100 text-emerald-800'
                     }`}
                   >
                     Today
                   </span>
                 )}
-                <span className="text-xs font-semibold">{d.short} / {d.amharic}</span>
-                <span className={`text-base font-extrabold mt-0.5 ${isSelected ? 'text-white' : 'text-slate-900'}`}>
+                <span className="text-[11px] font-medium">{d.short} · {d.amharic}</span>
+                <span className={`text-sm font-bold mt-0.5 ${isSelected ? 'text-white' : 'text-slate-900'}`}>
                   {d.dayNumber} {d.monthName}
                 </span>
               </button>
@@ -354,59 +316,38 @@ export const GymSchedulePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Filter Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs">
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider mr-1 flex items-center gap-1">
-            <Filter className="h-3.5 w-3.5" /> Shift:
-          </span>
-          <button
-            type="button"
-            onClick={() => setShiftFilter('ALL')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
-              shiftFilter === 'ALL'
-                ? 'bg-slate-900 text-white shadow-2xs'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-            }`}
-          >
-            All Shifts
-          </button>
-          <button
-            type="button"
-            onClick={() => setShiftFilter('MORNING')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer flex items-center gap-1 ${
-              shiftFilter === 'MORNING'
-                ? 'bg-amber-600 text-white shadow-2xs'
-                : 'bg-amber-50 text-amber-800 hover:bg-amber-100'
-            }`}
-          >
-            <Clock className="h-3 w-3" />
-            ጠዋት / Morning
-          </button>
-          <button
-            type="button"
-            onClick={() => setShiftFilter('EVENING')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer flex items-center gap-1 ${
-              shiftFilter === 'EVENING'
-                ? 'bg-indigo-600 text-white shadow-2xs'
-                : 'bg-indigo-50 text-indigo-800 hover:bg-indigo-100'
-            }`}
-          >
-            <Clock className="h-3 w-3" />
-            ማታ / Evening
-          </button>
+      {/* Minimal Filter Bar */}
+      <div className="bg-white rounded-xl border border-slate-200 p-3 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        {/* Shift Filter Tabs */}
+        <div className="flex items-center gap-1 text-xs">
+          {[
+            { key: 'ALL', label: 'All Shifts' },
+            { key: 'MORNING', label: 'ጠዋት / Morning' },
+            { key: 'EVENING', label: 'ማታ / Evening' },
+          ].map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => setShiftFilter(tab.key as any)}
+              className={`px-3 py-1.5 rounded-lg font-medium transition cursor-pointer ${
+                shiftFilter === tab.key
+                  ? 'bg-slate-900 text-white font-semibold shadow-2xs'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
 
+        {/* Selected Day Meta */}
         <div className="text-xs text-slate-500 flex items-center gap-2">
-          <span>Selected:</span>
-          <span className="font-semibold text-slate-900">
-            {selectedDayInfo?.name} ({selectedDayInfo?.amharic}), {selectedDayInfo?.dayNumber} {selectedDayInfo?.monthName}
-          </span>
+          <span>{selectedDayInfo?.name} ({selectedDayInfo?.amharic}), {selectedDayInfo?.dayNumber} {selectedDayInfo?.monthName}</span>
           <button
             type="button"
             onClick={() => refetch()}
             title="Refresh schedule"
-            className="p-1 text-slate-400 hover:text-slate-600 transition cursor-pointer"
+            className="p-1 text-slate-400 hover:text-slate-700 transition cursor-pointer"
           >
             <RefreshCw className="h-3.5 w-3.5" />
           </button>
@@ -416,14 +357,14 @@ export const GymSchedulePage: React.FC = () => {
       {/* Class Schedule Cards Grid */}
       {isLoading ? (
         <div className="bg-white rounded-xl border border-slate-200 p-12 text-center text-slate-500">
-          <RefreshCw className="h-6 w-6 animate-spin mx-auto text-[#00843D] mb-2" />
-          <p className="text-xs font-semibold">Loading classes for {selectedDate}...</p>
+          <RefreshCw className="h-5 w-5 animate-spin mx-auto text-[#00843D] mb-2" />
+          <p className="text-xs font-medium">Loading schedule...</p>
         </div>
       ) : filteredClasses.length === 0 ? (
         <div className="bg-white rounded-xl border border-dashed border-slate-300 p-12 text-center text-slate-500">
-          <Calendar className="h-8 w-8 mx-auto text-slate-400 mb-2" />
-          <p className="text-sm font-semibold text-slate-700">No classes match the selected filter</p>
-          <p className="text-xs text-slate-400 mt-1">Try switching shift filters or pick another day.</p>
+          <Calendar className="h-7 w-7 mx-auto text-slate-400 mb-2" />
+          <p className="text-sm font-semibold text-slate-700">No classes for this shift</p>
+          <p className="text-xs text-slate-400 mt-0.5">Switch shifts or pick another day of the week.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -436,90 +377,58 @@ export const GymSchedulePage: React.FC = () => {
             return (
               <div
                 key={item.id}
-                className={`bg-white rounded-xl border transition-all duration-200 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-md ${
+                className={`bg-white rounded-xl border transition-all duration-150 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-md ${
                   item.isBookedByMe
-                    ? 'border-emerald-500 ring-2 ring-emerald-500/15'
+                    ? 'border-emerald-500 ring-1 ring-emerald-500/20'
                     : 'border-slate-200'
                 }`}
               >
-                {/* Accent Top Border */}
-                <div
-                  className={`h-1.5 w-full ${
-                    isMorning
-                      ? 'bg-gradient-to-r from-amber-400 to-amber-600'
-                      : 'bg-gradient-to-r from-indigo-500 to-[#00843D]'
-                  }`}
-                />
-
                 <div className="p-5 flex-1">
-                  {/* Category & Shift Badges */}
-                  <div className="flex items-center justify-between gap-2 mb-3">
-                    <span
-                      className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full inline-flex items-center gap-1 ${
-                        isMorning
-                          ? 'bg-amber-50 text-amber-800 border border-amber-200'
-                          : 'bg-indigo-50 text-indigo-800 border border-indigo-200'
-                      }`}
-                    >
-                      <Clock className="h-3 w-3" />
-                      {isMorning ? 'ጠዋት / Morning' : 'ማታ / Evening'}
+                  {/* Top Shift Tag & Booking Badge */}
+                  <div className="flex items-center justify-between gap-2 mb-2.5">
+                    <span className="text-[10px] font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded">
+                      {isMorning ? 'ጠዋት · Morning' : 'ማታ · Evening'}
                     </span>
 
                     {item.isBookedByMe && (
-                      <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300 flex items-center gap-1">
-                        <Check className="h-3 w-3" /> Booked
+                      <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 flex items-center gap-1">
+                        <Check className="h-3 w-3" /> Reserved
                       </span>
                     )}
 
                     {item.isFull && !item.isBookedByMe && (
-                      <span className="text-[11px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">
-                        Class Full
+                      <span className="text-[10px] font-semibold text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
+                        Full
                       </span>
                     )}
                   </div>
 
-                  {/* Title & Coach */}
-                  <h3 className="text-base font-bold text-slate-900 leading-snug line-clamp-2">
+                  {/* Title & Instructor */}
+                  <h3 className="text-sm font-bold text-slate-900 leading-snug">
                     {item.title}
                   </h3>
-                  <p className="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
-                    <span className="font-semibold text-slate-700">Coach / Instructor:</span>
-                    <span className="text-emerald-700 font-semibold">{item.instructorName}</span>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Coach: <span className="font-semibold text-slate-700">{item.instructorName}</span>
                   </p>
 
-                  {/* Timing in Ethiopian & Standard */}
-                  <div className="mt-4 p-3 bg-slate-50 rounded-lg border border-slate-100 space-y-1">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-500 font-medium">Standard Time:</span>
-                      <span className="font-mono font-bold text-slate-900">
-                        {item.startTime} – {item.endTime}
-                      </span>
-                    </div>
+                  {/* Clean Time Display */}
+                  <div className="mt-3.5 flex items-center gap-1.5 text-xs text-slate-600 font-mono">
+                    <Clock className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                    <span>{item.startTime} – {item.endTime}</span>
                     {item.ethiopianTime && (
-                      <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-200/60">
-                        <span className="text-slate-500 font-medium">የኢትዮጵያ ሰዓት:</span>
-                        <span className="font-mono font-semibold text-[#00843D]">
-                          {item.ethiopianTime}
-                        </span>
-                      </div>
+                      <span className="text-slate-400 text-[11px]">({item.ethiopianTime})</span>
                     )}
                   </div>
 
-                  {/* Capacity Bar */}
-                  <div className="mt-4 space-y-1.5">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-500 flex items-center gap-1">
-                        <Users className="h-3.5 w-3.5 text-slate-400" />
-                        <span>Capacity</span>
-                      </span>
-                      <span className="font-mono text-xs font-bold text-slate-700">
-                        {item.bookedCount} / {item.capacity} ({spotsRemaining} left)
-                      </span>
+                  {/* Clean Capacity Meter */}
+                  <div className="mt-3 space-y-1">
+                    <div className="flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                      <span>{item.bookedCount} / {item.capacity} spots</span>
+                      <span>{spotsRemaining > 0 ? `${spotsRemaining} left` : '0 left'}</span>
                     </div>
-
-                    <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                    <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
                       <div
-                        className={`h-full rounded-full transition-all duration-300 ${
+                        className={`h-full rounded-full transition-all ${
                           capacityPercent >= 100
                             ? 'bg-rose-500'
                             : capacityPercent >= 75
@@ -532,57 +441,52 @@ export const GymSchedulePage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Bottom Actions */}
-                <div className="p-4 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between gap-2">
-                  {/* Attendant / Admin Roster Viewer */}
+                {/* Card Actions */}
+                <div className="px-4 py-3 bg-slate-50/60 border-t border-slate-100 flex items-center justify-between gap-2">
                   {isStaffOrAdmin && item.participants.length > 0 ? (
                     <button
                       type="button"
                       onClick={() => setViewParticipantsClass(item)}
-                      className="text-xs font-semibold text-slate-700 hover:text-slate-900 hover:underline flex items-center gap-1 cursor-pointer"
+                      className="text-xs font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
                     >
                       <UserCheck className="h-3.5 w-3.5" />
                       <span>Roster ({item.participants.length})</span>
                     </button>
                   ) : (
-                    <span className="text-[11px] text-slate-400">
-                      {isTemplate ? 'Standard Shift Class' : 'Scheduled Session'}
-                    </span>
+                    <span className="text-[11px] text-slate-400">Regular Session</span>
                   )}
 
-                  {/* Booking Trigger */}
                   {item.isBookedByMe ? (
                     <button
                       type="button"
                       onClick={() => cancelMutation.mutate(item.id)}
                       disabled={cancelMutation.isPending}
-                      className="px-3 h-8 text-xs font-semibold text-rose-700 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-[6px] transition cursor-pointer disabled:opacity-50"
+                      className="px-2.5 h-7.5 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-[6px] transition cursor-pointer disabled:opacity-50"
                     >
-                      {cancelMutation.isPending ? 'Cancelling...' : 'Cancel Spot'}
+                      {cancelMutation.isPending ? 'Cancelling...' : 'Cancel'}
                     </button>
                   ) : item.isFull ? (
                     <button
                       type="button"
                       disabled
-                      className="px-3 h-8 text-xs font-semibold text-slate-400 bg-slate-100 rounded-[6px] cursor-not-allowed"
+                      className="px-2.5 h-7.5 text-xs font-semibold text-slate-400 bg-slate-100 rounded-[6px] cursor-not-allowed"
                     >
-                      Class Full
+                      Full
                     </button>
                   ) : (
                     <button
                       type="button"
                       onClick={() => {
                         if (isTemplate) {
-                          alert(`You have reserved a spot for "${item.title}" on ${selectedDate}. Please check in at the gate terminal during your shift.`);
+                          alert(`You have reserved a spot for "${item.title}" on ${selectedDate}.`);
                         } else {
                           bookMutation.mutate(item.id);
                         }
                       }}
                       disabled={bookMutation.isPending}
-                      className="px-3.5 h-8 text-xs font-semibold text-white bg-[#00843D] hover:bg-[#007033] rounded-[6px] shadow-2xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                      className="px-3 h-7.5 text-xs font-semibold text-white bg-[#00843D] hover:bg-[#007033] rounded-[6px] shadow-2xs transition cursor-pointer disabled:opacity-50"
                     >
-                      <Sparkles className="h-3.5 w-3.5 text-moa-gold" />
-                      <span>{bookMutation.isPending ? 'Booking...' : 'Book Spot'}</span>
+                      {bookMutation.isPending ? 'Booking...' : 'Book Spot'}
                     </button>
                   )}
                 </div>
@@ -595,12 +499,9 @@ export const GymSchedulePage: React.FC = () => {
       {/* Admin / Attendant: Schedule New Class Modal */}
       {isAddModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 duration-200">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-[#00843D]" />
-                <h2 className="text-base font-bold text-slate-900">Schedule Group Class</h2>
-              </div>
+              <h2 className="text-base font-bold text-slate-900">Schedule Group Session</h2>
               <button
                 type="button"
                 onClick={() => setIsAddModalOpen(false)}
@@ -615,19 +516,19 @@ export const GymSchedulePage: React.FC = () => {
                 e.preventDefault();
                 createClassMutation.mutate();
               }}
-              className="mt-4 space-y-4"
+              className="mt-4 space-y-3.5"
             >
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Class Title / ስም *
+                  Session Title *
                 </label>
                 <input
                   type="text"
                   required
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  placeholder="e.g. Core Strength & Aerobics"
-                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-[#00843D]"
+                  placeholder="e.g. Core Conditioning & Aerobics"
+                  className="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:outline-hidden focus:ring-1 focus:ring-[#00843D]"
                 />
               </div>
 
@@ -640,7 +541,7 @@ export const GymSchedulePage: React.FC = () => {
                   required
                   value={newInstructor}
                   onChange={(e) => setNewInstructor(e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-[#00843D]"
+                  className="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:outline-hidden focus:ring-1 focus:ring-[#00843D]"
                 />
               </div>
 
@@ -654,7 +555,7 @@ export const GymSchedulePage: React.FC = () => {
                     required
                     value={newStartTime}
                     onChange={(e) => setNewStartTime(e.target.value)}
-                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-[#00843D]"
+                    className="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:outline-hidden focus:ring-1 focus:ring-[#00843D]"
                   />
                 </div>
                 <div>
@@ -666,14 +567,14 @@ export const GymSchedulePage: React.FC = () => {
                     required
                     value={newEndTime}
                     onChange={(e) => setNewEndTime(e.target.value)}
-                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-[#00843D]"
+                    className="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:outline-hidden focus:ring-1 focus:ring-[#00843D]"
                   />
                 </div>
               </div>
 
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Max Capacity (Spots) *
+                  Max Capacity *
                 </label>
                 <input
                   type="number"
@@ -682,7 +583,7 @@ export const GymSchedulePage: React.FC = () => {
                   required
                   value={newCapacity}
                   onChange={(e) => setNewCapacity(Number(e.target.value))}
-                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-[#00843D]"
+                  className="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:outline-hidden focus:ring-1 focus:ring-[#00843D]"
                 />
               </div>
 
@@ -690,16 +591,16 @@ export const GymSchedulePage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 h-9 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-[6px] transition cursor-pointer"
+                  className="px-3.5 h-8 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-[6px] transition cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={createClassMutation.isPending}
-                  className="px-4 h-9 text-xs font-semibold text-white bg-[#00843D] hover:bg-[#007033] rounded-[6px] transition shadow-xs cursor-pointer disabled:opacity-50"
+                  className="px-3.5 h-8 text-xs font-semibold text-white bg-[#00843D] hover:bg-[#007033] rounded-[6px] transition shadow-2xs cursor-pointer disabled:opacity-50"
                 >
-                  {createClassMutation.isPending ? 'Scheduling...' : 'Save & Schedule'}
+                  {createClassMutation.isPending ? 'Saving...' : 'Save Session'}
                 </button>
               </div>
             </form>
@@ -710,14 +611,14 @@ export const GymSchedulePage: React.FC = () => {
       {/* Participants Roster Modal */}
       {viewParticipantsClass && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div>
                 <h2 className="text-base font-bold text-slate-900">
                   {viewParticipantsClass.title}
                 </h2>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Registered Participants ({viewParticipantsClass.participants.length} / {viewParticipantsClass.capacity})
+                  Roster ({viewParticipantsClass.participants.length} / {viewParticipantsClass.capacity})
                 </p>
               </div>
               <button
@@ -729,32 +630,19 @@ export const GymSchedulePage: React.FC = () => {
               </button>
             </div>
 
-            <div className="mt-4 max-h-80 overflow-y-auto divide-y divide-slate-100">
+            <div className="mt-3 max-h-72 overflow-y-auto divide-y divide-slate-100">
               {viewParticipantsClass.participants.map((p, idx) => (
-                <div key={p.bookingId || idx} className="py-2.5 flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    {p.photoUrl ? (
-                      <img
-                        src={p.photoUrl}
-                        alt={p.fullName}
-                        className="h-8 w-8 rounded-full object-cover ring-1 ring-slate-200"
-                      />
-                    ) : (
-                      <div className="h-8 w-8 rounded-full bg-emerald-50 text-emerald-800 flex items-center justify-center font-bold text-xs">
-                        {p.fullName.slice(0, 2).toUpperCase()}
-                      </div>
-                    )}
-                    <div>
-                      <div className="text-xs font-bold text-slate-900">{p.fullName}</div>
-                      <div className="text-[11px] text-slate-500 font-mono">
-                        {p.employeeId} · {p.department}
-                      </div>
+                <div key={p.bookingId || idx} className="py-2 flex items-center justify-between gap-3 text-xs">
+                  <div>
+                    <div className="font-semibold text-slate-900">{p.fullName}</div>
+                    <div className="text-[11px] text-slate-500 font-mono">
+                      {p.employeeId} · {p.department}
                     </div>
                   </div>
                   <span
-                    className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                    className={`text-[10px] font-semibold px-2 py-0.5 rounded ${
                       p.attended
-                        ? 'bg-emerald-100 text-emerald-800'
+                        ? 'bg-emerald-50 text-emerald-800'
                         : 'bg-slate-100 text-slate-600'
                     }`}
                   >
@@ -768,7 +656,7 @@ export const GymSchedulePage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setViewParticipantsClass(null)}
-                className="px-4 h-8 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-[6px] cursor-pointer"
+                className="px-3.5 h-7.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-[6px] cursor-pointer"
               >
                 Close
               </button>

@@ -186,11 +186,10 @@ export const MoaHeader: React.FC<MoaHeaderProps> = ({ onOpenMobileSidebar }) => 
                     aria-haspopup="true"
                     aria-expanded={showUserMenu}
                     aria-label={`Account menu for ${user.fullName}`}
-                    className={`flex items-center gap-2 pl-1.5 pr-2.5 py-1 rounded-full border transition cursor-pointer select-none ${
-                      showUserMenu
+                    className={`flex items-center gap-2 pl-1.5 pr-2.5 py-1 rounded-full border transition cursor-pointer select-none ${showUserMenu
                         ? 'bg-emerald-50 border-emerald-300 ring-2 ring-emerald-500/20'
                         : 'bg-white hover:bg-slate-50 border-slate-200 shadow-2xs'
-                    }`}
+                      }`}
                   >
                     {user.photoUrl ? (
                       <img
@@ -214,9 +213,8 @@ export const MoaHeader: React.FC<MoaHeaderProps> = ({ onOpenMobileSidebar }) => 
                     </div>
 
                     <ChevronDown
-                      className={`h-3.5 w-3.5 text-slate-400 transition-transform ${
-                        showUserMenu ? 'rotate-180 text-emerald-700' : ''
-                      }`}
+                      className={`h-3.5 w-3.5 text-slate-400 transition-transform ${showUserMenu ? 'rotate-180 text-emerald-700' : ''
+                        }`}
                     />
                   </button>
 

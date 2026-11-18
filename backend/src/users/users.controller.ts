@@ -88,8 +88,9 @@ export class UsersController {
   async updateStatus(
     @Param('id') id: string,
     @Body('status') status: EmploymentStatus,
+    @Req() req: any,
   ) {
-    return this.usersService.updateUserStatus(id, status);
+    return this.usersService.updateUserStatus(id, status, req.user?.id);
   }
 
   @Get('candidates')

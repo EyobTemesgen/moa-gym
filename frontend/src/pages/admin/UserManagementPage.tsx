@@ -461,28 +461,38 @@ export const UserManagementPage: React.FC = () => {
 
                     {/* Status Badge & Toggle */}
                     <td className="px-4 py-3">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          updateStatusMutation.mutate({
-                            id: u.id,
-                            status: u.status === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE',
-                          })
-                        }
-                        title="Click to toggle account status"
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border transition cursor-pointer ${
-                          u.status === 'ACTIVE'
-                            ? 'bg-emerald-50 text-[#00843D] border-emerald-200 hover:bg-red-50 hover:text-red-700 hover:border-red-200'
-                            : 'bg-red-50 text-red-700 border-red-200 hover:bg-emerald-50 hover:text-[#00843D] hover:border-emerald-200'
-                        }`}
-                      >
+                      {u.employeeId === 'EMP-ADM-01' ? (
                         <span
-                          className={`h-1.5 w-1.5 rounded-full ${
-                            u.status === 'ACTIVE' ? 'bg-[#00843D]' : 'bg-red-600'
+                          title="Primary administrator account cannot be suspended"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border bg-emerald-50 text-[#00843D] border-emerald-200 opacity-90 cursor-default"
+                        >
+                          <span className="h-1.5 w-1.5 rounded-full bg-[#00843D]" />
+                          <span>ACTIVE (Protected)</span>
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            updateStatusMutation.mutate({
+                              id: u.id,
+                              status: u.status === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE',
+                            })
+                          }
+                          title="Click to toggle account status"
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border transition cursor-pointer ${
+                            u.status === 'ACTIVE'
+                              ? 'bg-emerald-50 text-[#00843D] border-emerald-200 hover:bg-red-50 hover:text-red-700 hover:border-red-200'
+                              : 'bg-red-50 text-red-700 border-red-200 hover:bg-emerald-50 hover:text-[#00843D] hover:border-emerald-200'
                           }`}
-                        />
-                        <span>{u.status}</span>
-                      </button>
+                        >
+                          <span
+                            className={`h-1.5 w-1.5 rounded-full ${
+                              u.status === 'ACTIVE' ? 'bg-[#00843D]' : 'bg-red-600'
+                            }`}
+                          />
+                          <span>{u.status}</span>
+                        </button>
+                      )}
                     </td>
 
                     {/* Actions */}

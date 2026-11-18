@@ -258,12 +258,20 @@ export class UsersService {
     };
   }
 
-  async updateUserStatus(userId: string, status: EmploymentStatus) {
+  async updateUserStatus(userId: string, status: EmploymentStatus, actorId?: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });
     if (!user) {
       throw new NotFoundException('User not found');
+    }
+
+    if (user.employeeId === 'EMP-ADM-01' && status !== EmploymentStatus.ACTIVE) {
+      throw new BadRequestException('The primary system administrator (EMP-ADM-01) cannot be suspended.');
+    }
+
+    if (actorId && actorId === userId && status !== EmploymentStatus.ACTIVE) {
+      throw new BadRequestException('You cannot suspend your own active administrator account.');
     }
 
     await this.prisma.hrEmployeeRoster.update({

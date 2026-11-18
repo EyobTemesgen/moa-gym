@@ -676,7 +676,7 @@ export const DedicatedSignUpPage: React.FC = () => {
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Eyob"
+                  placeholder="e.g. Abebe"
                   value={firstName}
                   onChange={(e) => {
                     setFirstName(e.target.value);
@@ -700,7 +700,7 @@ export const DedicatedSignUpPage: React.FC = () => {
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Temesgen"
+                  placeholder="e.g. Kebede"
                   value={lastName}
                   onChange={(e) => {
                     setLastName(e.target.value);
@@ -727,7 +727,7 @@ export const DedicatedSignUpPage: React.FC = () => {
               </label>
               <input
                 type="text"
-                placeholder="e.g. eyob-moa"
+                placeholder="e.g. staff.member"
                 value={username}
                 onChange={(e) => {
                   setUsername(e.target.value);
@@ -757,7 +757,7 @@ export const DedicatedSignUpPage: React.FC = () => {
               </label>
               <input
                 type="email"
-                placeholder="e.g. eyobatem@gmail.com or name@moa.gov.et"
+                placeholder="e.g. member@moa.gov.et or staff@gmail.com"
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);

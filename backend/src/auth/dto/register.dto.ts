@@ -8,22 +8,22 @@ export class RegisterStaffDto {
   @IsIn(['INTERNAL', 'EXTERNAL'])
   memberType: 'INTERNAL' | 'EXTERNAL';
 
-  @ApiProperty({ description: 'First Name', example: 'Eyob' })
+  @ApiProperty({ description: 'First Name', example: 'Abebe' })
   @IsNotEmpty()
   @IsString()
   firstName: string;
 
-  @ApiProperty({ description: 'Last Name', example: 'Temesgen' })
+  @ApiProperty({ description: 'Last Name', example: 'Kebede' })
   @IsNotEmpty()
   @IsString()
   lastName: string;
 
-  @ApiProperty({ description: 'Username or account handle', required: false, example: 'eyob-moa' })
+  @ApiProperty({ description: 'Username or account handle', required: false, example: 'staff.member' })
   @IsOptional()
   @IsString()
   username?: string;
 
-  @ApiProperty({ description: 'Official work or personal email', example: 'eyobatem@gmail.com' })
+  @ApiProperty({ description: 'Official work or personal email', example: 'member@moa.gov.et' })
   @IsNotEmpty()
   @IsEmail()
   email: string;

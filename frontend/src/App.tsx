@@ -16,7 +16,6 @@ import { RegistrationsPage } from './pages/desk/RegistrationsPage';
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
 import { UserManagementPage } from './pages/admin/UserManagementPage';
 import { AnalyticsPage } from './pages/admin/AnalyticsPage';
-import { SettingsPage } from './pages/admin/SettingsPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -142,14 +141,8 @@ export const App: React.FC = () => {
                 }
               />
 
-              <Route
-                path="/admin/settings"
-                element={
-                  <RoleGuard allowedRoles={['ADMIN', 'HR_ADMIN']}>
-                    <SettingsPage />
-                  </RoleGuard>
-                }
-              />
+              {/* Legacy Settings Route Redirected to Users */}
+              <Route path="/admin/settings" element={<Navigate to="/admin/users" replace />} />
 
               {/* Catch-all */}
               <Route path="*" element={<Navigate to="/" replace />} />

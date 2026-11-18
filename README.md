@@ -17,7 +17,6 @@ Built strictly aligned with the MoA Design System (`#00843D` green, `#FCDD09` go
    * **Staff Registrations (`/registrations`)**: Single unified intake and registration directory: individual staff registration, Excel (.xlsx) / CSV spreadsheet batch imports, paper waiver archiving, and printable A4 rosters.
    * **Settings Menu (`Settings`)**: Collapsible navigation drawer matching Asset Tracking System (ATS), containing:
      - **Users (`/admin/users`)**: Access control, live role switching (ADMIN, GYM_ATTENDANT, STAFF_MEMBER), account suspension, password resets, and user provisioning.
-     - **Facility Settings (`/admin/settings`)**: Capacity limits, gate thresholds, and legal waiver terms.
    * **Reports (`/reports`)**: Attendance volume curves, peak hours, and filtered CSV exports for civil service leadership.
 
 2. **Gate Checking Fast Lane (`GYM_ATTENDANT`)**:

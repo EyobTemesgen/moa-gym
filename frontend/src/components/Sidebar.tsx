@@ -14,7 +14,6 @@ import {
   LayoutDashboard,
   UserCog,
   Settings,
-  Sliders,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -34,9 +33,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const location = useLocation();
   const navigate = useNavigate();
 
-  const isSettingsActive =
-    location.pathname === '/admin/users' ||
-    location.pathname === '/admin/settings';
+  const isSettingsActive = location.pathname === '/admin/users';
 
   const [settingsOpen, setSettingsOpen] = useState<boolean>(() => {
     if (isSettingsActive) return true;
@@ -230,20 +227,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     >
                       <UserCog className="h-4 w-4 text-amber-300 shrink-0" />
                       <span className="truncate">Users</span>
-                    </NavLink>
-
-                    {/* Facility Settings */}
-                    <NavLink
-                      to="/admin/settings"
-                      onClick={onCloseMobile}
-                      className={`relative flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-medium transition ${
-                        isActive('/admin/settings')
-                          ? 'bg-white/20 text-white shadow-2xs font-semibold'
-                          : 'text-white/70 hover:text-white hover:bg-white/10'
-                      }`}
-                    >
-                      <Sliders className="h-4 w-4 text-sky-300 shrink-0" />
-                      <span className="truncate">Facility Settings</span>
                     </NavLink>
                   </div>
                 )}

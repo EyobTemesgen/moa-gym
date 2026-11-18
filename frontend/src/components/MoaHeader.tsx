@@ -32,11 +32,6 @@ export const MoaHeader: React.FC<MoaHeaderProps> = ({ onOpenMobileSidebar }) => 
           title: 'User Management',
           subtitle: 'System access control, role assignment, and administrative credentials',
         };
-      case '/admin/settings':
-        return {
-          title: 'Facility Settings',
-          subtitle: 'Capacity thresholds, gate policies, and legal waiver terms',
-        };
       case '/terminal':
         return {
           title: 'Gate Terminal',

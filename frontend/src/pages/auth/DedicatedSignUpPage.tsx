@@ -347,12 +347,12 @@ export const DedicatedSignUpPage: React.FC = () => {
   const getInputClass = (fieldName: string) => {
     const hasError = touched[fieldName] && fieldErrors[fieldName];
     const isValid = touched[fieldName] && !fieldErrors[fieldName];
-    return `w-full px-3.5 py-2.5 bg-slate-50 border rounded-xl text-sm transition-all focus:outline-none focus:ring-2 ${
+    return `w-full px-3.5 py-2.5 bg-white border text-sm text-slate-900 rounded-lg transition-all duration-150 shadow-2xs focus:outline-none ${
       hasError
-        ? 'border-rose-400 bg-rose-50/20 text-slate-900 focus:ring-rose-500 focus:border-rose-500'
+        ? 'border-rose-500 bg-rose-50/10 focus:border-rose-600 focus:ring-2 focus:ring-rose-500/20'
         : isValid
-        ? 'border-emerald-300 text-slate-900 focus:ring-emerald-500 focus:border-emerald-500 focus:bg-white'
-        : 'border-slate-200 text-slate-900 placeholder-slate-400 focus:ring-emerald-500 focus:border-emerald-500 focus:bg-white'
+        ? 'border-slate-300 hover:border-slate-500 focus:border-[#00843D] focus:ring-2 focus:ring-[#00843D]/20'
+        : 'border-slate-300 hover:border-slate-500 placeholder-slate-400 focus:border-[#00843D] focus:ring-2 focus:ring-[#00843D]/20'
     }`;
   };
 
@@ -750,10 +750,10 @@ export const DedicatedSignUpPage: React.FC = () => {
             </div>
 
             {/* First Name & Last Name (2 Cols) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  First Name <span className="text-red-500">*</span>
+                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                  First Name <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -776,8 +776,8 @@ export const DedicatedSignUpPage: React.FC = () => {
                 )}
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Last Name <span className="text-red-500">*</span>
+                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Last Name <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -803,8 +803,8 @@ export const DedicatedSignUpPage: React.FC = () => {
 
             {/* Username */}
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">
-                Username <span className="text-red-500">*</span>
+              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                Username <span className="text-rose-500">*</span>
               </label>
               <input
                 type="text"
@@ -825,7 +825,7 @@ export const DedicatedSignUpPage: React.FC = () => {
                   <span>{fieldErrors.username}</span>
                 </p>
               ) : (
-                <p className="text-[10px] text-slate-400 mt-0.5">
+                <p className="text-[10px] text-slate-400 mt-1">
                   Used for sign-in and personalized member identification.
                 </p>
               )}
@@ -833,8 +833,8 @@ export const DedicatedSignUpPage: React.FC = () => {
 
             {/* Email */}
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">
-                Email Address <span className="text-red-500">*</span>
+              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                Email Address <span className="text-rose-500">*</span>
               </label>
               <input
                 type="email"
@@ -860,8 +860,8 @@ export const DedicatedSignUpPage: React.FC = () => {
             {/* Department (if Internal) or Organization (if External) */}
             {memberType === 'INTERNAL' ? (
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Directorate / Department <span className="text-red-500">*</span>
+                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Directorate / Department <span className="text-rose-500">*</span>
                 </label>
                 <select
                   value={department}
@@ -893,8 +893,8 @@ export const DedicatedSignUpPage: React.FC = () => {
               </div>
             ) : (
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Organization / Institution <span className="text-red-500">*</span>
+                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Organization / Institution <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -919,12 +919,12 @@ export const DedicatedSignUpPage: React.FC = () => {
             )}
 
             {/* Employee ID & Phone (2 Cols) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
+                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                   {memberType === 'INTERNAL' ? (
                     <>
-                      Employee ID <span className="text-red-500">*</span>
+                      Employee ID <span className="text-rose-500">*</span>
                     </>
                   ) : (
                     'National / Kebele ID (Optional)'
@@ -951,8 +951,8 @@ export const DedicatedSignUpPage: React.FC = () => {
                 )}
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Phone Number <span className="text-red-500">*</span>
+                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Phone Number <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="tel"
@@ -978,8 +978,8 @@ export const DedicatedSignUpPage: React.FC = () => {
 
             {/* Password with Eye Toggle */}
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">
-                Password <span className="text-red-500">*</span>
+              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                Password <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
                 <input
@@ -1004,7 +1004,7 @@ export const DedicatedSignUpPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer p-1"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -1015,7 +1015,7 @@ export const DedicatedSignUpPage: React.FC = () => {
                   <span>{fieldErrors.password}</span>
                 </p>
               ) : (
-                <p className="text-[10px] text-slate-400 mt-0.5">
+                <p className="text-[10px] text-slate-400 mt-1">
                   Must be at least 6 characters long and include both letters and numbers.
                 </p>
               )}
@@ -1023,8 +1023,8 @@ export const DedicatedSignUpPage: React.FC = () => {
 
             {/* Confirm Password */}
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">
-                Confirm Password <span className="text-red-500">*</span>
+              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                Confirm Password <span className="text-rose-500">*</span>
               </label>
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -1065,7 +1065,7 @@ export const DedicatedSignUpPage: React.FC = () => {
             <div className="pt-2">
               <button
                 type="submit"
-                className="w-full py-3 px-4 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-sm rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 group cursor-pointer"
+                className="w-full py-3 px-6 bg-[#00843D] hover:bg-[#07572A] text-white font-bold text-xs uppercase tracking-wider rounded-lg shadow-sm hover:shadow-md active:shadow-xs transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 group"
               >
                 <span>Continue to Gym Schedule & Fee</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
@@ -1243,18 +1243,18 @@ export const DedicatedSignUpPage: React.FC = () => {
             )}
 
             {/* Navigation Buttons */}
-            <div className="flex items-center gap-3 pt-2">
+            <div className="flex items-center gap-3 pt-3">
               <button
                 type="button"
                 onClick={() => setStep(1)}
-                className="py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
+                className="py-3 px-5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 hover:border-slate-400 font-bold text-xs uppercase tracking-wider rounded-lg shadow-2xs transition-all duration-200 cursor-pointer flex items-center gap-1.5"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Back</span>
               </button>
               <button
                 type="submit"
-                className="flex-1 py-3 px-4 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-sm rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 group cursor-pointer"
+                className="flex-1 py-3 px-6 bg-[#00843D] hover:bg-[#07572A] text-white font-bold text-xs uppercase tracking-wider rounded-lg shadow-sm hover:shadow-md active:shadow-xs transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 group"
               >
                 <span>Continue to Locker Assignment</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
@@ -1389,11 +1389,11 @@ export const DedicatedSignUpPage: React.FC = () => {
             </div>
 
             {/* Navigation Buttons */}
-            <div className="flex items-center gap-3 pt-2">
+            <div className="flex items-center gap-3 pt-3">
               <button
                 type="button"
                 onClick={() => setStep(2)}
-                className="py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
+                className="py-3 px-5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 hover:border-slate-400 font-bold text-xs uppercase tracking-wider rounded-lg shadow-2xs transition-all duration-200 cursor-pointer flex items-center gap-1.5"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Back</span>
@@ -1401,10 +1401,10 @@ export const DedicatedSignUpPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex-1 py-3 px-4 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-sm rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 group cursor-pointer disabled:opacity-60"
+                className="flex-1 py-3 px-6 bg-[#00843D] hover:bg-[#07572A] disabled:opacity-60 text-white font-bold text-xs uppercase tracking-wider rounded-lg shadow-sm hover:shadow-md active:shadow-xs transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 group"
               >
-                <span>{isSubmitting ? 'Registering...' : 'Complete Registration & Sign Up'}</span>
                 <Check className="w-4 h-4" />
+                <span>{isSubmitting ? 'Registering...' : 'Complete Registration & Sign Up'}</span>
               </button>
             </div>
           </form>

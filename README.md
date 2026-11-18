@@ -1,163 +1,102 @@
-# MoA Staff Gym Management System (`moa-gym`)
-> **Ministry of Agriculture (MoA)**  
-> **Staff Wellness & Fitness Center Management System**
+# Ministry of Agriculture (MoA) — Staff Gym Management System
 
-![MoA Branding](frontend/public/moa-logo.png)
-
----
-
-## 1. Overview & Core Pillars
-
-**MoA-Gym** is an internal web application designed for the Ministry of Agriculture to streamline staff gym enrollment, gate access control, locker management, and facility utilization metrics.
-
-Built strictly aligned with the MoA Design System (`#00843D` green, `#FCDD09` gold, clean typography, 100% English):
-
-1. **Administration (`ADMIN`)**:
-   * **Executive Dashboard (`/admin/dashboard`)**: High-level KPI cards (Total Registrants, Active Members, Registered Today, Live On Floor), directorate wellness engagement progress bars, and workout shift breakdowns.
-   * **Reports (`/reports`)**: Attendance volume curves, peak hours, and filtered CSV exports for civil service leadership.
-   * **Settings Menu (`Settings`)**: Collapsible navigation drawer matching Asset Tracking System (ATS), containing:
-     - **Staff Registrations (`/registrations`)**: Single unified intake and registration directory: individual staff registration, Excel (.xlsx) / CSV spreadsheet batch imports, paper waiver archiving, and printable A4 rosters.
-     - **Users (`/admin/users`)**: Access control, live role switching (ADMIN, GYM_ATTENDANT, STAFF_MEMBER), account suspension, password resets, and user provisioning.
-
-2. **Gate Checking Fast Lane (`GYM_ATTENDANT`)**:
-   * **Gate Terminal (`/terminal`)**: Instant Employee ID / Name lookup with auto-focused search. Displays staff photo, name, and directorate.
-   * **Locker Allocation**: Auto-assigns or manually picks available lockers (`L-01` to `L-30`).
-   * **Fast Turnaround**: 2-press keyboard flow (`[Enter]` verify $\rightarrow$ `[Enter]` check-in) takes under 2 seconds.
-   * **Check-Out & Active Floor**: 1-click check-out to release lockers and record workout dwell times.
-
-3. **Staff Member Digital Access (`STAFF_MEMBER`)**:
-   * **Zero-Friction Self-Registration (`/claim`)**: Staff finds their Name & Directorate on the HR whitelist, sets their password, and picks their preferred workout shift.
-   * **Permanent Digital Entry Pass (`/dashboard`)**: Scannable QR code and barcode with photo, employee ID, registration number, and live facility occupancy meter.
-   * **Self-Service Password Reset (`/login`)**: Direct password change or recovery via temporary password or registered ministry email.
+> **Official internal management system for the Ministry of Agriculture Staff Wellness & Fitness Center.**  
+> Built strictly following the MoA Design System (`#00843D` Green, `#FCDD09` Gold, `#07572A` Deep Green).
 
 ---
 
-## 2. System Architecture & End-to-End Workflow
+## 1. Facility Specifications
 
-### High-Level Institutional Flow
-
-```mermaid
-flowchart LR
-    subgraph Staff["1. Staff Member"]
-        A["Self-Register (/claim)<br/>Search Name & Directorate"] --> B["Set Password & Shift<br/>(Morning/Lunch/Evening)"]
-        B --> C["View Digital Pass (/dashboard)<br/>Scannable QR + Photo"]
-    end
-
-    subgraph Gate["2. Gate Attendant (/terminal)"]
-        D["Scan QR or Type Employee ID"] --> E["Instant Photo & Status Verification"]
-        E --> F["Assign Locker & Check In<br/>(Occupancy Increments)"]
-        F --> G["Check Out on Exit<br/>(Release Locker & Dwell Time)"]
-    end
-
-    subgraph Admin["3. HR Admin (/admin/dashboard)"]
-        H["Executive Dashboard<br/>KPIs & Directorate Progress"]
-        I["Staff Registrations (/registrations)<br/>Roster, Paper Intake & CSV"]
-        J["Reports (/reports)<br/>Peak Hours & Attendance Trends"]
-    end
-
-    C -.->|"Presents pass at entrance"| D
-    G -.->|"Telemetry logs to database"| H
-```
-
-### Enrollment & Intake Options
-
-```mermaid
-flowchart TD
-    A["MoA Staff Member Wants Gym Access"] --> B{"How do they register?"}
-    
-    B -->|"Option A: Self-Service Online"| C["Opens /claim<br/>(smartphone or office PC)"]
-    C --> D["Searches Name & Directorate<br/>(verified against HR whitelist)"]
-    D --> E["Sets Password & chooses shift<br/>(Morning / Lunch / Evening)"]
-    E --> F["Enrolled! Gets immediate access"]
-
-    B -->|"Option B: Physical Paper Form"| G["Staff fills & signs paper form at HR"]
-    G --> H["HR Admin opens /registrations<br/>clicks 'Register Staff Member'"]
-    H --> I["Selects employee, confirms paper signature,<br/>and assigns shift preference"]
-    I --> F
-```
-
-### Lifecycle Phases: Prerequisites to Daily Operations
-
-1. **Phase 1: Prerequisites & Foundation (Setup)**:
-   * **MoA HR Whitelist**: Zero-trust employee whitelist. Only staff with `EmploymentStatus = ACTIVE` can register or claim access.
-   * **Facility Readiness**: 30 physical lockers (`L-01` to `L-30`) inventoried as `AVAILABLE`, maximum concurrent capacity set (40 staff).
-   * **Gate Workstation**: Front desk tablet/PC running `/terminal` with optional barcode/QR scanner or webcam.
-
-2. **Phase 2: Staff Member Enrollment**:
-   * **Self-Registration (`/claim`)**: Staff finds their name and directorate, sets password, and selects shift.
-   * **Paper Intake (`/registrations`)**: HR logs paper form submissions with verified physical signatures.
-   * Employee is assigned a permanent registration number (e.g. `#101`).
-
-3. **Phase 3: Digital Pass Issuance**:
-   * Staff logs in at `/login` to view their **Permanent Digital Pass** (`/dashboard`).
-   * High-contrast offline QR code, photo, directorate, and live facility occupancy gauge.
-
-4. **Phase 4: Daily Gate Operations (Check-In & Check-Out)**:
-   * **Arrival**: Staff member shows QR code or states Employee ID.
-   * **Verification**: Terminal shows staff photo, name, and green active status badge.
-   * **Check-In**: Attendant allocates locker key, clicks **Check In** (occupancy +1).
-   * **Check-Out**: Staff returns locker key upon exit; attendant clicks **Check Out** (locker returned to available, dwell time logged, occupancy -1).
-
-5. **Phase 5: Executive Administration & Reporting**:
-   * **Dashboard (`/admin/dashboard`)**: Live floor occupancy, directorate wellness engagement, shift distribution.
-   * **Audit & Archiving (`/reports` & `/registrations`)**: CSV export and A4 printable rosters for Ministry leadership.
+| Parameter | Specification |
+|---|---|
+| **Facility** | Single Main Fitness Room (Ministry Headquarters) |
+| **Working Sessions** | **Morning Session:** 06:00 AM – 08:30 AM (*ከማለዳው 12:00 – 2:30*)<br/>**Evening Session:** 05:30 PM – 09:00 PM (*ከምሽቱ 11:30 – 3:00*) |
+| **Weekend Schedule** | **Saturday:** Open (Normal sessions)<br/>**Sunday:** Closed for sanitization and maintenance |
+| **Lockers** | 30 Daily Lockers (`L-01` to `L-30`), assigned upon entrance scan, reset nightly at 23:59 |
+| **Membership Fee** | **Internal MoA Staff:** 100% Free (Institutional Wellness Benefit)<br/>**External Members:** Monthly tiered subscription |
+| **Workout Guidance** | Self-guided workouts supported by step-by-step video guides in Amharic & English |
 
 ---
 
-## 3. Tech Stack
-
-* **Backend**: NestJS v11, Prisma ORM v6, PostgreSQL 16, JWT & Passport RBAC, `@nestjs/schedule` (auto-checkout timer), Swagger OpenAPI (`/api/docs`).
-* **Frontend**: React 19, Vite, TypeScript, Tailwind CSS, TanStack React Query, React Router v7, `html5-qrcode`, `qrcode.react`, `read-excel-file`, Lucide icons.
-* **Containerization**: Docker Compose with multi-stage builds and Nginx reverse proxy.
-
----
-
-## 4. Pre-Seeded Default Accounts
+## 2. Pre-Seeded Default Accounts
 
 All default passwords: **`Password123!`**
 
-| Role | Name | Identifier / Email | Default Password | Primary Screens |
+| Role | Name | Identifier / Email | Default Landing | Primary Responsibilities |
 |---|---|---|---|---|
-| **ADMIN** | Dr. Girma Bekele | `EMP-ADM-01` / `admin@moa.gov.et` | `Password123!` | `/admin/dashboard`, `/registrations`, `/admin/users`, `/reports` |
-| **GYM_ATTENDANT** | Tigist Alemayehu | `EMP-DSK-01` / `desk@moa.gov.et` | `Password123!` | `/terminal` (Gate Fast Lane) |
-| **STAFF_MEMBER** | Dawit Yohannes | `EMP-MOA-001` / `dawit.y@moa.gov.et` | `Password123!` | `/dashboard` (Digital Pass) |
+| **ADMIN** | Dr. Girma Bekele | `EMP-ADM-01` / `admin@moa.gov.et` | `/admin/dashboard` | Directorate analytics, member directory, user RBAC, reports |
+| **GYM_ATTENDANT** | Tigist Alemayehu | `EMP-DSK-01` / `desk@moa.gov.et` | `/terminal` | Fast-lane QR check-in & 30-locker assignment |
+| **STAFF_MEMBER** | Dawit Yohannes | `EMP-MOA-001` / `dawit.y@moa.gov.et` | `/dashboard` | Personal digital QR entry pass, timetable & video guides |
 
 ---
 
-## 5. Port Allocations & Setup
+## 3. Core Capabilities by Role
 
-* **Frontend (React / Nginx)**: `http://localhost:3005`
-* **Backend API (NestJS)**: `http://localhost:5005`
-* **Swagger API Docs**: `http://localhost:5005/api/docs`
-* **PostgreSQL Database**: Port `5436` (internal `5432`)
+### 1. Staff Members (`STAFF_MEMBER`)
+* **Self-Registration (`/signup` & `/claim`)**: Fast intake pre-checked against HR whitelist. Free institutional wellness benefit with zero payment step.
+* **Personal Digital Entry Pass (`/dashboard`)**: High-contrast, offline-capable scannable QR code and barcode with live occupancy meter.
+* **Gym Timetable (`/schedule`)**: Real-time open/closed status for morning (6:00 – 8:30 AM) and evening (5:30 – 9:00 PM) working sessions.
+* **Exercise Video Guides (`/guides`)**: Equipment form, safe lifting techniques, and desk worker mobility routines in Amharic and English.
 
-### Running with Docker Compose
+### 2. Front Desk Attendants (`GYM_ATTENDANT`)
+* **Gate Terminal (`/terminal`)**: Fast-lane check-in with 2-second keyboard flow (`[Enter]` verify $\rightarrow$ `[Enter]` check-in). Auto-assigns available locker.
+* **Locker Control (`/floor`)**: Live grid of all 30 lockers (`L-01` to `L-30`). View active occupants, release lockers, or perform manual reassignment.
+
+### 3. Executive Administrators (`ADMIN` / `HR_ADMIN`)
+* **Executive Dashboard (`/admin/dashboard`)**: Directorate wellness engagement metrics, live floor count, and session preference distribution.
+* **Member Directory (`/registrations`)**: Search and manage members, import staff rosters via Excel/CSV, print official A4 membership cards.
+* **User Management (`/admin/users`)**: Role-based access control (RBAC), password resets, and account status management.
+* **Attendance Reports (`/reports`)**: Date-range attendance analytics, peak utilization graphs, and exportable CSV audit records.
+
+---
+
+## 4. Quick Start & Setup
+
+### Environment & Ports
+
+| Service | Port / URL | Description |
+|---|---|---|
+| **Frontend** | `http://localhost:3005` | React 19 + Vite + Tailwind CSS |
+| **Backend API** | `http://localhost:5005` | NestJS 11 + Prisma ORM 6 |
+| **API Documentation** | `http://localhost:5005/api/docs` | Swagger OpenAPI specification |
+| **PostgreSQL** | Port `5436` (internal `5432`) | Database container (`moa-gym-db`) |
+
+### Run with Docker Compose
 
 ```bash
+# 1. Start all containers (Database, Backend, Frontend)
 docker-compose up -d --build
-```
 
-To run Prisma migrations & seed:
-```bash
+# 2. Apply database migrations and seed default data
 docker-compose exec backend npm run prisma:migrate
 docker-compose exec backend npm run prisma:seed
 ```
 
+### Local Development Setup
+
+```bash
+# Backend
+cd backend
+npm install
+npm run prisma:generate
+npm run prisma:migrate
+npm run prisma:seed
+npm run start:dev
+
+# Frontend
+cd frontend
+npm install
+npm run dev
+```
+
 ---
 
-## 6. Daily Gate Operations (Check-In & Check-Out)
+## 5. Technology Stack
 
-* **Check-In**:
-  1. Staff member gives their MoA Employee ID (e.g. `EMP-MOA-001`) or shows their badge.
-  2. Attendant presses `[Enter]` to verify $\rightarrow$ system checks active membership and pre-selects an available locker.
-  3. Attendant presses `[Enter]` to confirm $\rightarrow$ entrance authorized, locker assigned, occupancy count +1.
-
-* **Check-Out**:
-  1. Staff member returns locker key when leaving.
-  2. Attendant clicks **Check Out** on their name in the active floor list (or re-enters ID).
-  3. Locker is returned to `AVAILABLE` and occupancy count -1.
-  * *(A background timer automatically closes any forgotten sessions after 2 hours).*
+* **Frontend**: React 19, Vite, TypeScript, Tailwind CSS, TanStack Query, React Router v7, Lucide Icons, `html5-qrcode`.
+* **Backend**: NestJS v11, TypeScript, Prisma ORM v6, PostgreSQL 16, JWT & Passport RBAC, `@nestjs/schedule` (auto-reset cron).
+* **Infrastructure**: Docker Compose, Nginx, Multi-stage builds.
 
 ---
 
-© 2026 Ministry of Agriculture (MoA) · Staff Gym
+© 2026 Ministry of Agriculture (MoA) · Staff Wellness & Fitness Center

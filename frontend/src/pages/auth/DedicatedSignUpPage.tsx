@@ -8,7 +8,6 @@ import { QRCodeSVG } from 'qrcode.react';
 import {
   ShieldCheck,
   Building2,
-  Globe,
   User,
   Mail,
   Phone,
@@ -22,7 +21,6 @@ import {
   ArrowRight,
   ArrowLeft,
   Sparkles,
-  DollarSign,
   CreditCard,
   Check,
   Video,
@@ -630,40 +628,7 @@ export const DedicatedSignUpPage: React.FC = () => {
           <form onSubmit={handleProceedToStep2} className="space-y-3">
             <div className="flex items-center justify-between border-b border-slate-100 pb-2 mb-1">
               <h2 className="text-base font-bold text-slate-900 tracking-tight">Create an Account</h2>
-              <span className="text-[11px] text-slate-400">MoA Staff & Community Registration</span>
-            </div>
-
-            {/* Member Category Segmented Toggle */}
-            <div className="space-y-1">
-              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider">
-                Membership Category <span className="text-red-500">*</span>
-              </label>
-              <div className="grid grid-cols-2 gap-1.5 p-1 bg-slate-100 rounded-[4px] border border-slate-200">
-                <button
-                  type="button"
-                  onClick={() => setMemberType('INTERNAL')}
-                  className={`flex items-center justify-center gap-2 py-2 px-3 text-xs font-semibold rounded-[4px] transition-all cursor-pointer ${
-                    memberType === 'INTERNAL'
-                      ? 'bg-white text-emerald-800 shadow-xs border border-slate-200/80 font-bold'
-                      : 'text-slate-600 hover:text-slate-900 border border-transparent'
-                  }`}
-                >
-                  <Building2 className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>MoA Staff Member</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMemberType('EXTERNAL')}
-                  className={`flex items-center justify-center gap-2 py-2 px-3 text-xs font-semibold rounded-[4px] transition-all cursor-pointer ${
-                    memberType === 'EXTERNAL'
-                      ? 'bg-white text-emerald-800 shadow-xs border border-slate-200/80 font-bold'
-                      : 'text-slate-600 hover:text-slate-900 border border-transparent'
-                  }`}
-                >
-                  <Globe className="w-3.5 h-3.5 text-teal-600" />
-                  <span>External Member</span>
-                </button>
-              </div>
+              <span className="text-[11px] text-slate-400">Official MoA Staff Registration</span>
             </div>
 
             {/* Member Profile Photo Section (Take with Camera or Attach Photo) */}
@@ -906,82 +871,49 @@ export const DedicatedSignUpPage: React.FC = () => {
               )}
             </div>
 
-            {/* Department (if Internal) or Organization (if External) */}
-            {memberType === 'INTERNAL' ? (
-              <div>
-                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Directorate / Department <span className="text-rose-500">*</span>
-                </label>
-                <select
-                  value={department}
-                  onChange={(e) => {
-                    setDepartment(e.target.value);
-                    if (touched.department) {
-                      setFieldErrors((prev) => ({ ...prev, department: validateField('department', e.target.value) }));
-                    }
-                  }}
-                  onBlur={(e) => markTouched('department', e.target.value)}
-                  className={getInputClass('department')}
-                >
-                  <option value="">Select your directorate / department...</option>
-                  {departments.map((dept) => (
-                    <option key={dept} value={dept}>
-                      {dept}
-                    </option>
-                  ))}
-                  {departments.length === 0 && (
-                    <option value="General MoA Staff">Ministry of Agriculture General Staff</option>
-                  )}
-                </select>
-                {touched.department && fieldErrors.department && (
-                  <p className="flex items-center gap-1 text-[11px] font-medium text-rose-600 mt-1">
-                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                    <span>{fieldErrors.department}</span>
-                  </p>
+            {/* Department */}
+            <div>
+              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                Directorate / Department <span className="text-rose-500">*</span>
+              </label>
+              <select
+                value={department}
+                onChange={(e) => {
+                  setDepartment(e.target.value);
+                  if (touched.department) {
+                    setFieldErrors((prev) => ({ ...prev, department: validateField('department', e.target.value) }));
+                  }
+                }}
+                onBlur={(e) => markTouched('department', e.target.value)}
+                className={getInputClass('department')}
+              >
+                <option value="">Select your directorate / department...</option>
+                {departments.map((dept) => (
+                  <option key={dept} value={dept}>
+                    {dept}
+                  </option>
+                ))}
+                {departments.length === 0 && (
+                  <option value="General MoA Staff">Ministry of Agriculture General Staff</option>
                 )}
-              </div>
-            ) : (
-              <div>
-                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Organization / Institution <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. UNDP Ethiopia, Private, or Community Member"
-                  value={organization}
-                  onChange={(e) => {
-                    setOrganization(e.target.value);
-                    if (touched.organization) {
-                      setFieldErrors((prev) => ({ ...prev, organization: validateField('organization', e.target.value) }));
-                    }
-                  }}
-                  onBlur={(e) => markTouched('organization', e.target.value)}
-                  className={getInputClass('organization')}
-                />
-                {touched.organization && fieldErrors.organization && (
-                  <p className="flex items-center gap-1 text-[11px] font-medium text-rose-600 mt-1">
-                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                    <span>{fieldErrors.organization}</span>
-                  </p>
-                )}
-              </div>
-            )}
+              </select>
+              {touched.department && fieldErrors.department && (
+                <p className="flex items-center gap-1 text-[11px] font-medium text-rose-600 mt-1">
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                  <span>{fieldErrors.department}</span>
+                </p>
+              )}
+            </div>
 
             {/* Employee ID & Phone (2 Cols) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div>
                 <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  {memberType === 'INTERNAL' ? (
-                    <>
-                      Employee ID <span className="text-rose-500">*</span>
-                    </>
-                  ) : (
-                    'National / Kebele ID (Optional)'
-                  )}
+                  Employee ID <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
-                  placeholder={memberType === 'INTERNAL' ? 'e.g. EMP-MOA-007' : 'e.g. ID-89472'}
+                  placeholder="e.g. EMP-MOA-007"
                   value={employeeId}
                   onChange={(e) => {
                     setEmployeeId(e.target.value);
@@ -1217,79 +1149,33 @@ export const DedicatedSignUpPage: React.FC = () => {
               )}
             </div>
 
-            {/* Dynamic Fee & Payment Card (Internal: 100% Free Staff Benefit; External: Paid Subscription) */}
-            {memberType === 'INTERNAL' ? (
-              <div className="p-4 bg-emerald-50/70 rounded-2xl border border-emerald-200/90 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-emerald-900 uppercase tracking-wider flex items-center gap-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-700" />
-                    MoA Staff Wellness Benefit
-                  </span>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-200">
-                    100% Free · Institutional Sponsorship
-                  </span>
-                </div>
-
-                <div className="flex items-baseline justify-between bg-white p-3.5 rounded-xl border border-emerald-100 shadow-xs">
-                  <div>
-                    <div className="text-2xl font-extrabold text-emerald-800">
-                      0 <span className="text-sm font-bold text-emerald-600">ETB / Month</span>
-                    </div>
-                    <div className="text-[11px] text-slate-500 mt-0.5">
-                      Provided at no cost to Ministry of Agriculture employees. No payment or deduction required.
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-[11px] font-medium text-slate-500">Locker Access</div>
-                    <div className="text-xs font-bold text-emerald-700">Included Free</div>
-                  </div>
-                </div>
+            {/* MoA Staff Wellness Benefit Card */}
+            <div className="p-4 bg-emerald-50/70 rounded-2xl border border-emerald-200/90 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-emerald-900 uppercase tracking-wider flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-700" />
+                  MoA Staff Wellness Benefit
+                </span>
+                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-200">
+                  100% Free · Institutional Sponsorship
+                </span>
               </div>
-            ) : (
-              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                    <DollarSign className="w-4 h-4 text-emerald-700" />
-                    Calculated Monthly Fee
-                  </span>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-100/80 text-amber-900 border border-amber-200">
-                    External Standard Rate
-                  </span>
-                </div>
 
-                <div className="flex items-baseline justify-between bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs">
-                  <div>
-                    <div className="text-2xl font-extrabold text-slate-900">
-                      {monthlyFee.toLocaleString()}{' '}
-                      <span className="text-sm font-bold text-emerald-700">ETB / Month</span>
-                    </div>
-                    <div className="text-[11px] text-slate-500 mt-0.5">
-                      {daysPerWeek} days per week (~{perSessionEst} ETB per workout session)
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-[11px] font-medium text-slate-500">Locker Access</div>
-                    <div className="text-xs font-bold text-emerald-700">Included Free</div>
-                  </div>
-                </div>
-
-                {/* Payment Method Selector for External Members */}
+              <div className="flex items-baseline justify-between bg-white p-3.5 rounded-xl border border-emerald-100 shadow-xs">
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-600 mb-1.5">
-                    Preferred Payment Method
-                  </label>
-                  <select
-                    value={paymentMethod}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-[4px] text-xs text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-[#00843D]/20 focus:border-[#00843D]"
-                  >
-                    <option value="TELEBIRR">Telebirr Direct</option>
-                    <option value="CBE_BIRR">Commercial Bank of Ethiopia (CBE Birr)</option>
-                    <option value="CASH_DESK">Gym Front Desk Cash / Receipt</option>
-                  </select>
+                  <div className="text-2xl font-extrabold text-emerald-800">
+                    0 <span className="text-sm font-bold text-emerald-600">ETB / Month</span>
+                  </div>
+                  <div className="text-[11px] text-slate-500 mt-0.5">
+                    Provided at no cost to Ministry of Agriculture employees. No payment or deduction required.
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-[11px] font-medium text-slate-500">Locker Access</div>
+                  <div className="text-xs font-bold text-emerald-700">Included Free</div>
                 </div>
               </div>
-            )}
+            </div>
 
             {/* Navigation Buttons */}
             <div className="flex items-center gap-3 pt-3">

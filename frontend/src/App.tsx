@@ -7,6 +7,7 @@ import { Layout } from './components/Layout';
 import { RoleGuard } from './components/RoleGuard';
 
 // Pages
+import { LandingPage } from './pages/public/LandingPage';
 import { LoginPage } from './pages/auth/LoginPage';
 import { RegisterClaimPage } from './pages/auth/RegisterClaimPage';
 import { DedicatedSignUpPage } from './pages/auth/DedicatedSignUpPage';
@@ -53,7 +54,9 @@ export const App: React.FC = () => {
         <ToastProvider>
           <BrowserRouter>
             <Routes>
-            {/* Public Auth Routes */}
+            {/* Public Landing & Auth Routes */}
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/home" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<DedicatedSignUpPage />} />
             <Route path="/signup" element={<DedicatedSignUpPage />} />

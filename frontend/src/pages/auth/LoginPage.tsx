@@ -11,6 +11,7 @@ import {
   Eye,
   EyeOff,
   CheckCircle2,
+  Check,
   X,
   KeyRound,
   Mail,
@@ -33,6 +34,14 @@ export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const toast = useToast();
 
+  // Field validation and touched states
+  const [fieldErrors, setFieldErrors] = useState<{ identifier?: string; password?: string }>({});
+  const [touched, setTouched] = useState<{ identifier?: boolean; password?: boolean }>({});
+  const [capsLockActive, setCapsLockActive] = useState(false);
+
+  const identifierInputRef = React.useRef<HTMLInputElement>(null);
+  const passwordInputRef = React.useRef<HTMLInputElement>(null);
+
   // Auto-redirect if already authenticated
   useEffect(() => {
     if (user) {
@@ -45,6 +54,60 @@ export const LoginPage: React.FC = () => {
       }
     }
   }, [user, navigate]);
+
+  // Validate single field
+  const validateField = (field: 'identifier' | 'password', val: string): string | undefined => {
+    const trimmed = val.trim();
+    if (field === 'identifier') {
+      if (!trimmed) {
+        return 'Please enter your Username, Employee ID, or Email address.';
+      }
+      if (trimmed.length < 2) {
+        return 'Identifier must be at least 2 characters.';
+      }
+      return undefined;
+    }
+    if (field === 'password') {
+      if (!val) {
+        return 'Please enter your account password.';
+      }
+      if (val.length < 6) {
+        return 'Password must be at least 6 characters.';
+      }
+      return undefined;
+    }
+    return undefined;
+  };
+
+  const handleBlur = (field: 'identifier' | 'password') => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+    const errorMsg = validateField(field, field === 'identifier' ? identifier : password);
+    setFieldErrors((prev) => ({ ...prev, [field]: errorMsg }));
+  };
+
+  const handleChange = (field: 'identifier' | 'password', value: string) => {
+    if (field === 'identifier') {
+      setIdentifier(value);
+    } else {
+      setPassword(value);
+    }
+
+    if (error) {
+      setError(null);
+    }
+
+    // Live validation if already touched
+    if (touched[field]) {
+      const errorMsg = validateField(field, value);
+      setFieldErrors((prev) => ({ ...prev, [field]: errorMsg }));
+    }
+  };
+
+  const handleKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.getModifierState) {
+      setCapsLockActive(e.getModifierState('CapsLock'));
+    }
+  };
 
   // Forgot / Reset Password Modal State (matching ATS standard)
   const [showForgotModal, setShowForgotModal] = useState(false);
@@ -59,11 +122,58 @@ export const LoginPage: React.FC = () => {
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotError, setForgotError] = useState<string | null>(null);
   const [forgotSuccess, setForgotSuccess] = useState<string | null>(null);
+  const [forgotTouched, setForgotTouched] = useState<Record<string, boolean>>({});
+  const [forgotFieldErrors, setForgotFieldErrors] = useState<Record<string, string>>({});
+
+  const validateForgotField = (field: string, val: string): string | undefined => {
+    const trimmed = val.trim();
+    if (field === 'forgotIdentifier' && !trimmed) {
+      return 'Enter your username, Employee ID, or registered email.';
+    }
+    if (field === 'currentPassword' && forgotMode === 'CURRENT_PASSWORD' && !val) {
+      return 'Current or temporary password is required.';
+    }
+    if (field === 'verifyEmail' && forgotMode === 'EMAIL') {
+      if (!trimmed) return 'Official work email is required.';
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) return 'Please enter a valid email address.';
+    }
+    if (field === 'newPassword') {
+      if (!val) return 'New password is required.';
+      if (val.length < 6) return 'Password must be at least 6 characters.';
+    }
+    if (field === 'confirmPassword') {
+      if (!val) return 'Please confirm your new password.';
+      if (val !== newPassword) return 'Passwords do not match.';
+    }
+    return undefined;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Mark all fields as touched
+    setTouched({ identifier: true, password: true });
+
+    // Validate all fields
+    const idErr = validateField('identifier', identifier);
+    const pwdErr = validateField('password', password);
+
+    setFieldErrors({
+      identifier: idErr,
+      password: pwdErr,
+    });
+
+    if (idErr || pwdErr) {
+      setError('Please resolve the highlighted credential errors below.');
+      if (idErr && identifierInputRef.current) {
+        identifierInputRef.current.focus();
+      } else if (pwdErr && passwordInputRef.current) {
+        passwordInputRef.current.focus();
+      }
+      return;
+    }
+
     const trimmedId = identifier.trim();
-    if (!trimmedId || !password) return;
 
     if (rememberMe) {
       localStorage.setItem('moa_gym_remembered_user', trimmedId);
@@ -86,7 +196,24 @@ export const LoginPage: React.FC = () => {
         navigate('/admin/dashboard', { replace: true });
       }
     } catch (err: any) {
-      const errMsg = err.message || 'Login failed. Please verify credentials.';
+      let errMsg = err.message || 'Login failed. Please verify credentials.';
+
+      // Context-aware error mapping
+      if (errMsg.includes('Invalid Employee ID or password') || errMsg.includes('Unauthorized') || errMsg.includes('Invalid credentials')) {
+        errMsg = 'Incorrect username, Employee ID, or password. Please verify and try again.';
+        setFieldErrors({
+          identifier: 'Please double-check your username or ID',
+          password: 'Check your password or reset if forgotten',
+        });
+        if (passwordInputRef.current) {
+          passwordInputRef.current.focus();
+        }
+      } else if (errMsg.includes('status is not active') || errMsg.includes('INACTIVE') || errMsg.includes('SUSPENDED')) {
+        errMsg = 'Access denied: Your employee record is inactive or suspended in HR records. Please contact HR Administration.';
+      } else if (errMsg.includes('Failed to fetch') || errMsg.includes('NetworkError') || !navigator.onLine) {
+        errMsg = 'Unable to connect to the gym server. Please check your intranet connection and try again.';
+      }
+
       setError(errMsg);
       toast.error('Authentication Failed', errMsg);
     } finally {
@@ -99,27 +226,35 @@ export const LoginPage: React.FC = () => {
     setForgotError(null);
     setForgotSuccess(null);
 
+    // Validate all modal fields
+    const idErr = validateForgotField('forgotIdentifier', forgotIdentifier);
+    const curErr = forgotMode === 'CURRENT_PASSWORD' ? validateForgotField('currentPassword', currentPassword) : undefined;
+    const emailErr = forgotMode === 'EMAIL' ? validateForgotField('verifyEmail', verifyEmail) : undefined;
+    const newPwdErr = validateForgotField('newPassword', newPassword);
+    const confirmErr = validateForgotField('confirmPassword', confirmPassword);
+
+    const errors: Record<string, string> = {};
+    if (idErr) errors.forgotIdentifier = idErr;
+    if (curErr) errors.currentPassword = curErr;
+    if (emailErr) errors.verifyEmail = emailErr;
+    if (newPwdErr) errors.newPassword = newPwdErr;
+    if (confirmErr) errors.confirmPassword = confirmErr;
+
+    setForgotTouched({
+      forgotIdentifier: true,
+      currentPassword: true,
+      verifyEmail: true,
+      newPassword: true,
+      confirmPassword: true,
+    });
+    setForgotFieldErrors(errors);
+
+    if (Object.keys(errors).length > 0) {
+      setForgotError('Please correct the highlighted errors before submitting.');
+      return;
+    }
+
     const trimmedId = forgotIdentifier.trim();
-    if (!trimmedId) {
-      setForgotError('Enter your username, Employee ID, or registered email.');
-      return;
-    }
-    if (forgotMode === 'CURRENT_PASSWORD' && !currentPassword) {
-      setForgotError('Enter your current or temporary password (e.g. Password123!).');
-      return;
-    }
-    if (forgotMode === 'EMAIL' && !verifyEmail.trim()) {
-      setForgotError('Enter your official registered work email.');
-      return;
-    }
-    if (newPassword.length < 6) {
-      setForgotError('New password must be at least 6 characters.');
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      setForgotError('New passwords do not match. Please verify.');
-      return;
-    }
 
     setForgotLoading(true);
     try {
@@ -137,6 +272,7 @@ export const LoginPage: React.FC = () => {
       toast.success('Password Updated', res.message || 'Password updated successfully. You can now sign in.');
       setIdentifier(res.employeeId || trimmedId);
       setPassword(newPassword);
+      setFieldErrors({});
       setTimeout(() => {
         setShowForgotModal(false);
         setForgotSuccess(null);
@@ -186,54 +322,123 @@ export const LoginPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Error Alert */}
+        {/* Contextual Error Alert */}
         {error && (
-          <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-2.5 text-xs text-rose-700 animate-in fade-in">
-            <AlertCircle className="h-4 w-4 shrink-0 text-rose-600" />
-            <span>{error}</span>
+          <div className="mb-4 p-3.5 bg-rose-50 border border-rose-200 rounded-xl flex items-start gap-2.5 text-xs text-rose-800 animate-in fade-in">
+            <AlertCircle className="h-4 w-4 shrink-0 text-rose-600 mt-0.5" />
+            <div className="flex-1 space-y-1">
+              <p className="font-medium leading-relaxed">{error}</p>
+              <div className="flex items-center gap-3 pt-0.5 text-[11px]">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setForgotIdentifier(identifier);
+                    setForgotError(null);
+                    setForgotSuccess(null);
+                    setShowForgotModal(true);
+                  }}
+                  className="font-bold text-[#00843D] hover:underline cursor-pointer"
+                >
+                  Forgot Password? →
+                </button>
+                <span className="text-slate-300">·</span>
+                <Link to="/register" className="font-bold text-[#00843D] hover:underline">
+                  New Member Sign Up →
+                </Link>
+              </div>
+            </div>
           </div>
         )}
 
         {/* Sign In Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} noValidate className="space-y-4">
           {/* Username / Identifier */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-              Username
-            </label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label htmlFor="login-identifier" className="block text-xs font-semibold text-slate-700">
+                Username or Staff Identifier <span className="text-rose-500">*</span>
+              </label>
+              {touched.identifier && !fieldErrors.identifier && identifier.trim() && (
+                <span className="text-[11px] font-semibold text-emerald-700 flex items-center gap-1">
+                  <Check className="w-3 h-3" /> Valid
+                </span>
+              )}
+            </div>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <div
+                className={`absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none transition-colors ${
+                  touched.identifier && fieldErrors.identifier ? 'text-rose-500' : 'text-slate-400'
+                }`}
+              >
                 <User className="h-4 w-4" />
               </div>
               <input
+                id="login-identifier"
+                ref={identifierInputRef}
                 type="text"
-                required
                 autoComplete="username"
                 value={identifier}
-                onChange={(e) => setIdentifier(e.target.value)}
+                onChange={(e) => handleChange('identifier', e.target.value)}
+                onBlur={() => handleBlur('identifier')}
+                aria-invalid={!!(touched.identifier && fieldErrors.identifier)}
+                aria-describedby={touched.identifier && fieldErrors.identifier ? 'identifier-error' : undefined}
                 placeholder="Username, Employee ID, or email"
-                className="w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00843D]/20 focus:border-[#00843D] bg-slate-50/50 focus:bg-white font-mono transition"
+                className={`w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm border rounded-xl focus:outline-none focus:ring-2 font-mono transition ${
+                  touched.identifier && fieldErrors.identifier
+                    ? 'border-rose-400 bg-rose-50/20 text-slate-900 focus:border-rose-500 focus:ring-rose-500/20'
+                    : 'border-slate-300 focus:border-[#00843D] focus:ring-[#00843D]/20 bg-slate-50/50 focus:bg-white'
+                }`}
               />
             </div>
+            {touched.identifier && fieldErrors.identifier && (
+              <p
+                id="identifier-error"
+                className="flex items-center gap-1.5 text-[11px] font-medium text-rose-600 mt-1.5 animate-in fade-in"
+              >
+                <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                <span>{fieldErrors.identifier}</span>
+              </p>
+            )}
           </div>
 
           {/* Password */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-              Password
-            </label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label htmlFor="login-password" className="block text-xs font-semibold text-slate-700">
+                Password <span className="text-rose-500">*</span>
+              </label>
+              {touched.password && !fieldErrors.password && password && (
+                <span className="text-[11px] font-semibold text-emerald-700 flex items-center gap-1">
+                  <Check className="w-3 h-3" /> Ready
+                </span>
+              )}
+            </div>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <div
+                className={`absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none transition-colors ${
+                  touched.password && fieldErrors.password ? 'text-rose-500' : 'text-slate-400'
+                }`}
+              >
                 <Lock className="h-4 w-4" />
               </div>
               <input
+                id="login-password"
+                ref={passwordInputRef}
                 type={showPassword ? 'text' : 'password'}
-                required
                 autoComplete="current-password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => handleChange('password', e.target.value)}
+                onBlur={() => handleBlur('password')}
+                onKeyUp={handleKeyUp}
+                onKeyDown={handleKeyUp}
+                aria-invalid={!!(touched.password && fieldErrors.password)}
+                aria-describedby={touched.password && fieldErrors.password ? 'password-error' : undefined}
                 placeholder="••••••••••••"
-                className="w-full pl-10 pr-10 py-2.5 text-xs sm:text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00843D]/20 focus:border-[#00843D] bg-slate-50/50 focus:bg-white transition"
+                className={`w-full pl-10 pr-10 py-2.5 text-xs sm:text-sm border rounded-xl focus:outline-none focus:ring-2 transition ${
+                  touched.password && fieldErrors.password
+                    ? 'border-rose-400 bg-rose-50/20 text-slate-900 focus:border-rose-500 focus:ring-rose-500/20'
+                    : 'border-slate-300 focus:border-[#00843D] focus:ring-[#00843D]/20 bg-slate-50/50 focus:bg-white'
+                }`}
               />
               <button
                 type="button"
@@ -244,6 +449,23 @@ export const LoginPage: React.FC = () => {
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
+
+            {/* Caps Lock Warning */}
+            {capsLockActive && (
+              <div className="mt-1.5 flex items-center gap-1.5 text-[11px] font-semibold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200 animate-in fade-in">
+                <span>⚠️ Caps Lock is turned ON</span>
+              </div>
+            )}
+
+            {touched.password && fieldErrors.password && (
+              <p
+                id="password-error"
+                className="flex items-center gap-1.5 text-[11px] font-medium text-rose-600 mt-1.5 animate-in fade-in"
+              >
+                <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                <span>{fieldErrors.password}</span>
+              </p>
+            )}
           </div>
 
           {/* Options Row: Remember Me & Forgot Password */}
@@ -391,7 +613,7 @@ export const LoginPage: React.FC = () => {
             )}
 
             {!forgotSuccess && (
-              <form onSubmit={handleForgotSubmit} className="py-3 space-y-3.5 text-xs">
+              <form onSubmit={handleForgotSubmit} noValidate className="py-3 space-y-3.5 text-xs">
                 {/* 1. Identifier */}
                 <div>
                   <label className="block font-bold text-slate-700 mb-1">
@@ -399,12 +621,32 @@ export const LoginPage: React.FC = () => {
                   </label>
                   <input
                     type="text"
-                    required
                     value={forgotIdentifier}
-                    onChange={(e) => setForgotIdentifier(e.target.value)}
+                    onChange={(e) => {
+                      setForgotIdentifier(e.target.value);
+                      if (forgotTouched.forgotIdentifier) {
+                        const err = validateForgotField('forgotIdentifier', e.target.value);
+                        setForgotFieldErrors((prev) => ({ ...prev, forgotIdentifier: err || '' }));
+                      }
+                    }}
+                    onBlur={() => {
+                      setForgotTouched((prev) => ({ ...prev, forgotIdentifier: true }));
+                      const err = validateForgotField('forgotIdentifier', forgotIdentifier);
+                      setForgotFieldErrors((prev) => ({ ...prev, forgotIdentifier: err || '' }));
+                    }}
                     placeholder="e.g. staff.member, EMP-MOA-001, or name@moa.gov.et"
-                    className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:outline-none focus:border-moa-green font-mono"
+                    className={`w-full px-3 py-2 border rounded-xl focus:outline-none font-mono ${
+                      forgotTouched.forgotIdentifier && forgotFieldErrors.forgotIdentifier
+                        ? 'border-rose-400 bg-rose-50/20 focus:border-rose-500'
+                        : 'border-slate-300 focus:border-moa-green'
+                    }`}
                   />
+                  {forgotTouched.forgotIdentifier && forgotFieldErrors.forgotIdentifier && (
+                    <p className="flex items-center gap-1 text-[11px] font-medium text-rose-600 mt-1">
+                      <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                      <span>{forgotFieldErrors.forgotIdentifier}</span>
+                    </p>
+                  )}
                 </div>
 
                 {/* 2. Verification Mode Switcher */}
@@ -415,7 +657,10 @@ export const LoginPage: React.FC = () => {
                   <div className="grid grid-cols-2 gap-1.5 p-1 bg-slate-100 rounded-xl">
                     <button
                       type="button"
-                      onClick={() => setForgotMode('CURRENT_PASSWORD')}
+                      onClick={() => {
+                        setForgotMode('CURRENT_PASSWORD');
+                        setForgotError(null);
+                      }}
                       className={`py-1.5 px-2 rounded-lg font-semibold transition text-center cursor-pointer ${
                         forgotMode === 'CURRENT_PASSWORD'
                           ? 'bg-white text-slate-900 shadow-xs'
@@ -426,7 +671,10 @@ export const LoginPage: React.FC = () => {
                     </button>
                     <button
                       type="button"
-                      onClick={() => setForgotMode('EMAIL')}
+                      onClick={() => {
+                        setForgotMode('EMAIL');
+                        setForgotError(null);
+                      }}
                       className={`py-1.5 px-2 rounded-lg font-semibold transition text-center cursor-pointer ${
                         forgotMode === 'EMAIL'
                           ? 'bg-white text-slate-900 shadow-xs'
@@ -447,11 +695,25 @@ export const LoginPage: React.FC = () => {
                     <div className="relative">
                       <input
                         type={showCurrentPassword ? 'text' : 'password'}
-                        required
                         value={currentPassword}
-                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        onChange={(e) => {
+                          setCurrentPassword(e.target.value);
+                          if (forgotTouched.currentPassword) {
+                            const err = validateForgotField('currentPassword', e.target.value);
+                            setForgotFieldErrors((prev) => ({ ...prev, currentPassword: err || '' }));
+                          }
+                        }}
+                        onBlur={() => {
+                          setForgotTouched((prev) => ({ ...prev, currentPassword: true }));
+                          const err = validateForgotField('currentPassword', currentPassword);
+                          setForgotFieldErrors((prev) => ({ ...prev, currentPassword: err || '' }));
+                        }}
                         placeholder="Enter current or temporary password"
-                        className="w-full px-3 pr-10 py-2 border border-slate-300 rounded-xl focus:outline-none focus:border-moa-green font-mono"
+                        className={`w-full px-3 pr-10 py-2 border rounded-xl focus:outline-none font-mono ${
+                          forgotTouched.currentPassword && forgotFieldErrors.currentPassword
+                            ? 'border-rose-400 bg-rose-50/20 focus:border-rose-500'
+                            : 'border-slate-300 focus:border-moa-green'
+                        }`}
                       />
                       <button
                         type="button"
@@ -461,9 +723,16 @@ export const LoginPage: React.FC = () => {
                         {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
                     </div>
-                    <span className="text-[10px] text-slate-400 mt-1 block">
-                      Default after admin provisioning or reset is <code>Password123!</code>
-                    </span>
+                    {forgotTouched.currentPassword && forgotFieldErrors.currentPassword ? (
+                      <p className="flex items-center gap-1 text-[11px] font-medium text-rose-600 mt-1">
+                        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                        <span>{forgotFieldErrors.currentPassword}</span>
+                      </p>
+                    ) : (
+                      <span className="text-[10px] text-slate-400 mt-1 block">
+                        Default after admin provisioning or reset is <code>Password123!</code>
+                      </span>
+                    )}
                   </div>
                 ) : (
                   <div>
@@ -474,13 +743,33 @@ export const LoginPage: React.FC = () => {
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                       <input
                         type="email"
-                        required
                         value={verifyEmail}
-                        onChange={(e) => setVerifyEmail(e.target.value)}
+                        onChange={(e) => {
+                          setVerifyEmail(e.target.value);
+                          if (forgotTouched.verifyEmail) {
+                            const err = validateForgotField('verifyEmail', e.target.value);
+                            setForgotFieldErrors((prev) => ({ ...prev, verifyEmail: err || '' }));
+                          }
+                        }}
+                        onBlur={() => {
+                          setForgotTouched((prev) => ({ ...prev, verifyEmail: true }));
+                          const err = validateForgotField('verifyEmail', verifyEmail);
+                          setForgotFieldErrors((prev) => ({ ...prev, verifyEmail: err || '' }));
+                        }}
                         placeholder="e.g. member@moa.gov.et"
-                        className="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-xl focus:outline-none focus:border-moa-green"
+                        className={`w-full pl-9 pr-3 py-2 border rounded-xl focus:outline-none ${
+                          forgotTouched.verifyEmail && forgotFieldErrors.verifyEmail
+                            ? 'border-rose-400 bg-rose-50/20 focus:border-rose-500'
+                            : 'border-slate-300 focus:border-moa-green'
+                        }`}
                       />
                     </div>
+                    {forgotTouched.verifyEmail && forgotFieldErrors.verifyEmail && (
+                      <p className="flex items-center gap-1 text-[11px] font-medium text-rose-600 mt-1">
+                        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                        <span>{forgotFieldErrors.verifyEmail}</span>
+                      </p>
+                    )}
                   </div>
                 )}
 
@@ -493,11 +782,25 @@ export const LoginPage: React.FC = () => {
                     <div className="relative">
                       <input
                         type={showNewPassword ? 'text' : 'password'}
-                        required
                         value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
+                        onChange={(e) => {
+                          setNewPassword(e.target.value);
+                          if (forgotTouched.newPassword) {
+                            const err = validateForgotField('newPassword', e.target.value);
+                            setForgotFieldErrors((prev) => ({ ...prev, newPassword: err || '' }));
+                          }
+                        }}
+                        onBlur={() => {
+                          setForgotTouched((prev) => ({ ...prev, newPassword: true }));
+                          const err = validateForgotField('newPassword', newPassword);
+                          setForgotFieldErrors((prev) => ({ ...prev, newPassword: err || '' }));
+                        }}
                         placeholder="••••••••••••"
-                        className="w-full px-3 pr-10 py-2 border border-slate-300 rounded-xl focus:outline-none focus:border-moa-green"
+                        className={`w-full px-3 pr-10 py-2 border rounded-xl focus:outline-none ${
+                          forgotTouched.newPassword && forgotFieldErrors.newPassword
+                            ? 'border-rose-400 bg-rose-50/20 focus:border-rose-500'
+                            : 'border-slate-300 focus:border-moa-green'
+                        }`}
                       />
                       <button
                         type="button"
@@ -507,6 +810,12 @@ export const LoginPage: React.FC = () => {
                         {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
                     </div>
+                    {forgotTouched.newPassword && forgotFieldErrors.newPassword && (
+                      <p className="flex items-center gap-1 text-[11px] font-medium text-rose-600 mt-1">
+                        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                        <span>{forgotFieldErrors.newPassword}</span>
+                      </p>
+                    )}
                   </div>
 
                   <div>
@@ -515,12 +824,32 @@ export const LoginPage: React.FC = () => {
                     </label>
                     <input
                       type="password"
-                      required
                       value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      onChange={(e) => {
+                        setConfirmPassword(e.target.value);
+                        if (forgotTouched.confirmPassword) {
+                          const err = validateForgotField('confirmPassword', e.target.value);
+                          setForgotFieldErrors((prev) => ({ ...prev, confirmPassword: err || '' }));
+                        }
+                      }}
+                      onBlur={() => {
+                        setForgotTouched((prev) => ({ ...prev, confirmPassword: true }));
+                        const err = validateForgotField('confirmPassword', confirmPassword);
+                        setForgotFieldErrors((prev) => ({ ...prev, confirmPassword: err || '' }));
+                      }}
                       placeholder="••••••••••••"
-                      className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:outline-none focus:border-moa-green"
+                      className={`w-full px-3 py-2 border rounded-xl focus:outline-none ${
+                        forgotTouched.confirmPassword && forgotFieldErrors.confirmPassword
+                          ? 'border-rose-400 bg-rose-50/20 focus:border-rose-500'
+                          : 'border-slate-300 focus:border-moa-green'
+                      }`}
                     />
+                    {forgotTouched.confirmPassword && forgotFieldErrors.confirmPassword && (
+                      <p className="flex items-center gap-1 text-[11px] font-medium text-rose-600 mt-1">
+                        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                        <span>{forgotFieldErrors.confirmPassword}</span>
+                      </p>
+                    )}
                   </div>
                 </div>
 

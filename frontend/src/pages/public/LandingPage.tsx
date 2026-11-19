@@ -352,7 +352,7 @@ export const LandingPage: React.FC = () => {
                 </div>
                 <div>
                   <div className="text-xs font-bold text-slate-800">Evening Shift:</div>
-                  <div className="text-xs text-slate-500 font-medium">05:00 – 08:30 PM</div>
+                  <div className="text-xs text-slate-500 font-medium">05:30 – 09:00 PM</div>
                 </div>
               </div>
 

@@ -383,7 +383,7 @@ export const LoginPage: React.FC = () => {
                 aria-invalid={!!(touched.identifier && fieldErrors.identifier)}
                 aria-describedby={touched.identifier && fieldErrors.identifier ? 'identifier-error' : undefined}
                 placeholder="Username, Employee ID, or email"
-                className={`w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm border rounded-xl focus:outline-none focus:ring-2 font-mono transition ${
+                className={`w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm border rounded-[4px] focus:outline-none focus:ring-2 font-mono transition ${
                   touched.identifier && fieldErrors.identifier
                     ? 'border-rose-400 bg-rose-50/20 text-slate-900 focus:border-rose-500 focus:ring-rose-500/20'
                     : 'border-slate-300 focus:border-[#00843D] focus:ring-[#00843D]/20 bg-slate-50/50 focus:bg-white'
@@ -434,7 +434,7 @@ export const LoginPage: React.FC = () => {
                 aria-invalid={!!(touched.password && fieldErrors.password)}
                 aria-describedby={touched.password && fieldErrors.password ? 'password-error' : undefined}
                 placeholder="••••••••••••"
-                className={`w-full pl-10 pr-10 py-2.5 text-xs sm:text-sm border rounded-xl focus:outline-none focus:ring-2 transition ${
+                className={`w-full pl-10 pr-10 py-2.5 text-xs sm:text-sm border rounded-[4px] focus:outline-none focus:ring-2 transition ${
                   touched.password && fieldErrors.password
                     ? 'border-rose-400 bg-rose-50/20 text-slate-900 focus:border-rose-500 focus:ring-rose-500/20'
                     : 'border-slate-300 focus:border-[#00843D] focus:ring-[#00843D]/20 bg-slate-50/50 focus:bg-white'
@@ -452,7 +452,7 @@ export const LoginPage: React.FC = () => {
 
             {/* Caps Lock Warning */}
             {capsLockActive && (
-              <div className="mt-1.5 flex items-center gap-1.5 text-[11px] font-semibold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200 animate-in fade-in">
+              <div className="mt-1.5 flex items-center gap-1.5 text-[11px] font-semibold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-[4px] border border-amber-200 animate-in fade-in">
                 <span>⚠️ Caps Lock is turned ON</span>
               </div>
             )}
@@ -502,7 +502,7 @@ export const LoginPage: React.FC = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-2.5 sm:py-3 px-4 bg-[#00843D] hover:bg-[#0B6B3A] active:bg-[#06542D] text-white text-xs sm:text-sm font-semibold rounded-xl shadow-xs hover:shadow transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+            className="w-full py-2.5 sm:py-3 px-4 bg-[#00843D] hover:bg-[#0B6B3A] active:bg-[#06542D] text-white text-xs sm:text-sm font-semibold rounded-[4px] shadow-xs hover:shadow transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
           >
             <span>{isSubmitting ? 'Authenticating...' : 'Sign In'}</span>
             <ArrowRight className="h-4 w-4" />
